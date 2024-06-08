@@ -941,6 +941,14 @@ public class Rs2Bank {
         return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
     }
 
+    public static boolean walkToBank(BankLocation bankLocation) {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
+        Microbot.status = "Walking to nearest bank " + bankLocation.toString();
+        Rs2Walker.walkTo(bankLocation.getWorldPoint());
+        return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
+    }
+
     /**
      * Use bank or chest
      *

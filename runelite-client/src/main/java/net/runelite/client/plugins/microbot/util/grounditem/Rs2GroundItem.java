@@ -306,6 +306,10 @@ public class Rs2GroundItem {
         return false;
     }
 
+    public static void loot(RS2Item item){
+        interact(item);
+    }
+
     public static boolean lootAtGePrice(int minGePrice) {
         return lootItemBasedOnValue(minGePrice, 14);
     }

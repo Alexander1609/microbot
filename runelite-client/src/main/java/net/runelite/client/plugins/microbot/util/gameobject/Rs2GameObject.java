@@ -354,6 +354,30 @@ public class Rs2GameObject {
         return null;
     }
 
+    public static List<GameObject> findClosestObjects(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
+        return getGameObjectsWithinDistance(distance, anchorPoint)
+                .stream()
+                .filter(x -> {
+                    ObjectComposition objComp = convertGameObjectToObjectComposition(x);
+
+                    if (objComp == null) return false;
+
+                    String compName;
+                    try {
+                        compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+                    } catch (Exception e) {
+                        return false;
+                    }
+
+                    if (compName == null) return false;
+
+                    return !exact && compName.toLowerCase().contains(objectName.toLowerCase())
+                            || compName.equalsIgnoreCase(objectName);
+                })
+                .sorted(Comparator.comparing(x -> x.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
+    }
+
     public static GameObject findObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
         List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
 

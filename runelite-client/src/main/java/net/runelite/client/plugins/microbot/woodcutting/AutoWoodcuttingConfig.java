@@ -63,4 +63,16 @@ public interface AutoWoodcuttingConfig extends Config {
     {
         return false;
     }
+
+    @ConfigItem(
+            keyName = "BurnLogs",
+            name = "BurnLogs",
+            description = "Use a tinderbox to burn chopped logs",
+            position = 3,
+            section = generalSection
+    )
+    default boolean burnLogs()
+    {
+        return false;
+    }
 }
