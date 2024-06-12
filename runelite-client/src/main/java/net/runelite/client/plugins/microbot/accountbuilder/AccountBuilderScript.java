@@ -47,6 +47,9 @@ public class AccountBuilderScript extends Script {
                     nextTask = getNewRandomTask();
 
                 if (nextTask != null && (task == null || (taskEndTime != 0 && System.currentTimeMillis() > taskEndTime))) {
+                    if (task != null)
+                        finishTask();
+
                     task = nextTask;
                     taskStartTime = taskEndTime = 0;
 
@@ -54,11 +57,8 @@ public class AccountBuilderScript extends Script {
                     nextTask = getNewRandomTask();
                 }
 
-                if (task.isCompleted()){
-                    task.doTaskCleanup(false);
-                    taskRunning = false;
-                    task = null;
-                }
+                if (task.isCompleted())
+                    finishTask();
 
                 if (task != null && task.requirementsMet() && !taskRunning) {
                     if (!Microbot.isLoggedIn()) return;
@@ -81,6 +81,12 @@ public class AccountBuilderScript extends Script {
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private void finishTask(){
+        task.doTaskCleanup(false);
+        taskRunning = false;
+        task = null;
     }
 
     private AccountBuilderTask getNewRandomTask(){
