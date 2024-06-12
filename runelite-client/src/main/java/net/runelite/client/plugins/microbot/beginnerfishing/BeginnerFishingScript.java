@@ -33,7 +33,6 @@ public class BeginnerFishingScript extends Script {
     public static double version = 1.0;
     public String[] items = { "Small fishing net", "Tinderbox" };
     public String[] rawFish = { "Raw shrimps", "Raw anchovies" };
-    public String[] cookedFish = { "Shrimps", "Anchovies" };
 
     public boolean run(BeginnerFishingConfig config) {
         Microbot.enableAutoRunOn = false;
@@ -41,7 +40,7 @@ public class BeginnerFishingScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (Microbot.isMoving() || Microbot.isAnimating()) return;
+                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
 
                 if (!Arrays.stream(items).allMatch(Rs2Inventory::contains)){
                     Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_CASTLE_TOP);
@@ -68,7 +67,10 @@ public class BeginnerFishingScript extends Script {
                         var fire = Rs2GameObject.findObject("fire", true, 100, Rs2Player.getWorldLocation());
 
                         if (fire == null){
-                            var logs = Arrays.stream(Rs2GroundItem.getAll(10)).filter(x -> x.getItem().getName().equals("Logs")).findFirst();
+                            var logs = Arrays.stream(Rs2GroundItem.getAll(10))
+                                    .filter(x -> x.getItem().getName().equals("Logs"))
+                                    .filter(x -> Rs2GameObject.getGameObject(x.getTile().getWorldLocation()) == null)
+                                    .findFirst();
 
                             if (logs.isEmpty())
                                 return;
@@ -79,7 +81,7 @@ public class BeginnerFishingScript extends Script {
                             return;
                         }
 
-                        var item = Rs2Inventory.get(rawFish);
+                        var item = Rs2Inventory.get(rawFish).name;
                         Rs2Inventory.use(item);
                         Rs2GameObject.interact("fire");
 
@@ -88,9 +90,9 @@ public class BeginnerFishingScript extends Script {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         sleep(5000);
                         while (true) {
-                            var rawFoodCount = Rs2Inventory.get(item.name).quantity;
+                            var rawFoodCount = Rs2Inventory.get(item).quantity;
                             sleep(3000);
-                            if (rawFoodCount == Rs2Inventory.get(item.name).quantity)
+                            if (rawFoodCount == Rs2Inventory.get(item).quantity)
                                 break;
                         }
                     } else {

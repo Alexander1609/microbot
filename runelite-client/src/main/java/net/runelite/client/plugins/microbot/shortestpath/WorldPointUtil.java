@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.shortestpath;
 
+import net.runelite.api.World;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
@@ -40,15 +41,18 @@ public class WorldPointUtil {
     public static int distanceBetween(int previousPacked, int currentPacked, int diagonal) {
         final int previousX = WorldPointUtil.unpackWorldX(previousPacked);
         final int previousY = WorldPointUtil.unpackWorldY(previousPacked);
+        final int previousZ = WorldPointUtil.unpackWorldPlane(previousPacked);
         final int currentX = WorldPointUtil.unpackWorldX(currentPacked);
         final int currentY = WorldPointUtil.unpackWorldY(currentPacked);
+        final int currentZ = WorldPointUtil.unpackWorldPlane(currentPacked);
         final int dx = Math.abs(previousX - currentX);
         final int dy = Math.abs(previousY - currentY);
+        final int dz = previousZ != currentZ ? 1000 : 0;
 
         if (diagonal == 1) {
-            return Math.max(dx, dy);
+            return Math.max(dx, dy) + dz;
         } else if (diagonal == 2) {
-            return dx + dy;
+            return dx + dy + dz;
         }
 
         return Integer.MAX_VALUE;

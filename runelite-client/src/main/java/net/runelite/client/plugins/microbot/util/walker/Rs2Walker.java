@@ -43,6 +43,15 @@ public class Rs2Walker {
 
     private static ExecutorService pathfindingExecutor = Executors.newSingleThreadExecutor();
 
+    public static boolean walkTo(WorldArea area, int distanceThreshold) {
+        if (area.distanceTo(Rs2Player.getWorldLocation()) > distanceThreshold){
+            var points = area.toWorldPointList();
+            var index = new java.util.Random().nextInt(points.size());
+            return Rs2Walker.walkTo(points.get(index));
+        }
+        return true;
+    }
+
     public static boolean walkTo(WorldPoint target) {
         return walkTo(target, 6);
     }
