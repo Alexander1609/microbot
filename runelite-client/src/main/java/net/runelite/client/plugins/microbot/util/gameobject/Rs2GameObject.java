@@ -58,7 +58,7 @@ public class Rs2GameObject {
     public static boolean interact(int id, boolean checkCanReach) {
         TileObject object = findObjectById(id);
         if (object == null) return false;
-        if (checkCanReach && Rs2GameObject.hasLineOfSight(object))
+        if (checkCanReach && (Rs2GameObject.hasLineOfSight(object) || Rs2Camera.isTileOnScreen(object)))
             return clickObject(object);
         Rs2Walker.walkTo(object.getWorldLocation());
         return false;

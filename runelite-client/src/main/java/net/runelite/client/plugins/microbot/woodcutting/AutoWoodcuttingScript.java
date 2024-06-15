@@ -85,7 +85,7 @@ public class AutoWoodcuttingScript extends Script {
                         do {
                             burnLog(config);
                         }
-                        while (Rs2Inventory.contains(config.TREE().getLog()));
+                        while (Rs2Inventory.contains(config.TREE().getLog()) && !mainScheduledFuture.isCancelled());
 
                         walkBack(config);
                         break;
@@ -124,9 +124,7 @@ public class AutoWoodcuttingScript extends Script {
             }
         }
 
-        fireSpot(distance + 1);
-
-        return null;
+        return fireSpot(distance + 1);
     }
 
     private boolean isFiremake() {

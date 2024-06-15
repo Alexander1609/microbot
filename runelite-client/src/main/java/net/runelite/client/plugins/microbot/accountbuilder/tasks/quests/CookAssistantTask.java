@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -7,8 +8,12 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+
+import java.util.concurrent.TimeUnit;
 
 public class CookAssistantTask extends AccountBuilderTask {
     boolean bankDone;
@@ -16,6 +21,16 @@ public class CookAssistantTask extends AccountBuilderTask {
 
     public CookAssistantTask(){
         quest = QuestHelperQuest.COOKS_ASSISTANT;
+    }
+
+    @Override
+    public void run() {
+        super.run();
+
+        scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
+            if (Rs2Widget.hasWidget("What's wrong?"))
+                Rs2Widget.clickWidget("What's wrong?");
+        }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 
     @Override

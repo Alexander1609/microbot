@@ -42,7 +42,7 @@ public class RomeoJulietTask extends AccountBuilderTask {
         super.run();
 
         scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
-            if (Microbot.isAnimating() || Microbot.isMoving() || Microbot.pauseAllScripts) return;
+            if (Rs2Player.isAnimating() || Rs2Player.isMoving() || Microbot.pauseAllScripts) return;
 
             var step = quest.getQuestHelper().getCurrentStep();
             if (step != null)

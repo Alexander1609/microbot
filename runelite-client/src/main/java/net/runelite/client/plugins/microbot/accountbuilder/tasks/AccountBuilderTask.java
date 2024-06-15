@@ -2,9 +2,13 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
 import lombok.Getter;
 import net.runelite.api.Skill;
+import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
@@ -23,6 +27,7 @@ public class AccountBuilderTask {
     protected int minLevel = 0;
     protected int maxLevel = Integer.MAX_VALUE;
 
+    @Getter
     protected QuestHelperQuest quest = null;
     private MQuestScript questScript;
 
@@ -90,6 +95,9 @@ public class AccountBuilderTask {
         return "{MISSING NAME}";
     }
 
+    public void onChatMessage(ChatMessage chatMessage) { }
+    public void onGameObjectSpawned(GameObjectSpawned event){ }
+
     protected void startupQuest(){
         Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().startUpQuest(quest.getQuestHelper()); return null; });
     }
@@ -109,6 +117,14 @@ public class AccountBuilderTask {
     protected void sleep(int time) {
         try {
             Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    protected void sleep(int time, int maxTime) {
+        try {
+            Thread.sleep(Random.random(time, maxTime));
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }

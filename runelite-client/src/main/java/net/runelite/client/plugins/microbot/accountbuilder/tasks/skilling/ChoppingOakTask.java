@@ -1,7 +1,9 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling;
 
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -9,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.woodcutting.AutoWoodcuttingConfig;
 import net.runelite.client.plugins.microbot.woodcutting.AutoWoodcuttingScript;
+import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingResetOptions;
 import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
 
 public class ChoppingOakTask extends AccountBuilderTask {
@@ -21,15 +24,15 @@ public class ChoppingOakTask extends AccountBuilderTask {
         }
 
         @Override
-        public boolean burnLogs() {
-            return true;
+        public WoodcuttingResetOptions resetOptions() {
+            return WoodcuttingResetOptions.FIREMAKE;
         }
     };
 
     public ChoppingOakTask(){
         skill = Skill.WOODCUTTING;
         minLevel = 15;
-        maxLevel = 43;
+        maxLevel = 35;
     }
 
     @Override
@@ -76,5 +79,12 @@ public class ChoppingOakTask extends AccountBuilderTask {
         super.doTaskCleanup(shutdown);
 
         script.shutdown();
+    }
+
+    @Override
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (chatMessage.getType() == ChatMessageType.GAMEMESSAGE && chatMessage.getMessage().equals("You can't light a fire here.")) {
+            script.cannotLightFire = true;
+        }
     }
 }

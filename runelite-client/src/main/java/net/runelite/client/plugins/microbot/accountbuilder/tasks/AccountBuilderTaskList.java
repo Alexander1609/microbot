@@ -2,14 +2,8 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
 import lombok.Getter;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.GoblinFightingTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.CookAssistantTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.RomeoJulietTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.RuneMysteriesTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.SheepShearerTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.ChoppingOakTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.ChoppingTreeTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.FishingShrimpsTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.MiningSmithingBronzeTask;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +19,16 @@ public class AccountBuilderTaskList {
         tasks.put(new SheepShearerTask(), 2000);
         tasks.put(new RomeoJulietTask(), 1000);
         tasks.put(new RuneMysteriesTask(), 1000);
+        tasks.put(new RestlessGhostTask(), 1000);
+        tasks.put(new ErnestTheChickenTask(), 1000);
+        tasks.put(new MisthalinMysteryTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
 
-        tasks.put(new MiningSmithingBronzeTask(), 2000);
-        tasks.put(new ChoppingTreeTask(), 2000);
-        tasks.put(new ChoppingOakTask(), 2000);
-        tasks.put(new FishingShrimpsTask(), 2000);
+        tasks.put(new MiningSmithingBronzeTask(), 1000);
+        tasks.put(new ChoppingTreeTask(), 1000);
+        tasks.put(new ChoppingOakTask(), 1000);
+        tasks.put(new ChoppingWillowTask(), 1000);
+        tasks.put(new FishingShrimpsTask(), 1000);
     }
 }

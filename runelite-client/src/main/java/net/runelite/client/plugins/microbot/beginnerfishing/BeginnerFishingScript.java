@@ -40,10 +40,10 @@ public class BeginnerFishingScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (Microbot.isMoving() || Microbot.isAnimating() || Microbot.pauseAllScripts) return;
+                if (Rs2Player.isMoving() || Rs2Player.isAnimating() || Microbot.pauseAllScripts) return;
 
                 if (!Arrays.stream(items).allMatch(Rs2Inventory::contains)){
-                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_CASTLE_TOP);
+                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_TOP);
                     Rs2Bank.useBank();
                     Rs2Bank.depositEquipment();
                     Rs2Bank.depositAll(x -> Arrays.stream(items).noneMatch(y -> x.name.equals(y)));
@@ -96,7 +96,7 @@ public class BeginnerFishingScript extends Script {
                                 break;
                         }
                     } else {
-                        Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_CASTLE_TOP);
+                        Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_TOP);
                         Rs2Bank.useBank();
                         Rs2Bank.depositAll(x -> Arrays.stream(items).noneMatch(y -> x.name.contains(y)));
                     }

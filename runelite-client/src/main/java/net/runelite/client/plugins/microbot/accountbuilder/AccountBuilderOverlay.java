@@ -1,7 +1,6 @@
 package net.runelite.client.plugins.microbot.accountbuilder;
 
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.natepainthelper.PaintFormat;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
@@ -11,6 +10,7 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 import javax.inject.Inject;
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class AccountBuilderOverlay extends OverlayPanel {
     @Inject
@@ -44,9 +44,9 @@ public class AccountBuilderOverlay extends OverlayPanel {
 
             if (script.taskEndTime != 0)
                 panelComponent.getChildren().add(LineComponent.builder()
-                        .left(String.format("Time till next task: %s", PaintFormat.ft(script.taskEndTime - System.currentTimeMillis())))
+                        .left(String.format("Time till next task: %s", getTimeSting(script.taskEndTime - System.currentTimeMillis())))
                         .build());
-            else if (script.task != null)
+            else if (script.task != null && script.task.getQuest() == null)
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Preparing task..")
                         .build());
@@ -62,5 +62,18 @@ public class AccountBuilderOverlay extends OverlayPanel {
             System.out.println(ex.getMessage());
         }
         return super.render(graphics);
+    }
+
+    public static String getTimeSting(long duration) {
+        long days = TimeUnit.MILLISECONDS.toDays(duration);
+        long hours = TimeUnit.MILLISECONDS.toHours(duration) % 24;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+
+        if (days == 0) {
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        } else {
+            return String.format("%d:%02d:%02d:%02d", days, hours, minutes, seconds);
+        }
     }
 }

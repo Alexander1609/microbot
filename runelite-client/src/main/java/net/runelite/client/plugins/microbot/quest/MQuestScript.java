@@ -14,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
@@ -103,6 +104,8 @@ public class MQuestScript extends Script {
                         applyStep(conditionalStep);
                     } else if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof NpcStep) {
                         applyNpcStep((NpcStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
+                    } else if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ObjectStep){
+                        applyObjectStep((ObjectStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
                     }
                 }
             } catch (Exception ex) {
@@ -131,6 +134,8 @@ public class MQuestScript extends Script {
             return applyObjectStep((ObjectStep) step);
         } else if (step instanceof NpcStep) {
             return applyNpcStep((NpcStep) step);
+        } else if (step instanceof WidgetStep){
+            return applyWidgetStep((WidgetStep) step);
         } else if (step instanceof DetailedQuestStep) {
             return applyDetailedQuestStep((DetailedQuestStep) step);
         }
@@ -138,16 +143,25 @@ public class MQuestScript extends Script {
     }
 
     public boolean applyNpcStep(NpcStep step) {
+        for (var requirement : step.getRequirements()){
+            if (requirement instanceof ItemRequirement){
+                var itemRequirement = (ItemRequirement) requirement;
+
+                if (Rs2Inventory.contains(itemRequirement.getId()) && ((ItemRequirement) requirement).isEquip())
+                    Rs2Inventory.equip(itemRequirement.getId());
+            }
+        }
+
         net.runelite.api.NPC npc = Rs2Npc.getNpc(step.npcID);
         if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
             Rs2Npc.interact(step.npcID, "Talk-to");
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
-            Rs2Walker.walkTo(npc.getWorldLocation());
+            Rs2Walker.walkTo(npc.getWorldLocation(), 2);
         } else if (npc != null && !Rs2Npc.hasLineOfSight(npc)) {
-            Rs2Walker.walkTo(npc.getWorldLocation());
+            Rs2Walker.walkTo(npc.getWorldLocation(), 2);
         } else {
             if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
-                Rs2Walker.walkTo(step.getWorldPoint());
+                Rs2Walker.walkTo(step.getWorldPoint(), 2);
                 return false;
             }
         }
@@ -156,8 +170,8 @@ public class MQuestScript extends Script {
 
 
     public boolean applyObjectStep(ObjectStep step) {
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 5) {
-            Rs2Walker.walkTo(step.getWorldPoint());
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 3) {
+            Rs2Walker.walkTo(step.getWorldPoint(), 2);
             return false;
         }
         boolean success = Rs2GameObject.interact(step.objectID, true);
@@ -194,11 +208,14 @@ public class MQuestScript extends Script {
                     }
 
                     if (!itemRequirement.getAllIds().contains(item.id) && conditionalStep.getWorldPoint() != null) {
-                        if (Rs2Walker.canReach(conditionalStep.getWorldPoint())) {
+                        if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) && conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2) {
                             Rs2GroundItem.loot(itemRequirement.getId());
                         } else {
-                            Rs2Walker.walkTo(conditionalStep.getWorldPoint());
+                            Rs2Walker.walkTo(conditionalStep.getWorldPoint(), 2);
                         }
+                        return true;
+                    } else if (!itemRequirement.getAllIds().contains(item.id)){
+                        Rs2GroundItem.loot(itemRequirement.getId());
                         return true;
                     }
                 }
@@ -207,4 +224,17 @@ public class MQuestScript extends Script {
         return false;
     }
 
+    private boolean applyWidgetStep(WidgetStep step) {
+        var widgetDetails = step.getWidgetDetails().get(0);
+        var widget = Microbot.getClient().getWidget(widgetDetails.groupID, widgetDetails.childID);
+
+        if (widgetDetails.childChildID != -1){
+            var tmpWidget = widget.getChild(widgetDetails.childChildID);
+
+            if (tmpWidget != null)
+                widget = tmpWidget;
+        }
+
+        return Rs2Widget.clickWidget(widget.getId());
+    }
 }

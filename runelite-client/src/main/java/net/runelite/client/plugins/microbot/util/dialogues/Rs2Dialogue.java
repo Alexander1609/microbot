@@ -9,6 +9,7 @@ public class Rs2Dialogue {
 
     public static boolean isInDialogue() {
         return Rs2Widget.isWidgetVisible(231, 0)
+                || Rs2Widget.isWidgetVisible(229, 0)
                 || Rs2Widget.isWidgetVisible(219, 0)
                 || Rs2Widget.isWidgetVisible(217, 0)
                 || Rs2Widget.isWidgetVisible(193, 0);

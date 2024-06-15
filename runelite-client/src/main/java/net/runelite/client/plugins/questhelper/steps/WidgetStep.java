@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import lombok.Setter;
@@ -36,6 +37,7 @@ import java.util.List;
 
 public class WidgetStep extends DetailedQuestStep
 {
+	@Getter
 	@Setter
 	protected List<WidgetDetails> widgetDetails = new ArrayList<>();
 

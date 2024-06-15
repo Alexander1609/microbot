@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.util.grandexchange;
 
+import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.NPC;
 import net.runelite.api.widgets.ComponentID;
@@ -587,8 +588,16 @@ public class Rs2GrandExchange {
         return getAvailableSlot().getRight() == Arrays.stream(GrandExchangeSlots.values()).count();
     }
 
+    public static GrandExchangeOffer getOffer(int itemId) {
+        return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).filter(x -> x.getItemId() == itemId).findFirst().orElse(null);
+    }
+
     public static boolean hasBoughtOffer() {
         return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getState() == GrandExchangeOfferState.BOUGHT);
+    }
+
+    public static boolean hasBoughtOffer(int itemId) {
+        return Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getItemId() == itemId && x.getState() == GrandExchangeOfferState.BOUGHT);
     }
 
     public static boolean hasSoldOffer() {
@@ -601,5 +610,9 @@ public class Rs2GrandExchange {
 
     public static boolean walkToGrandExchange() {
         return Rs2Walker.walkTo(BankLocation.GRAND_EXCHANGE.getWorldPoint());
+    }
+
+    public static boolean isAtGrandExchange(){
+        return Rs2Player.getWorldLocation().distanceTo(BankLocation.GRAND_EXCHANGE.getWorldPoint()) <= 6;
     }
 }

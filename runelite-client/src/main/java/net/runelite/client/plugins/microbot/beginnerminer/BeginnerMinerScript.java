@@ -29,13 +29,13 @@ public class BeginnerMinerScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
-                if (Microbot.isAnimating() || Microbot.isMoving() || Microbot.pauseAllScripts) return;
+                if (Rs2Player.isAnimating() || Rs2Player.isMoving() || Microbot.pauseAllScripts) return;
 
                 if (!Rs2Equipment.isWearing("Bronze pickaxe")
                         || Rs2Inventory.get(x -> !x.name.equals(OresEnum.TIN.getOreName())
                             && !x.name.equals(OresEnum.COPPER.getOreName())
                             && !x.name.equals("Bronze bar")) != null){
-                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_CASTLE_TOP);
+                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_TOP);
                     Rs2Bank.useBank();
                     Rs2Bank.depositAll();
 
@@ -46,7 +46,7 @@ public class BeginnerMinerScript extends Script {
                 }
 
                 if (!Rs2Inventory.hasItem(OresEnum.COPPER.getOreName()) && !Rs2Inventory.hasItem(OresEnum.TIN.getOreName()) && !Rs2Inventory.isEmpty()){
-                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_CASTLE_TOP);
+                    Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_TOP);
                     Rs2Bank.useBank();
                     Rs2Bank.depositAll();
                 } else if (Rs2Inventory.isFull() || Rs2Inventory.contains("Bronze bar")){

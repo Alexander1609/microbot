@@ -1,13 +1,23 @@
 package net.runelite.client.plugins.microbot.accountbuilder;
 
 import lombok.Getter;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ChatMessage;
+import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.RuneMysteriesTask;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.MisthalinMysteryTask;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
+import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +42,9 @@ public class AccountBuilderScript extends Script {
     Map<AccountBuilderTask, Integer> taskMap;
     boolean taskRunning = false;
 
+    long timeSinceLastAction = 0;
+    WorldPoint lastLocation = null;
+
     public boolean run(AccountBuilderConfig config) {
         Microbot.enableAutoRunOn = false;
         taskMap = AccountBuilderTaskList.getTasks();
@@ -40,8 +53,22 @@ public class AccountBuilderScript extends Script {
 
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
-                if (task == null && !Microbot.isLoggedIn())
+                if (task == null && !Microbot.isLoggedIn() || Microbot.getVarbitPlayerValue(281) != 1000)
                     return;
+
+                if (task == null)
+                    sleep(1000, 5000);
+
+                // Move randomly if stuck at some point
+                if (Rs2Player.isInteracting() || Rs2Player.isAnimating() || Rs2Player.isMoving() || Rs2Dialogue.isInDialogue() || Rs2GrandExchange.isOpen()
+                        || !Rs2Player.getWorldLocation().equals(lastLocation)){
+                    lastLocation = Rs2Player.getWorldLocation();
+                    timeSinceLastAction = System.currentTimeMillis();
+                } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
+                    List<WorldPoint> worldPoints = Rs2Tile.getWalkableTilesAroundPlayer(5);
+                    var randomIndex = new Random().nextInt(worldPoints.size());
+                    Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
+                }
 
                 if (task == null && nextTask == null)
                     nextTask = getNewRandomTask();
@@ -67,11 +94,13 @@ public class AccountBuilderScript extends Script {
                     if (!task.doTaskPreparations())
                         return;
 
-                    var minDuration = (int) Duration.ofMinutes(config.MinTaskDuration()).toMillis();
-                    var maxDuration = (int) Duration.ofMinutes(config.MaxTaskDuration()).toMillis();
-                    var taskDuration = minDuration + new Random().nextInt(maxDuration - minDuration);
-                    taskStartTime = System.currentTimeMillis();
-                    taskEndTime = taskStartTime + taskDuration;
+                    if (task.getQuest() == null){
+                        var minDuration = (int) Duration.ofMinutes(config.MinTaskDuration()).toMillis();
+                        var maxDuration = (int) Duration.ofMinutes(config.MaxTaskDuration()).toMillis();
+                        var taskDuration = minDuration + new Random().nextInt(maxDuration - minDuration);
+                        taskStartTime = System.currentTimeMillis();
+                        taskEndTime = taskStartTime + taskDuration;
+                    }
 
                     taskRunning = true;
                     task.run();
@@ -108,6 +137,16 @@ public class AccountBuilderScript extends Script {
         }
 
         return null;
+    }
+
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (task != null)
+            task.onChatMessage(chatMessage);
+    }
+
+    public void onGameObjectSpawned(GameObjectSpawned event){
+        if (task != null)
+            task.onGameObjectSpawned(event);
     }
 
     @Override

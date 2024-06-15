@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -1622,7 +1623,7 @@ public class Rs2Inventory {
                     break;
                 }
             }
-            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check")){
+            if((Objects.equals(actions[1], "Wear") && actions[0]==null) || action.equalsIgnoreCase("drop") || action.equalsIgnoreCase("empty") || action.equalsIgnoreCase("check") || action.equalsIgnoreCase("destroy")){
                 identifier++;
             }
         }
@@ -1683,6 +1684,11 @@ public class Rs2Inventory {
 
         Microbot.doInvoke(new NewMenuEntry(param0, param1, menuAction.getId(), identifier, rs2Item.id, rs2Item.name), new Rectangle(0, 0, 1, 1));
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
+
+        if (action.equalsIgnoreCase("destroy")){
+            sleepUntil(() -> Rs2Widget.getWidget(584) != null);
+            Rs2Widget.clickWidget(Rs2Widget.getWidget(584, 1).getId());
+        }
     }
 
     private static Widget getInventory() {
