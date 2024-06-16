@@ -6,6 +6,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
@@ -153,7 +154,10 @@ public class MQuestScript extends Script {
         }
 
         net.runelite.api.NPC npc = Rs2Npc.getNpc(step.npcID);
-        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc) && step.getText().stream().anyMatch(x -> x.contains("Kill"))) {
+            if (!Rs2Combat.inCombat())
+                Rs2Npc.interact(step.npcID, "Attack");
+        } else if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
             Rs2Npc.interact(step.npcID, "Talk-to");
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);

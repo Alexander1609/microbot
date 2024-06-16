@@ -10,7 +10,9 @@ import net.runelite.api.events.NpcSpawned;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 
 @PluginDescriptor(
         name = "<html>[<font color=#FF7F7F>F</font>] Event Dismiss</html>",
@@ -48,6 +50,9 @@ public class EventDismiss extends Plugin
 
     private boolean shouldDismissNpc(NPC npc)
     {
+        if (npc.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()) > 2)
+            return false;
+
         String npcName = npc.getName();
         for (String name : npcNamesToDismiss)
         {

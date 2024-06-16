@@ -11,10 +11,7 @@ import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.cannon.CannonScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.AttackNpcScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.CombatPotionScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
-import net.runelite.client.plugins.microbot.playerassist.combat.PrayerPotionScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.*;
 import net.runelite.client.plugins.microbot.playerassist.loot.LootScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -37,6 +34,7 @@ public class GoblinFightingTask extends AccountBuilderTask {
     private final AttackNpcScript attackNpc = new AttackNpcScript();
     private final FoodScript foodScript = new FoodScript();
     private final LootScript lootScript = new LootScript();
+    private final BuryScatterScript buryScript = new BuryScatterScript();
 
     private long nextCombatSwap = 0;
 
@@ -57,13 +55,39 @@ public class GoblinFightingTask extends AccountBuilderTask {
         }
 
         @Override
+        public boolean toggleBuryBones() {
+            return true;
+        }
+
+        @Override
         public int minPriceOfItemsToLoot() {
             return 500;
+        }
+
+        @Override
+        public WorldPoint centerLocation() {
+            return new WorldPoint(3252, 3234, 0);
+        }
+
+        @Override
+        public int attackRadius() {
+            return 10;
+        }
+
+        @Override
+        public boolean toggleOnlyLootMyItems() {
+            return true;
+        }
+
+        @Override
+        public boolean toggleDelayedLooting() {
+            return true;
         }
     };
 
     String food = "Shrimps";
     boolean hasTrainingGear = true;
+    WorldArea goblinArea = new WorldArea(3246, 3233, 9, 8, 0);
 
     @Override
     public String getName() {
@@ -82,9 +106,10 @@ public class GoblinFightingTask extends AccountBuilderTask {
         attackNpc.run(config);
         foodScript.run(config);
         lootScript.run(config);
+        buryScript.run(config);
 
         scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
-            if (Microbot.isAnimating() || Microbot.isMoving() || Microbot.pauseAllScripts) return;
+            if (Rs2Player.isAnimating() || Rs2Player.isMoving() || Microbot.pauseAllScripts) return;
 
             if (!Rs2Inventory.hasItem(food)){
                 attackNpc.shutdown();
@@ -92,6 +117,9 @@ public class GoblinFightingTask extends AccountBuilderTask {
             }
             else if (!attackNpc.isRunning())
                 attackNpc.run(config);
+
+            if (Rs2Inventory.hasItem(food) && !Rs2Combat.inCombat() && Rs2Player.getWorldLocation().distanceTo(goblinArea) > 10)
+                Rs2Walker.walkTo(goblinArea, 5);
 
             if (nextCombatSwap < System.currentTimeMillis()){
                 nextCombatSwap = System.currentTimeMillis() + 120_000 + new Random().nextInt(180_000);
@@ -120,6 +148,7 @@ public class GoblinFightingTask extends AccountBuilderTask {
         attackNpc.shutdown();
         foodScript.shutdown();
         lootScript.shutdown();
+        buryScript.shutdown();
     }
 
     private boolean getFoodFromBank(){
@@ -177,9 +206,6 @@ public class GoblinFightingTask extends AccountBuilderTask {
             return false;
         }
 
-        if (!Rs2Walker.walkTo(new WorldArea(3246, 3233, 9, 8, 0), 3))
-            return false;
-
-        return true;
+        return Rs2Walker.walkTo(goblinArea, 3);
     }
 }

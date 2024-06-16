@@ -39,7 +39,8 @@ public class EquipmentHelper {
                 Rs2Bank.withdrawItem(item.getId());
                 return true;
             }
-            else if (Microbot.getVarbitPlayerValue(VarPlayer.QUEST_POINTS) > 10 && (item.getGp() < gp || Rs2GrandExchange.isAtGrandExchange() && Rs2GrandExchange.getOffer(item.getId()) != null)){
+            else if (Microbot.getVarbitPlayerValue(VarPlayer.QUEST_POINTS) > 10 && Microbot.getClient().getTotalLevel() > 100
+                    && (item.getGp() < gp || Rs2GrandExchange.isAtGrandExchange() && Rs2GrandExchange.getOffer(item.getId()) != null)){
                 var offer = Rs2GrandExchange.getOffer(item.getId());
                 if (offer == null){
                     if (Rs2GrandExchange.isAtGrandExchange()){

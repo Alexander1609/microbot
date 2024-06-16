@@ -9,8 +9,8 @@ public class MiningSmithingBronzeTask extends AccountBuilderTask {
     BeginnerMinerScript script = new BeginnerMinerScript();
 
     public MiningSmithingBronzeTask(){
-        skill = Skill.MINING;
-        maxLevel = 25;
+        skill = Skill.SMITHING;
+        maxLevel = 15;
     }
 
     @Override

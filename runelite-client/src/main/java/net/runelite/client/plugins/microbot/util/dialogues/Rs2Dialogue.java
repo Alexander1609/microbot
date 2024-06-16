@@ -12,7 +12,8 @@ public class Rs2Dialogue {
                 || Rs2Widget.isWidgetVisible(229, 0)
                 || Rs2Widget.isWidgetVisible(219, 0)
                 || Rs2Widget.isWidgetVisible(217, 0)
-                || Rs2Widget.isWidgetVisible(193, 0);
+                || Rs2Widget.isWidgetVisible(193, 0)
+                || Rs2Widget.hasWidget("Click here to continue");
     }
     public static void clickContinue() {
         if (Rs2Widget.hasWidget("Click here to continue"))

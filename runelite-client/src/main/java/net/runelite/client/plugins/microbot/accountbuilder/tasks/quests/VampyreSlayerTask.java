@@ -1,0 +1,149 @@
+package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
+
+import net.runelite.api.NpcID;
+import net.runelite.api.ObjectID;
+import net.runelite.api.Quest;
+import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
+import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
+import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
+import net.runelite.client.plugins.microbot.util.shop.Rs2Shop;
+import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.steps.ConditionalStep;
+import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
+import net.runelite.client.plugins.questhelper.steps.QuestStep;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+public class VampyreSlayerTask extends AccountBuilderTask {
+    FoodScript foodScript = new FoodScript();
+    PlayerAssistConfig foodConfig = new PlayerAssistConfig() {
+        @Override
+        public boolean toggleFood() {
+            return true;
+        }
+    };
+
+    public VampyreSlayerTask(){
+        quest = QuestHelperQuest.VAMPYRE_SLAYER;
+    }
+
+    String food = "Shrimps";
+    QuestStep currentStep;
+
+    @Override
+    public void run() {
+        super.run();
+
+        foodScript.run(foodConfig);
+
+        scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
+            var step = quest.getQuestHelper().getCurrentStep();
+            if (step != null)
+                currentStep = step;
+
+            while (currentStep instanceof ConditionalStep)
+                currentStep = currentStep.getActiveStep();
+
+            if (currentStep instanceof NpcStep){
+                var npcStep = (NpcStep)currentStep;
+
+                if (npcStep.npcID == NpcID.DR_HARLOW && !Rs2Inventory.contains("beer") && Rs2Inventory.hasItemAmount("Coins", 3, true)){
+                    if (isQuestRunning())
+                        stopQuest();
+
+                    if (!Rs2Dialogue.isInDialogue()){
+                        Rs2Npc.interact("Bartender", "Talk-to");
+                    } else if(Rs2Dialogue.hasSelectAnOption()){
+                        Rs2Widget.clickWidget("finest ale");
+                    } else {
+                        Rs2Dialogue.clickContinue();
+                    }
+                } else if (!isQuestRunning())
+                    startupQuest();
+            } else if (currentStep instanceof ObjectStep){
+                var objectStep = (ObjectStep) currentStep;
+
+                if (objectStep.objectID == ObjectID.LARGE_DOOR_134 && !Rs2Inventory.hasItem("Hammer")){
+                    if (isQuestRunning())
+                        stopQuest();
+
+                    if (!Rs2Walker.walkTo(new WorldArea(3214, 3411, 7, 8, 0), 0))
+                        return;
+
+                    Rs2Shop.openShop("Shop keeper");
+                    Rs2Shop.buyItem("Hammer", "1");
+                } else if (!isQuestRunning())
+                    startupQuest();
+            }
+        }, 0, 1000, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public boolean requirementsMet() {
+        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 20;
+    }
+
+    @Override
+    public boolean doTaskPreparations() {
+        if (Rs2Inventory.count(food) < 20 && !getFoodFromBank())
+            return false;
+
+        if (!Rs2Equipment.isWearing("Training sword") || !Rs2Equipment.isWearing("Training shield")){
+            if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
+                return false;
+
+            Rs2Bank.depositEquipment();
+            Rs2Bank.withdrawAndEquip("Training sword");
+            Rs2Bank.withdrawAndEquip("Training shield");
+
+            return false;
+        }
+
+        if (!Rs2Inventory.hasItemAmount("Coins", 3, true)){
+            if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
+                return false;
+
+            Rs2Bank.withdrawX("Coins", 3);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean getFoodFromBank(){
+        if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
+            return false;
+
+        Rs2Bank.depositAll();
+
+        if (!Rs2Bank.hasBankItem(food, 20)){
+            cancel();
+            return false;
+        } else {
+            Rs2Bank.withdrawX(food, 20);
+            return true;
+        }
+    }
+
+    @Override
+    public void doTaskCleanup(boolean shutdown) {
+        super.doTaskCleanup(shutdown);
+
+        foodScript.shutdown();
+    }
+}

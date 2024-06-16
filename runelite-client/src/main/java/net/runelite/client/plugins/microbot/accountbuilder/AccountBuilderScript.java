@@ -4,12 +4,11 @@ import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.MisthalinMysteryTask;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -45,6 +44,8 @@ public class AccountBuilderScript extends Script {
     long timeSinceLastAction = 0;
     WorldPoint lastLocation = null;
 
+    long nextCameraRotationTime = 0;
+
     public boolean run(AccountBuilderConfig config) {
         Microbot.enableAutoRunOn = false;
         taskMap = AccountBuilderTaskList.getTasks();
@@ -68,6 +69,13 @@ public class AccountBuilderScript extends Script {
                     List<WorldPoint> worldPoints = Rs2Tile.getWalkableTilesAroundPlayer(5);
                     var randomIndex = new Random().nextInt(worldPoints.size());
                     Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
+                }
+
+                if (nextCameraRotationTime < System.currentTimeMillis()){
+                    nextCameraRotationTime = System.currentTimeMillis() + 60_000 + new Random().nextInt(240_000);
+
+                    Rs2Camera.setPitch(300 + new Random().nextInt(84));
+                    Rs2Camera.setAngle(new Random().nextInt(360));
                 }
 
                 if (task == null && nextTask == null)
