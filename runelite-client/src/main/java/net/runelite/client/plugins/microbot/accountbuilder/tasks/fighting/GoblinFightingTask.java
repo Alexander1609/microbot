@@ -189,8 +189,8 @@ public class GoblinFightingTask extends AccountBuilderTask {
                     return false;
 
                 if (Rs2Inventory.contains("Training sword")){
-                    Rs2Inventory.equip("Training sword");
                     Rs2Inventory.equip("Training shield");
+                    Rs2Inventory.equip("Training sword");
 
                     return false;
                 }

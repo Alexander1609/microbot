@@ -120,14 +120,16 @@ public class CookAssistantTask extends AccountBuilderTask {
                 if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 2)))
                     return false;
 
-                Rs2Player.waitForAnimation(1000);
-                Rs2GameObject.interact(24961, "Fill");
-                Rs2Player.waitForAnimation();
+                if (Rs2Inventory.contains("Grain")){
+                    Rs2GameObject.interact(24961, "Fill");
+                    Rs2Player.waitForWalking();
+                    Rs2Player.waitForAnimation();
 
-                Rs2GameObject.interact("Hopper controls", "Operate");
-                Rs2Player.waitForAnimation();
-                depositedWheat = true;
-                return false;
+                    Rs2GameObject.interact("Hopper controls", "Operate");
+                    Rs2Player.waitForWalking();
+                    Rs2Player.waitForAnimation();
+                } else
+                    depositedWheat = true;
             }
 
             if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 0)))

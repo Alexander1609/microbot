@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -26,6 +27,11 @@ public class ChoppingTreeTask extends AccountBuilderTask {
         @Override
         public WoodcuttingResetOptions resetOptions() {
             return WoodcuttingResetOptions.FIREMAKE;
+        }
+
+        @Override
+        public int distanceToStray() {
+            return 10;
         }
     };
 
@@ -65,7 +71,7 @@ public class ChoppingTreeTask extends AccountBuilderTask {
                 cancel();
         }
 
-        return Rs2Walker.walkTo(new WorldArea(3239, 3265, 6, 6, 0), 5);
+        return Rs2Walker.walkTo(new WorldPoint(3189, 3246, 0), 5);
     }
 
     @Override

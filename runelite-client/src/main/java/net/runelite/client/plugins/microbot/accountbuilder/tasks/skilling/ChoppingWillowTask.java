@@ -57,7 +57,7 @@ public class ChoppingWillowTask extends AccountBuilderTask {
 
     @Override
     public String getName() {
-        return "Woodcutting: Oak";
+        return "Woodcutting: Willow";
     }
 
     @Override

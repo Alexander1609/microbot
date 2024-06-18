@@ -1686,7 +1686,7 @@ public class Rs2Inventory {
         //Rs2Reflection.invokeMenu(param0, param1, menuAction.getId(), identifier, rs2Item.id, action, target, -1, -1);
 
         if (action.equalsIgnoreCase("destroy")){
-            sleepUntil(() -> Rs2Widget.getWidget(584) != null);
+            sleepUntil(() -> Rs2Widget.isWidgetVisible(584, 0));
             Rs2Widget.clickWidget(Rs2Widget.getWidget(584, 1).getId());
         }
     }

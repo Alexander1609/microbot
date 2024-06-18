@@ -1,8 +1,13 @@
 package net.runelite.client.plugins.microbot.quest;
 
+import net.runelite.api.MenuAction;
 import net.runelite.api.NPC;
 import net.runelite.api.Quest;
+import net.runelite.api.ScriptID;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
@@ -14,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -23,8 +29,10 @@ import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -158,6 +166,24 @@ public class MQuestScript extends Script {
             if (!Rs2Combat.inCombat())
                 Rs2Npc.interact(step.npcID, "Attack");
         } else if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
+            if (step instanceof NpcEmoteStep){
+                var emoteStep = (NpcEmoteStep)step;
+
+                for (Widget emoteWidget : Rs2Widget.getWidget(WidgetInfo.EMOTE_CONTAINER).getDynamicChildren())
+                {
+                    if (emoteWidget.getSpriteId() == emoteStep.getEmote().getSpriteId())
+                    {
+                        var id = emoteWidget.getOriginalX() / 42 + ((emoteWidget.getOriginalY() - 6) / 49) * 4;
+
+                        Microbot.doInvoke(new NewMenuEntry("Perform", Emote.JIG.getName(), 1, MenuAction.CC_OP, id, ComponentID.EMOTES_EMOTE_CONTAINER, false), new Rectangle(0, 0, 1, 1));
+                        Rs2Player.waitForAnimation();
+
+                        if (Rs2Dialogue.isInDialogue())
+                            return false;
+                    }
+                }
+            }
+
             Rs2Npc.interact(step.npcID, "Talk-to");
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);

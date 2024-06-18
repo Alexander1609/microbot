@@ -24,6 +24,7 @@ public class AccountBuilderTaskList {
         tasks.put(new ErnestTheChickenTask(), 1000);
         tasks.put(new MisthalinMysteryTask(), 1000);
         tasks.put(new VampyreSlayerTask(), 1000);
+        tasks.put(new BelowIceMountainTask(), 4000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);
