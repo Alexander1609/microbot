@@ -70,6 +70,10 @@ public abstract class AccountBuilderTask {
         scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
             try {
                 sleep(minTickTime, maxTickTime);
+
+                if (Microbot.pauseAllScripts || !Microbot.isLoggedIn())
+                    return;
+
                 tick();
             } catch (Exception e){
                 System.out.println(e.getMessage());

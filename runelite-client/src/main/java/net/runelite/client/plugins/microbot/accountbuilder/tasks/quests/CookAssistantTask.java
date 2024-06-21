@@ -95,9 +95,7 @@ public class CookAssistantTask extends AccountBuilderQuestTask {
             if (!Rs2Walker.walkTo(new WorldPoint(3255, 3275, 0), 3))
                 return false;
 
-            Rs2Inventory.use("Bucket");
             Rs2GameObject.interact("Dairy cow");
-
             Rs2Player.waitForAnimation();
             return false;
         }
@@ -124,8 +122,10 @@ public class CookAssistantTask extends AccountBuilderQuestTask {
                     Rs2GameObject.interact("Hopper controls", "Operate");
                     Rs2Player.waitForWalking();
                     Rs2Player.waitForAnimation();
-                } else
-                    depositedWheat = true;
+
+                    if (!Rs2Inventory.contains("Grain"))
+                        depositedWheat = true;
+                }
             }
 
             if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 0)))

@@ -48,6 +48,11 @@ public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
             if (!Rs2Bank.walkToBankAndUseBank())
                 return false;
 
+            if (!Rs2Bank.hasBankItem("goblin mail", 3)){
+                cancel();
+                return false;
+            }
+
             Rs2Bank.withdrawItem("goblin mail");
             return false;
         }

@@ -20,7 +20,6 @@ import net.runelite.client.plugins.questhelper.steps.*;
 import java.util.Random;
 
 public class MisthalinMysteryTask extends AccountBuilderQuestTask {
-    QuestStep currentStep;
     GameObject targetWardrobe;
     long targetWardrobeTime;
 
@@ -67,10 +66,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
             }
 
             var targetLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), targetWardrobe.getLocalLocation());
-            System.out.printf("Mirror: %d %d%n", mirrorLocation.getX(), mirrorLocation.getY());
-            System.out.printf("Target: %d %d%n", targetLocation.getX(), targetLocation.getY());
 
-            // Check if vertical wardrobe
             if (targetWardrobe.getOrientation() == 512 || targetWardrobe.getOrientation() == 1536) {
                 if (targetLocation.getX() > mirrorLocation.getX()) {
                     walkCanvasCheck(mirrorLocation.dx(-1));
@@ -123,7 +119,6 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
     protected void handleObjectStep(ObjectStep step) {
         if (step.objectID == NullObjectID.NULL_29649 && step.getText().stream().anyMatch(x -> x.contains("Use the bucket"))){
             Rs2Inventory.use(ItemID.BUCKET);
-            Rs2GameObject.interact(NullObjectID.NULL_29649);
         } else if (step.objectID == NullObjectID.NULL_29650 && step.getText().stream().anyMatch(x -> x.contains("Use a knife"))){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1628, 4825, 5, 10, 0)) > 0){
                 if (isQuestRunning())
@@ -138,14 +133,12 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
             }
             else{
                 Rs2Inventory.use("knife");
-                Rs2GameObject.interact(NullObjectID.NULL_29650);
 
                 if (!isQuestRunning())
                     startupQuest();
             }
         } else if (step.getText().stream().anyMatch(x -> x.contains("Light the"))){
             Rs2Inventory.use("tinderbox");
-            Rs2GameObject.interact(step.objectID);
         } else if (step.objectID == ObjectID.DEAD_TREE_30150){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1648, 4826, 4, 18, 0)) == 0)
                 Rs2Walker.walkTo(new WorldPoint(1650, 4845, 0), 1);
@@ -163,7 +156,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
             }
             else if (!isQuestRunning())
                 startupQuest();
-        } else if (step.objectID == NullObjectID.NULL_29657){
+        } else if (step.objectID == NullObjectID.NULL_29657 && step.getText().stream().anyMatch(x -> x.contains("back"))){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1648, 4828, 4, 17, 0)) > 0
                     && Rs2Player.getWorldLocation().distanceTo(new WorldPoint(1647, 4828, 0)) > 3){
                 if (isQuestRunning())
