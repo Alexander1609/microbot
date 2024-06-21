@@ -378,7 +378,7 @@ public class Rs2GameObject {
                 .collect(Collectors.toList());
     }
 
-    public static GameObject findObject(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
+    public static GameObject findObject(String objectName, boolean exact, int distance, boolean hasLineOfSight, WorldPoint anchorPoint) {
         List<GameObject> gameObjects = getGameObjectsWithinDistance(distance, anchorPoint);
 
         if (gameObjects == null) {
@@ -387,6 +387,9 @@ public class Rs2GameObject {
 
         for (GameObject gameObject : gameObjects) {
             ObjectComposition objComp = convertGameObjectToObjectComposition(gameObject);
+
+            if(hasLineOfSight && !hasLineOfSight(gameObject))
+                continue;
 
             if (objComp == null) {
                 continue;
@@ -546,6 +549,7 @@ public class Rs2GameObject {
         for (int id :
                 ids) {
             TileObject object = findObjectById(id);
+            if (object == null) continue;
             if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
                 tileObject = object;
                 distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
@@ -745,6 +749,7 @@ public class Rs2GameObject {
 
         int z = Microbot.getClient().getPlane();
         List<GameObject> tileObjects = new ArrayList<>();
+
         for (int x = 0; x < Constants.SCENE_SIZE; ++x) {
             for (int y = 0; y < Constants.SCENE_SIZE; ++y) {
                 Tile tile = tiles[z][x][y];
@@ -752,11 +757,27 @@ public class Rs2GameObject {
                 if (tile == null) {
                     continue;
                 }
+
                 for (GameObject tileObject : tile.getGameObjects()) {
                     if (tileObject != null
-                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation())
-                    && anchorPoint.distanceTo(tileObject.getWorldLocation()) <= distance)
-                        tileObjects.add(tileObject);
+                            && tileObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+
+                        int distanceToAnchor = anchorPoint.distanceTo(tileObject.getWorldLocation());
+
+                        if (distance == 0) {
+                            // Check in a cross pattern if distance is 0
+                            WorldPoint objectLocation = tileObject.getWorldLocation();
+                            if ((Math.abs(anchorPoint.getX() - objectLocation.getX()) == 1 && anchorPoint.getY() == objectLocation.getY())
+                                    || (Math.abs(anchorPoint.getY() - objectLocation.getY()) == 1 && anchorPoint.getX() == objectLocation.getX())) {
+                                tileObjects.add(tileObject);
+                            }
+                        } else {
+                            // Default behavior for distances greater than 0
+                            if (distanceToAnchor <= distance) {
+                                tileObjects.add(tileObject);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -775,8 +796,8 @@ public class Rs2GameObject {
         tileObjects.addAll(getWallObjects());
 
         return tileObjects;
-
     }
+
 
     public static List<GroundObject> getGroundObjects() {
         return getGroundObjects(Constants.SCENE_SIZE);
