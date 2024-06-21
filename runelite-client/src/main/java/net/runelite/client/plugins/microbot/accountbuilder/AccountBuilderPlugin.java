@@ -7,6 +7,7 @@ import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameTick;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -77,5 +78,10 @@ public class AccountBuilderPlugin extends Plugin {
     @Subscribe
     public void onGameObjectSpawned(GameObjectSpawned event){
         script.onGameObjectSpawned(event);
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick gameTick) {
+        script.onGameTick(gameTick);
     }
 }

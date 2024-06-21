@@ -15,22 +15,18 @@ import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 
 import java.util.concurrent.TimeUnit;
 
-public class CookAssistantTask extends AccountBuilderTask {
+public class CookAssistantTask extends AccountBuilderQuestTask {
     boolean bankDone;
     boolean depositedWheat;
 
     public CookAssistantTask(){
-        quest = QuestHelperQuest.COOKS_ASSISTANT;
+        super(QuestHelperQuest.COOKS_ASSISTANT);
     }
 
     @Override
-    public void run() {
-        super.run();
-
-        scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
-            if (Rs2Widget.hasWidget("What's wrong?"))
-                Rs2Widget.clickWidget("What's wrong?");
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+    public void tick() {
+        if (Rs2Widget.hasWidget("What's wrong?"))
+            Rs2Widget.clickWidget("What's wrong?");
     }
 
     @Override

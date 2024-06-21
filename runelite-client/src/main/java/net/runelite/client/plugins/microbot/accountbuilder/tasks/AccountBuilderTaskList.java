@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 import lombok.Getter;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.GiantFrogFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.GoblinFightingTask;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.moneymaking.CollectingBronzePickaxesTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.*;
 
@@ -24,7 +25,11 @@ public class AccountBuilderTaskList {
         tasks.put(new ErnestTheChickenTask(), 1000);
         tasks.put(new MisthalinMysteryTask(), 1000);
         tasks.put(new VampyreSlayerTask(), 1000);
-        tasks.put(new BelowIceMountainTask(), 4000);
+        tasks.put(new BelowIceMountainTask(), 10000);
+        tasks.put(new ImpCatcherTask(), 1000);
+        tasks.put(new BlackKnightFortressTask(), 1000);
+        tasks.put(new GoblinDiplomacyTask(), 1000);
+        tasks.put(new DoricsQuestTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);
@@ -34,5 +39,7 @@ public class AccountBuilderTaskList {
         tasks.put(new ChoppingOakTask(), 1000);
         tasks.put(new ChoppingWillowTask(), 1000);
         tasks.put(new FishingShrimpsTask(), 1000);
+
+        tasks.put(new CollectingBronzePickaxesTask(), 1000);
     }
 }

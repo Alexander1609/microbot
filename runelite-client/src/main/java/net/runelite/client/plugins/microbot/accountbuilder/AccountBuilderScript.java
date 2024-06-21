@@ -4,10 +4,15 @@ import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.moneymaking.CollectingBronzePickaxesTask;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.AccountBuilderQuestTask;
+import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
@@ -102,7 +107,7 @@ public class AccountBuilderScript extends Script {
                     if (!task.doTaskPreparations())
                         return;
 
-                    if (task.getQuest() == null){
+                    if (!(task instanceof AccountBuilderQuestTask)){
                         var minDuration = (int) Duration.ofMinutes(config.MinTaskDuration()).toMillis();
                         var maxDuration = (int) Duration.ofMinutes(config.MaxTaskDuration()).toMillis();
                         var taskDuration = minDuration + new Random().nextInt(maxDuration - minDuration);
@@ -115,6 +120,7 @@ public class AccountBuilderScript extends Script {
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
+                ex.printStackTrace(System.out);
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
         return true;
@@ -157,9 +163,17 @@ public class AccountBuilderScript extends Script {
             task.onGameObjectSpawned(event);
     }
 
+    public void onGameTick(GameTick gameTick) {
+        if (task != null)
+            task.onGameTick(gameTick);
+    }
+
     @Override
     public void shutdown() {
         super.shutdown();
+
+        if (ShortestPathPlugin.getMarker() != null)
+            ShortestPathPlugin.exit();
 
         if (task != null)
             task.doTaskCleanup(true);

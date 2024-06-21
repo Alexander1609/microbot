@@ -1,9 +1,7 @@
 package net.runelite.client.plugins.microbot.quest;
 
-import net.runelite.api.MenuAction;
-import net.runelite.api.NPC;
-import net.runelite.api.Quest;
-import net.runelite.api.ScriptID;
+import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -22,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
@@ -200,11 +199,42 @@ public class MQuestScript extends Script {
 
 
     public boolean applyObjectStep(ObjectStep step) {
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 3) {
+        var object = Rs2GameObject.getGameObjects(step.objectID, step.getWorldPoint()).stream().findFirst().orElse(null);
+
+        if (object == null){
+            var localPoint = LocalPoint.fromWorld(Microbot.getClient(), step.getWorldPoint());
+
+            if (localPoint != null){
+                var tile = Microbot.getClient().getScene().getTiles()[Microbot.getClient().getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+
+                if (tile != null && tile.getWallObject() != null
+                        && tile.getWallObject().getId() == step.objectID
+                        && Rs2GameObject.hasLineOfSight(tile.getWallObject())
+                        && Rs2Camera.isTileOnScreen(tile.getWallObject())){
+                    Rs2GameObject.interact(tile.getWallObject());
+                    return false;
+                }
+
+                if (tile != null && tile.getDecorativeObject() != null
+                        && tile.getDecorativeObject().getId() == step.objectID
+                        && Rs2GameObject.hasLineOfSight(tile.getDecorativeObject())
+                        && Rs2Camera.isTileOnScreen(tile.getDecorativeObject())){
+                    Rs2GameObject.interact(tile.getDecorativeObject());
+                    return false;
+                }
+            }
+        }
+
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 3
+                && (!Rs2GameObject.hasLineOfSight(object) || !Rs2Camera.isTileOnScreen(object))) {
             Rs2Walker.walkTo(step.getWorldPoint(), 2);
             return false;
         }
-        boolean success = Rs2GameObject.interact(step.objectID, true);
+
+        var success = false;
+        if (Rs2GameObject.hasLineOfSight(object) || object != null && Rs2Camera.isTileOnScreen(object))
+            success = Rs2GameObject.interact(object);
+
         if (!success) {
             for (int objectId : step.getAlternateObjectIDs()) {
                 success = Rs2GameObject.interact(objectId, true);
@@ -238,7 +268,10 @@ public class MQuestScript extends Script {
                     }
 
                     if (!itemRequirement.getAllIds().contains(item.id) && conditionalStep.getWorldPoint() != null) {
-                        if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) && conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2) {
+                        if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) &&
+                                (conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2)
+                                    || conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea())
+                                        && Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), conditionalStep.getWorldPoint()))) {
                             Rs2GroundItem.loot(itemRequirement.getId());
                         } else {
                             Rs2Walker.walkTo(conditionalStep.getWorldPoint(), 2);

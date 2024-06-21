@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder;
 
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.AccountBuilderQuestTask;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
@@ -46,7 +47,7 @@ public class AccountBuilderOverlay extends OverlayPanel {
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left(String.format("Time till next task: %s", getTimeSting(script.taskEndTime - System.currentTimeMillis())))
                         .build());
-            else if (script.task != null && script.task.getQuest() == null)
+            else if (script.task != null && !(script.task instanceof AccountBuilderQuestTask))
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Preparing task..")
                         .build());

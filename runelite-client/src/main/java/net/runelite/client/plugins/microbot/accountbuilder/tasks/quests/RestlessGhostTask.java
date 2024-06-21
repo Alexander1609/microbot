@@ -1,10 +1,8 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import net.runelite.api.ItemID;
-import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -14,26 +12,22 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 
-import java.util.concurrent.TimeUnit;
-
-public class RestlessGhostTask extends AccountBuilderTask {
+public class RestlessGhostTask extends AccountBuilderQuestTask {
     public RestlessGhostTask(){
-        quest = QuestHelperQuest.THE_RESTLESS_GHOST;
+        super(QuestHelperQuest.THE_RESTLESS_GHOST);
     }
 
     @Override
-    public void run() {
-        super.run();
+    public void tick() {
+        super.tick();
 
-        scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
-            if (Rs2Player.getWorldLocation().distanceTo(new WorldPoint(3105, 3166, 0)) < 2)
-                Rs2GameObject.interact(Rs2Walker.getTile(new WorldPoint(3109, 3167, 0)).getWallObject());
+        if (Rs2Player.getWorldLocation().distanceTo(new WorldPoint(3105, 3166, 0)) < 2)
+            Rs2GameObject.interact(Rs2Walker.getTile(new WorldPoint(3109, 3167, 0)).getWallObject());
 
-            if (Rs2Inventory.hasItem(ItemID.GHOSTSPEAK_AMULET)) {
-                Rs2Tab.switchToInventoryTab();
-                Rs2Widget.clickWidget("ghostspeak amulet");
-            }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        if (Rs2Inventory.hasItem(ItemID.GHOSTSPEAK_AMULET)) {
+            Rs2Tab.switchToInventoryTab();
+            Rs2Widget.clickWidget("ghostspeak amulet");
+        }
     }
 
     @Override

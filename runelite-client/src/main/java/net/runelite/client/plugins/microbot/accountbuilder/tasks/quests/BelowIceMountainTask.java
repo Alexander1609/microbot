@@ -4,88 +4,66 @@ import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
-import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
-import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.steps.*;
 
-import java.util.concurrent.TimeUnit;
-
-public class BelowIceMountainTask extends AccountBuilderTask {
-    FoodScript foodScript = new FoodScript();
-    PlayerAssistConfig foodConfig = new PlayerAssistConfig() {
-        @Override
-        public boolean toggleFood() {
-            return true;
-        }
-    };
-
+public class BelowIceMountainTask extends AccountBuilderQuestTask {
     String food = "Shrimps";
     boolean depositedWheat = false;
-    QuestStep currentStep;
 
     public BelowIceMountainTask(){
-        quest = QuestHelperQuest.BELOW_ICE_MOUNTAIN;
+        super(QuestHelperQuest.BELOW_ICE_MOUNTAIN);
+        useFood = true;
     }
 
     @Override
-    public void run() {
-        super.run();
+    protected void handleNPCEmoteStep(NpcEmoteStep step) {
+        if (!Rs2Inventory.contains(ItemID.COOKED_MEAT)){
+            if (isQuestRunning())
+                stopQuest();
 
-        foodScript.run(foodConfig);
+            if (Rs2Dialogue.isInDialogue())
+                Rs2Dialogue.clickContinue();
 
-        scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
-            var step = quest.getQuestHelper().getCurrentStep();
+            Rs2GroundItem.loot(ItemID.COOKED_MEAT);
+            Rs2Player.waitForAnimation();
+        } else if (!Rs2Inventory.contains(ItemID.BEER)){
+            if (isQuestRunning())
+                stopQuest();
 
-            while (step instanceof ConditionalStep)
-                step = step.getActiveStep();
+            Rs2GroundItem.loot(ItemID.BEER);
+            Rs2Player.waitForAnimation();
+        } else if (!isQuestRunning())
+            startupQuest();
+    }
 
-            if (step != null)
-                currentStep = step;
+    @Override
+    protected void handleDetailedStep(DetailedQuestStep step) {
+        if (step.getText().stream().anyMatch(x -> x.contains("Use the knife on the bread")))
+            Rs2Inventory.combine(ItemID.KNIFE, ItemID.BREAD);
+    }
 
-            if (currentStep instanceof NpcEmoteStep){
-                if (!Rs2Inventory.contains(ItemID.COOKED_MEAT)){
-                    if (isQuestRunning())
-                        stopQuest();
+    @Override
+    protected void handleNPCStep(NpcStep step) {
+        if (step.npcID == NpcID.ANCIENT_GUARDIAN){
+            if (isQuestRunning())
+                stopQuest();
 
-                    Rs2GroundItem.loot(ItemID.COOKED_MEAT);
-                    Rs2Player.waitForAnimation();
-                } else if (!Rs2Inventory.contains(ItemID.BEER)){
-                    if (isQuestRunning())
-                        stopQuest();
-
-                    Rs2GroundItem.loot(ItemID.BEER);
-                    Rs2Player.waitForAnimation();
-                } else if (!isQuestRunning())
-                    startupQuest();
-            } else if (currentStep instanceof DetailedQuestStep && currentStep.getText().stream().anyMatch(x -> x.contains("Use the knife on the bread"))){
-                Rs2Inventory.combine(ItemID.KNIFE, ItemID.BREAD);
-            } else if (currentStep instanceof NpcStep){
-                var npcStep = (NpcStep)currentStep;
-
-                if (npcStep.npcID == NpcID.ANCIENT_GUARDIAN){
-                    if (isQuestRunning())
-                        stopQuest();
-
-                    if (Rs2GameObject.get("Structural pillar") == null && !isQuestRunning())
-                        startupQuest();
-                    else {
-                        Rs2GameObject.interact("Structural pillar", "Mine");
-                        Rs2Player.waitForAnimation();
-                    }
-
-                }
+            if (Rs2GameObject.get("Structural pillar") == null && !isQuestRunning())
+                startupQuest();
+            else {
+                Rs2GameObject.interact("Structural pillar", "Mine");
+                Rs2Player.waitForAnimation();
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
@@ -243,12 +221,5 @@ public class BelowIceMountainTask extends AccountBuilderTask {
                 && Microbot.getVarbitPlayerValue(VarPlayer.QUEST_POINTS) >= 16
                 && Microbot.getClient().getLocalPlayer().getCombatLevel() > 20
                 && Microbot.getClient().getRealSkillLevel(Skill.MINING) >= 10;
-    }
-
-    @Override
-    public void doTaskCleanup(boolean shutdown) {
-        super.doTaskCleanup(shutdown);
-
-        foodScript.shutdown();
     }
 }
