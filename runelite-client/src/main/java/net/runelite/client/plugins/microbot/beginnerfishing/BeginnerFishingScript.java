@@ -64,7 +64,7 @@ public class BeginnerFishingScript extends Script {
                             Rs2Walker.walkTo(points.get(index));
                         }
 
-                        var fire = Rs2GameObject.findObject("fire", true, 100, Rs2Player.getWorldLocation());
+                        var fire = Rs2GameObject.findObject("fire", true, 100, true, Rs2Player.getWorldLocation());
 
                         if (fire == null){
                             var logs = Arrays.stream(Rs2GroundItem.getAll(10))

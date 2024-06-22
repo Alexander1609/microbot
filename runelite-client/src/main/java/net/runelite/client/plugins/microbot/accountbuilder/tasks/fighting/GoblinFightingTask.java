@@ -41,7 +41,7 @@ public class GoblinFightingTask extends AccountBuilderFightingTask {
 
             @Override
             public int minPriceOfItemsToLoot() {
-                return 500;
+                return 400;
             }
 
             @Override
@@ -139,8 +139,13 @@ public class GoblinFightingTask extends AccountBuilderFightingTask {
                 if (!Rs2Walker.walkTo(new WorldPoint(3217, 3238, 0), 5))
                     return false;
 
-                if (Rs2Inventory.contains("Training sword")){
+                if (Rs2Inventory.contains("Training shield")){
                     Rs2Inventory.equip("Training shield");
+
+                    return false;
+                }
+
+                if (Rs2Inventory.contains("Training sword")){
                     Rs2Inventory.equip("Training sword");
 
                     return false;

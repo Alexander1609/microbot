@@ -19,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -74,7 +75,7 @@ public class AccountBuilderScript extends Script {
                     lastLocation = Rs2Player.getWorldLocation();
                     timeSinceLastAction = System.currentTimeMillis();
                 } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
-                    List<WorldPoint> worldPoints = Rs2Tile.getWalkableTilesAroundPlayer(5);
+                    var worldPoints = new ArrayList<>(Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet());
                     var randomIndex = new Random().nextInt(worldPoints.size());
                     Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
                 }

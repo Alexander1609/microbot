@@ -109,6 +109,9 @@ public class Rs2Tile {
     }
 
     public static boolean isWalkable(LocalPoint localPoint) {
+        if (localPoint == null)
+            return true;
+
         Client client = Microbot.getClient();
         if (client.getCollisionMaps() != null) {
             int[][] flags = client.getCollisionMaps()[client.getPlane()].getFlags();

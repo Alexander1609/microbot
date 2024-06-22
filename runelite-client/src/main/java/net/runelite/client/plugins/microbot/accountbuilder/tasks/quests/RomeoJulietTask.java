@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import net.runelite.api.ObjectID;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -36,9 +37,11 @@ public class RomeoJulietTask extends AccountBuilderQuestTask {
     @Override
     protected void handleObjectStep(ObjectStep step) {
         if (step.objectID == ObjectID.STAIRCASE_11797 && step.isStarted()){
-            if (!Rs2Walker.walkTo(new WorldPoint(3157, 3434, 0), 3)){
+            if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(3156, 3433, 5, 3, 0)) != 0){
                 if (isQuestRunning())
                     stopQuest();
+
+                Rs2Walker.walkTo(new WorldPoint(3157, 3434, 0), 1);
             }
             else if (!isQuestRunning()){
                 startupQuest();

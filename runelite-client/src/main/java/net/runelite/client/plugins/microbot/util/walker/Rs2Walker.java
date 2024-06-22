@@ -58,7 +58,8 @@ public class Rs2Walker {
     }
 
     public static boolean walkTo(WorldPoint target, int distance) {
-        if (Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
+        if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance).containsKey(target)
+            || !Rs2Tile.isWalkable(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target)) && Rs2Player.getWorldLocation().distanceTo(target) <= distance) {
             return true;
         }
         if (currentTarget != null && currentTarget.equals(target) && ShortestPathPlugin.getMarker() != null && !Microbot.getClientThread().scheduledFuture.isDone())
@@ -442,25 +443,25 @@ public class Rs2Walker {
             int orientation = wallObject.getOrientationA();
             if (orientation == 1) {
                 //blocks west
-                if (a.dx(-1).equals(b)) {
+                if (a.dx(-1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 4) {
                 //blocks east
-                if (a.dx(+1).equals(b)) {
+                if (a.dx(+1).getX() == b.getX()) {
                     return true;
                 }
             }
             if (orientation == 2) {
                 //blocks north
-                if (a.dy(1).equals(b)) {
+                if (a.dy(1).getY() == b.getY()) {
                     return true;
                 }
             }
             if (orientation == 8) {
                 //blocks south
-                return a.dy(-1).equals(b);
+                return a.dy(-1).getY() == b.getY();
             }
         }
 

@@ -201,7 +201,7 @@ public class Rs2Inventory {
      * @return True if the inventory contains all the specified IDs, false otherwise.
      */
     public static boolean containsAll(int... ids) {
-        return contains(ids);
+        return Arrays.stream(ids).allMatch(x -> items().stream().anyMatch(y -> y.id == x));
     }
 
     /**
