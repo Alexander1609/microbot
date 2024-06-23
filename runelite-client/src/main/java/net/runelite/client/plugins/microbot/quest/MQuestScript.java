@@ -33,8 +33,10 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MQuestScript extends Script {
     public static double version = 0.2;
@@ -47,6 +49,7 @@ public class MQuestScript extends Script {
 
 
     private MQuestConfig config;
+    private ArrayList<String> selectedChatOptions = new ArrayList<>();
 
 
     public boolean run(MQuestConfig config) {
@@ -60,7 +63,21 @@ public class MQuestScript extends Script {
                     Widget widget = Rs2Widget.findWidget("Start ");
                     if (Rs2Widget.hasWidget("select an option") && MQuestHelperPlugin.getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
                             Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
-                        Rs2Keyboard.keyPress('1');
+                        var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+                        var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
+                                .collect(Collectors.toMap(x -> (String) x.getOnKeyListener()[7], x -> x));
+                        var keysSorted = new ArrayList<>(childs.keySet());
+                        Collections.sort(keysSorted);
+
+                        for (var key : keysSorted){
+                            var text = childs.get(key).getText();
+                            if (!selectedChatOptions.contains(text)){
+                                selectedChatOptions.add(text);
+                                Rs2Keyboard.keyPress(key.charAt(0));
+                                break;
+                            }
+                        }
+
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }
@@ -68,7 +85,8 @@ public class MQuestScript extends Script {
                     if (Rs2Dialogue.isInDialogue()) {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
-                    }
+                    } else if (!selectedChatOptions.isEmpty())
+                        selectedChatOptions.clear();
 
                     boolean isInCutscene = Microbot.getVarbitValue(4606) > 0;
                     if (isInCutscene) {
