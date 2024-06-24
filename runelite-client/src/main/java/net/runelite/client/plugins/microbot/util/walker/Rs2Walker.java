@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
@@ -133,15 +134,26 @@ public class Rs2Walker {
                     if (doorOrTransportResult)
                         break;
 
-                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > config.recalculateDistance()
-                            || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance) {
+                    if (currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > 10
+                            || Rs2Player.getWorldLocation().distanceTo(target) < 12 && currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) > distance
+                            || i == ShortestPathPlugin.getPathfinder().getPath().size() - 2) {
                         // InstancedRegions require localPoint instead of worldpoint to navigate
                         if (Microbot.getClient().isInInstancedRegion()) {
                             Rs2Walker.walkFastCanvas(currentWorldPoint);
                             sleep(600, 1000);
                         } else {
                             long movingStart = System.currentTimeMillis();
-                            Rs2Walker.walkMiniMap(currentWorldPoint);
+
+                            var reachableTiles = Rs2Tile.getReachableTilesFromTile(currentWorldPoint, 2).keySet()
+                                    .stream().filter(x -> x.distanceTo(currentWorldPoint) < 2).count();
+                            var walkableTiles = Rs2Tile.getWalkableTilesAroundTile(currentWorldPoint, 1).size();
+                            if (reachableTiles + 3 >= walkableTiles || !Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), currentWorldPoint))){
+                                Rs2Walker.walkMiniMap(currentWorldPoint);
+                                System.out.println("walk minimap");
+                            } else {
+                                Rs2Walker.walkFastCanvas(currentWorldPoint);
+                                System.out.println("walk canvas");
+                            }
                             int randomInt = Random.random(3, 5);
                             sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
                             if(System.currentTimeMillis()-movingStart<120){
@@ -581,6 +593,15 @@ public class Rs2Walker {
                         if (indexOfDestination < indexOfOrigin) continue;
 
                         if (path.get(i).equals(origin)) {
+                            if (b.isShip()){
+                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null){
+                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
+                                    sleep(1200, 1600);
+                                } else {
+                                    Rs2Walker.walkFastCanvas(path.get(i));
+                                    sleep(1200, 1600);
+                                }
+                            }
 
                             if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                                 handleTrapdoor(b);

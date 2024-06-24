@@ -1,25 +1,17 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
-import lombok.Getter;
 import net.runelite.api.Skill;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
-import net.runelite.client.plugins.microbot.quest.MQuestConfig;
-import net.runelite.client.plugins.microbot.quest.MQuestScript;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
-import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 
+import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -31,6 +23,7 @@ public abstract class AccountBuilderTask {
     protected ScheduledFuture<?> scheduledFuture;
     private boolean canceled;
 
+    protected boolean memberOnly = true;
     protected Skill skill = null;
     protected int minLevel = 0;
     protected int maxLevel = Integer.MAX_VALUE;
@@ -47,6 +40,9 @@ public abstract class AccountBuilderTask {
             if (level < minLevel || level > maxLevel)
                 return false;
         }
+
+        if (memberOnly && !Rs2Player.isMember())
+            return false;
 
         return true;
     }
@@ -69,6 +65,13 @@ public abstract class AccountBuilderTask {
     public void run(){
         scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
             try {
+                if (Microbot.enableAutoRunOn)
+                    Rs2Player.toggleRunEnergy(true);
+
+                if (Rs2Widget.getWidget(15269889) != null) {
+                    Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                }
+
                 sleep(minTickTime, maxTickTime);
 
                 if (Microbot.pauseAllScripts || !Microbot.isLoggedIn())

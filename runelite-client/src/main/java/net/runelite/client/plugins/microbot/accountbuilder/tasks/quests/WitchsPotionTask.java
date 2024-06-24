@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class WitchsPotionTask extends AccountBuilderQuestTask {
     public WitchsPotionTask(){
         super(QuestHelperQuest.WITCHS_POTION);
+        memberOnly = false;
     }
 
     @Override

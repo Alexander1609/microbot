@@ -48,6 +48,7 @@ public class ChoppingWillowTask extends AccountBuilderTask {
     public ChoppingWillowTask(){
         skill = Skill.WOODCUTTING;
         minLevel = 30;
+        memberOnly = false;
     }
 
     @Override

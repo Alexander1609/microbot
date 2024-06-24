@@ -21,6 +21,7 @@ public class CollectingBronzePickaxesTask extends AccountBuilderTask {
     public CollectingBronzePickaxesTask(){
         minTickTime = 100;
         maxTickTime = 250;
+        memberOnly = false;
     }
 
     @Override

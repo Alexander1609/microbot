@@ -16,6 +16,7 @@ public class RomeoJulietTask extends AccountBuilderQuestTask {
 
     public RomeoJulietTask(){
         super(QuestHelperQuest.ROMEO__JULIET);
+        memberOnly = false;
     }
 
     @Override

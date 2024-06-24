@@ -21,6 +21,7 @@ public class BlackKnightFortressTask extends AccountBuilderQuestTask {
     public BlackKnightFortressTask(){
         super(QuestHelperQuest.BLACK_KNIGHTS_FORTRESS);
         useFood = true;
+        memberOnly = false;
     }
 
     @Override

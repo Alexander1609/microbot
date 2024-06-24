@@ -69,6 +69,8 @@ public class GoblinFightingTask extends AccountBuilderFightingTask {
                 return true;
             }
         });
+
+        memberOnly = false;
     }
 
     String food = "Shrimps";

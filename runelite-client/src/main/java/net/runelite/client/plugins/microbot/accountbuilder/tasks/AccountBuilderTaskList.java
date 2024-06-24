@@ -31,6 +31,11 @@ public class AccountBuilderTaskList {
         tasks.put(new GoblinDiplomacyTask(), 1000);
         tasks.put(new DoricsQuestTask(), 1000);
         tasks.put(new PrinceAliRescueTask(), 1000);
+        tasks.put(new WitchsPotionTask(), 1000);
+
+        tasks.put(new NatualHistoryQuizTask(), 1000);
+        tasks.put(new DwarfCannonTask(), 1000);
+        tasks.put(new WaterfallQuestTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);

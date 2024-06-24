@@ -27,6 +27,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
 
     public PrinceAliRescueTask(){
         super(QuestHelperQuest.PRINCE_ALI_RESCUE);
+        memberOnly = false;
     }
 
     @Override

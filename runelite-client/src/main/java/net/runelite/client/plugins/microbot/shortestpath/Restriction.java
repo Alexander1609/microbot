@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * This class represents requirements for a WorldPoint to use in the pathfinder.
+ * This class represents (conditional) restrictions for a WorldPoint to use in the pathfinder.
  */
 @Getter
 public class Restriction {

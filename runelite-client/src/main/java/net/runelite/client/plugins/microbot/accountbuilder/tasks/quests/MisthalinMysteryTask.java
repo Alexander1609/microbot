@@ -25,6 +25,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
 
     public MisthalinMysteryTask(){
         super(QuestHelperQuest.MISTHALIN_MYSTERY);
+        memberOnly = false;
     }
 
     @Override

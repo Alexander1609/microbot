@@ -11,6 +11,7 @@ public class MiningSmithingBronzeTask extends AccountBuilderTask {
     public MiningSmithingBronzeTask(){
         skill = Skill.SMITHING;
         maxLevel = 15;
+        memberOnly = false;
     }
 
     @Override

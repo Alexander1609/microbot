@@ -15,6 +15,7 @@ import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 public class RestlessGhostTask extends AccountBuilderQuestTask {
     public RestlessGhostTask(){
         super(QuestHelperQuest.THE_RESTLESS_GHOST);
+        memberOnly = false;
     }
 
     @Override

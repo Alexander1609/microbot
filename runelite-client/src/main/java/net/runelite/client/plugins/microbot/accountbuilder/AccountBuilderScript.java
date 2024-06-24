@@ -53,7 +53,6 @@ public class AccountBuilderScript extends Script {
     long nextCameraRotationTime = 0;
 
     public boolean run(AccountBuilderConfig config) {
-        Microbot.enableAutoRunOn = false;
         taskMap = AccountBuilderTaskList.getTasks();
         task = null;
         taskRunning = false;

@@ -22,6 +22,7 @@ public class BelowIceMountainTask extends AccountBuilderQuestTask {
     public BelowIceMountainTask(){
         super(QuestHelperQuest.BELOW_ICE_MOUNTAIN);
         useFood = true;
+        memberOnly = false;
     }
 
     @Override

@@ -16,6 +16,7 @@ import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
     public GoblinDiplomacyTask(){
         super(QuestHelperQuest.GOBLIN_DIPLOMACY);
+        memberOnly = false;
     }
 
     @Override
@@ -85,7 +86,7 @@ public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
 
         if (!Rs2Inventory.hasItem(ItemID.BLUE_GOBLIN_MAIL)
                 && !Rs2Inventory.hasItem(ItemID.BLUE_DYE)
-                && !Rs2Inventory.hasItemAmount(ItemID.WOAD_LEAF, 2, true)){
+                && !Rs2Inventory.hasItemAmount(ItemID.WOAD_LEAF, 2)){
             if (!Rs2Walker.walkTo(new WorldPoint(3025, 3379, 0), 5))
                 return false;
 

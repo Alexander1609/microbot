@@ -111,6 +111,7 @@ public abstract class QuestStep implements Module
 	@Setter
 	protected boolean allowInCutscene = false;
 
+	@Getter
 	protected int iconItemID = -1;
 	protected BufferedImage icon;
 

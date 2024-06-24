@@ -23,6 +23,7 @@ public class ImpCatcherTask extends AccountBuilderQuestTask {
 
     public ImpCatcherTask(){
         super(QuestHelperQuest.IMP_CATCHER);
+        memberOnly = false;
     }
 
     @Override

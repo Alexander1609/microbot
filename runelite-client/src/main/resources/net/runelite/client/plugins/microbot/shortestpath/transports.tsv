@@ -1338,10 +1338,10 @@
 2557 9844 0	2557 3444 0	Climb-up Ladder 17387				2	
 							
 # Tree Gnome Village Dungeon (during Waterfall quest)							
-2533 3156 0	2533 9556 0	Climb-down Ladder 5250			Waterfall Quest		
-2534 3155 0	2534 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2532 3155 0	2532 9555 0	Climb-down Ladder 5250			Waterfall Quest		
-2533 9556 0	2533 3156 0	Climb-up Ladder 17387			Waterfall Quest		
+2533 3156 0	2533 9556 0	Climb-down Ladder 5250
+2534 3155 0	2534 9555 0	Climb-down Ladder 5250
+2532 3155 0	2532 9555 0	Climb-down Ladder 5250
+2533 9556 0	2533 3156 0	Climb-up Ladder 17387
 							
 # Tree Gnome Village Dungeon (after Waterfall quest)							
 2533 3156 0	2597 4436 0	Climb-down Ladder 5250			Waterfall Quest		

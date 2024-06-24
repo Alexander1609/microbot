@@ -22,6 +22,7 @@ public class SheepShearerTask extends AccountBuilderQuestTask {
 
     public SheepShearerTask(){
         super(QuestHelperQuest.SHEEP_SHEARER);
+        memberOnly = false;
     }
 
     @Override

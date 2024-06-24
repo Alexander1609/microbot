@@ -14,6 +14,7 @@ import net.runelite.client.plugins.questhelper.QuestHelperQuest;
 public class DoricsQuestTask extends AccountBuilderQuestTask {
     public DoricsQuestTask(){
         super(QuestHelperQuest.DORICS_QUEST);
+        memberOnly = false;
     }
 
     @Override

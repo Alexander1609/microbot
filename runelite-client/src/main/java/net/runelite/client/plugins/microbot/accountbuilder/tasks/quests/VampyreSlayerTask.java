@@ -34,6 +34,7 @@ public class VampyreSlayerTask extends AccountBuilderQuestTask {
     public VampyreSlayerTask(){
         super(QuestHelperQuest.VAMPYRE_SLAYER);
         useFood = true;
+        memberOnly = false;
     }
 
     String food = "Shrimps";

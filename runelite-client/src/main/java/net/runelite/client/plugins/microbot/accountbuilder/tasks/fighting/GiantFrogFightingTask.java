@@ -64,6 +64,8 @@ public class GiantFrogFightingTask extends AccountBuilderFightingTask {
                 return true;
             }
         });
+
+        memberOnly = false;
     }
 
     String food = "Shrimps";
@@ -193,7 +195,7 @@ public class GiantFrogFightingTask extends AccountBuilderFightingTask {
             }
 
             if (Rs2Inventory.hasItem("Bronze kiteshield"))
-                Rs2Inventory.wield("Bronze kiteshield");
+                Rs2Inventory.interact("Bronze kiteshield");
             else if (!Rs2Inventory.hasItem("Bronze bar")){
                 if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
                     return false;

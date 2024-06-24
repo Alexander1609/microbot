@@ -11,6 +11,7 @@ public class FishingShrimpsTask extends AccountBuilderTask {
     public FishingShrimpsTask(){
         skill = Skill.FISHING;
         maxLevel = 25;
+        memberOnly = false;
     }
 
     @Override

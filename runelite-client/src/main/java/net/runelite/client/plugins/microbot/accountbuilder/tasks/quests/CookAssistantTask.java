@@ -21,6 +21,7 @@ public class CookAssistantTask extends AccountBuilderQuestTask {
 
     public CookAssistantTask(){
         super(QuestHelperQuest.COOKS_ASSISTANT);
+        memberOnly = false;
     }
 
     @Override

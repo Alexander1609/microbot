@@ -17,6 +17,7 @@ public class ErnestTheChickenTask extends AccountBuilderQuestTask {
     public ErnestTheChickenTask(){
         super(QuestHelperQuest.ERNEST_THE_CHICKEN);
         useFood = true;
+        memberOnly = false;
     }
 
     @Override

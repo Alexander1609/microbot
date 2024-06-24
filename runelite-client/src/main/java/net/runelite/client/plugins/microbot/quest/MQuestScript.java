@@ -59,6 +59,7 @@ public class MQuestScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+
                 if (MQuestHelperPlugin.getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> MQuestHelperPlugin.getSelectedQuest().isCompleted())) {
                     Widget widget = Rs2Widget.findWidget("Start ");
                     if (Rs2Widget.hasWidget("select an option") && MQuestHelperPlugin.getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
@@ -136,6 +137,9 @@ public class MQuestScript extends Script {
                     } else if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ObjectStep){
                         applyObjectStep((ObjectStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
                     }
+
+                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating());
+                    sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -221,6 +225,7 @@ public class MQuestScript extends Script {
 
     public boolean applyObjectStep(ObjectStep step) {
         var object = Rs2GameObject.getGameObjects(step.objectID, step.getWorldPoint()).stream().findFirst().orElse(null);
+        var itemId = step.getIconItemID();
 
         if (object == null){
             var localPoint = LocalPoint.fromWorld(Microbot.getClient(), step.getWorldPoint());
@@ -231,30 +236,53 @@ public class MQuestScript extends Script {
                 if (tile != null && tile.getWallObject() != null
                         && tile.getWallObject().getId() == step.objectID
                         && Rs2GameObject.hasLineOfSight(tile.getWallObject())
-                        && Rs2Camera.isTileOnScreen(tile.getWallObject())){
-                    Rs2GameObject.interact(tile.getWallObject());
+                        && (Rs2Camera.isTileOnScreen(tile.getWallObject()) || tile.getWallObject().getCanvasLocation() != null)){
+
+                    if (itemId == -1)
+                        Rs2GameObject.interact(tile.getWallObject());
+                    else{
+                        Rs2Inventory.use(itemId);
+                        Rs2GameObject.interact(tile.getWallObject());
+                    }
                     return false;
                 }
 
                 if (tile != null && tile.getDecorativeObject() != null
                         && tile.getDecorativeObject().getId() == step.objectID
                         && Rs2GameObject.hasLineOfSight(tile.getDecorativeObject())
-                        && Rs2Camera.isTileOnScreen(tile.getDecorativeObject())){
-                    Rs2GameObject.interact(tile.getDecorativeObject());
+                        && (Rs2Camera.isTileOnScreen(tile.getDecorativeObject()) || tile.getDecorativeObject().getCanvasLocation() != null)){
+                    if (itemId == -1)
+                        Rs2GameObject.interact(tile.getDecorativeObject());
+                    else{
+                        Rs2Inventory.use(itemId);
+                        Rs2GameObject.interact(tile.getDecorativeObject());
+                    }
                     return false;
                 }
             }
         }
 
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 3
-                && (!Rs2GameObject.hasLineOfSight(object) || !Rs2Camera.isTileOnScreen(object))) {
-            Rs2Walker.walkTo(step.getWorldPoint(), 2);
-            return false;
+        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
+                && (!Rs2GameObject.canWalkTo(object, 10) || !Rs2Camera.isTileOnScreen(object))) {
+            Rs2Walker.walkTo(step.getWorldPoint(), 1);
+
+            if (ShortestPathPlugin.getPathfinder() != null){
+                var path = ShortestPathPlugin.getPathfinder().getPath();
+                if (path.get(path.size() - 1).distanceTo(step.getWorldPoint()) <= 1)
+                    return false;
+            } else
+                return false;
         }
 
         var success = false;
-        if (Rs2GameObject.hasLineOfSight(object) || object != null && Rs2Camera.isTileOnScreen(object))
-            success = Rs2GameObject.interact(object);
+        if (Rs2GameObject.hasLineOfSight(object) || object != null && (Rs2Camera.isTileOnScreen(object) || object.getCanvasLocation() != null)){
+            if (itemId == -1)
+                success = Rs2GameObject.interact(object);
+            else{
+                Rs2Inventory.use(itemId);
+                success = Rs2GameObject.interact(object);
+            }
+        }
 
         if (!success) {
             for (int objectId : step.getAlternateObjectIDs()) {
@@ -284,7 +312,7 @@ public class MQuestScript extends Script {
 
                     if (itemRequirement.getAllIds().contains(item.id)) {
                         if (itemRequirement.shouldHighlightInInventory(Microbot.getClient())) {
-                            Rs2Inventory.use(item.id);
+                            Rs2Inventory.interact(item.id);
                         }
                     }
 

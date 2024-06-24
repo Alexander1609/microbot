@@ -38,6 +38,7 @@ public class ChoppingTreeTask extends AccountBuilderTask {
     public ChoppingTreeTask(){
         skill = Skill.WOODCUTTING;
         maxLevel = 15;
+        memberOnly = false;
     }
 
     @Override
