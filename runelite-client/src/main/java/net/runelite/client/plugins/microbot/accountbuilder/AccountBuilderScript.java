@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -69,8 +70,13 @@ public class AccountBuilderScript extends Script {
                     sleep(1000, 5000);
 
                 // Move randomly if stuck at some point
-                if (Rs2Player.isInteracting() || Rs2Player.isAnimating() || Rs2Player.isMoving() || Rs2Dialogue.isInDialogue() || Rs2GrandExchange.isOpen()
-                        || !Rs2Player.getWorldLocation().equals(lastLocation)){
+                if (Rs2Player.isInteracting()
+                        || Rs2Player.isAnimating()
+                        || Rs2Player.isMoving()
+                        || Rs2Dialogue.isInDialogue()
+                        || Rs2GrandExchange.isOpen()
+                        || !Rs2Player.getWorldLocation().equals(lastLocation)
+                        || (task != null && task instanceof AccountBuilderQuestTask && ((AccountBuilderQuestTask)task).getCurrentStep() instanceof WidgetStep)){
                     lastLocation = Rs2Player.getWorldLocation();
                     timeSinceLastAction = System.currentTimeMillis();
                 } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){

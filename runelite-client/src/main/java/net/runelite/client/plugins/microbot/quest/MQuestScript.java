@@ -138,7 +138,7 @@ public class MQuestScript extends Script {
                         applyObjectStep((ObjectStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
                     }
 
-                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating());
+                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating(), 1000);
                     sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                 }
             } catch (Exception ex) {

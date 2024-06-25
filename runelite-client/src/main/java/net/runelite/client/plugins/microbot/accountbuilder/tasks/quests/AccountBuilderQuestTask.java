@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
+import lombok.Getter;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
@@ -17,6 +18,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     private final MQuestScript questScript  = new MQuestScript();
     private final FoodScript foodScript = new FoodScript();
 
+    @Getter
     protected QuestStep currentStep;
 
     protected boolean useFood = false;

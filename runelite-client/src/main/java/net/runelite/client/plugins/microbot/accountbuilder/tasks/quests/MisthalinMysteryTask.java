@@ -29,6 +29,11 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
     }
 
     @Override
+    public boolean requirementsMet() {
+        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 15;
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -118,9 +123,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
 
     @Override
     protected void handleObjectStep(ObjectStep step) {
-        if (step.objectID == NullObjectID.NULL_29649 && step.getText().stream().anyMatch(x -> x.contains("Use the bucket"))){
-            Rs2Inventory.use(ItemID.BUCKET);
-        } else if (step.objectID == NullObjectID.NULL_29650 && step.getText().stream().anyMatch(x -> x.contains("Use a knife"))){
+        if (step.objectID == NullObjectID.NULL_29650 && step.getText().stream().anyMatch(x -> x.contains("Use a knife"))){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1628, 4825, 5, 10, 0)) > 0){
                 if (isQuestRunning())
                     stopQuest();
@@ -131,15 +134,8 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
                 }
 
                 Rs2Walker.walkTo(new WorldPoint(1628, 4830, 0), 2);
-            }
-            else{
-                Rs2Inventory.use("knife");
-
-                if (!isQuestRunning())
+            } else if (!isQuestRunning())
                     startupQuest();
-            }
-        } else if (step.getText().stream().anyMatch(x -> x.contains("Light the"))){
-            Rs2Inventory.use("tinderbox");
         } else if (step.objectID == ObjectID.DEAD_TREE_30150){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1648, 4826, 4, 18, 0)) == 0)
                 Rs2Walker.walkTo(new WorldPoint(1650, 4845, 0), 1);
@@ -149,13 +145,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
                     stopQuest();
 
                 Rs2Walker.walkTo(new WorldPoint(1639, 4828, 0), 2);
-            }
-            else if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1641, 4833, 7, 6, 0)) == 0){
-                Rs2Inventory.use("knife");
-                Rs2GameObject.interact(NullObjectID.NULL_29659);
-                Rs2GameObject.interact(NullObjectID.NULL_29659, "Search");
-            }
-            else if (!isQuestRunning())
+            } else if (!isQuestRunning())
                 startupQuest();
         } else if (step.objectID == NullObjectID.NULL_29657 && step.getText().stream().anyMatch(x -> x.contains("back"))){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(1648, 4828, 4, 17, 0)) > 0
