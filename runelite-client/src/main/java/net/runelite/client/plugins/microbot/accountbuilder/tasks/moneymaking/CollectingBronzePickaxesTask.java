@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 
 import java.util.Arrays;
 

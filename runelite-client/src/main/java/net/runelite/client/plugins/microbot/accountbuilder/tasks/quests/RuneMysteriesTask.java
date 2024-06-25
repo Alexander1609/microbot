@@ -4,7 +4,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 
 public class RuneMysteriesTask extends AccountBuilderQuestTask {
     public RuneMysteriesTask(){

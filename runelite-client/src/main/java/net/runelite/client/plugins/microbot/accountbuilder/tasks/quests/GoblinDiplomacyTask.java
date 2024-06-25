@@ -11,7 +11,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 
 public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
     public GoblinDiplomacyTask(){

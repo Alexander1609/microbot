@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
@@ -40,6 +41,7 @@ import net.runelite.api.widgets.Widget;
 public class NpcEmoteStep extends NpcStep
 {
 	private boolean hasScrolled;
+	@Getter
 	private final QuestEmote emote;
 
 	public NpcEmoteStep(QuestHelper questHelper, int npcID, QuestEmote emote, WorldPoint worldPoint, String text, Requirement... requirements)

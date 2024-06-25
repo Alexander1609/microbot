@@ -9,8 +9,8 @@ import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
-import net.runelite.client.plugins.questhelper.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.steps.*;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
@@ -107,10 +107,10 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     }
 
     protected boolean isQuestRunning(){
-        return Microbot.getClientThread().runOnClientThread(() -> MQuestHelperPlugin.getSelectedQuest() != null);
+        return Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest() != null);
     }
 
-    protected MQuestHelperPlugin getQuestHelperPlugin() {
-        return (MQuestHelperPlugin)Microbot.getPluginManager().getPlugins().stream().filter(x -> x instanceof MQuestHelperPlugin).findFirst().orElse(null);
+    protected QuestHelperPlugin getQuestHelperPlugin() {
+        return (QuestHelperPlugin)Microbot.getPluginManager().getPlugins().stream().filter(x -> x instanceof QuestHelperPlugin).findFirst().orElse(null);
     }
 }

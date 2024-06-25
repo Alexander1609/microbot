@@ -431,6 +431,15 @@ public class QuestHelperPlugin extends Plugin
 		return questManager.getSelectedQuest();
 	}
 
+	public void startUpQuest(QuestHelper questHelper)
+	{
+		questManager.startUpQuest(questHelper);
+	}
+
+	public void shutDownQuestFromSidebar(){
+		questManager.shutDownQuestFromSidebar();
+	}
+
 	public Map<String, QuestHelper> getBackgroundHelpers()
 	{
 		return questManager.backgroundHelpers;

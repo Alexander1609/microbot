@@ -24,6 +24,7 @@
  */
 package net.runelite.client.plugins.questhelper.steps;
 
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.QuestHelperConfig;
 import static net.runelite.client.plugins.questhelper.QuestHelperConfig.ObjectHighlightStyle.OUTLINE;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
@@ -64,8 +65,9 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class ObjectStep extends DetailedQuestStep
 {
+	@Getter
 	protected final ArrayList<Integer> alternateObjectIDs = new ArrayList<>();
-	private final int objectID;
+	public final int objectID;
 	private final List<TileObject> objects = new ArrayList<>();
 	private boolean showAllInArea;
 	@Setter

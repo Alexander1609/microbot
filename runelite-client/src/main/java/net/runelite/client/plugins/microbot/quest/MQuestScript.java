@@ -24,7 +24,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
-import net.runelite.client.plugins.questhelper.MQuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
@@ -60,9 +60,9 @@ public class MQuestScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
 
-                if (MQuestHelperPlugin.getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> MQuestHelperPlugin.getSelectedQuest().isCompleted())) {
+                if (getQuestHelperPlugin().getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest().isCompleted())) {
                     Widget widget = Rs2Widget.findWidget("Start ");
-                    if (Rs2Widget.hasWidget("select an option") && MQuestHelperPlugin.getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
+                    if (Rs2Widget.hasWidget("select an option") && getQuestHelperPlugin().getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
                             Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
                         var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
                         var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
@@ -96,20 +96,20 @@ public class MQuestScript extends Script {
                         return;
                     }
 
-                    if (MQuestHelperPlugin.getSelectedQuest().getQuest().getId() == Quest.THE_RESTLESS_GHOST.getId()) {
+                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.THE_RESTLESS_GHOST.getId()) {
                         if (Rs2Inventory.hasItem("ghostspeak amulet")) {
                             Rs2Inventory.wear("ghostspeak amulet");
                         }
                     }
 
-                    if (MQuestHelperPlugin.getSelectedQuest().getQuest().getId() == Quest.RUNE_MYSTERIES.getId()) {
+                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.RUNE_MYSTERIES.getId()) {
                         NPC aubury = Rs2Npc.getNpc("Aubury");
                         if (Rs2Inventory.hasItem("research package") && aubury != null) {
                             Rs2Npc.interact(aubury, "Talk-to");
                         }
                     }
 
-                    if (MQuestHelperPlugin.getSelectedQuest().getQuest().getId() == Quest.COOKS_ASSISTANT.getId()) {
+                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.COOKS_ASSISTANT.getId()) {
                         NPC aubury = Rs2Npc.getNpc("Aubury");
                         if (Rs2Inventory.hasItem("research package") && aubury != null) {
                             Rs2Npc.interact(aubury, "Talk-to");
@@ -121,21 +121,21 @@ public class MQuestScript extends Script {
                      * This portion is needed when using item on another item in your inventory.
                      * If we do not prioritize this, the script will think we are missing items
                      */
-                    QuestStep questStep = MQuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep();
+                    QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
                     if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep)) {
-                        boolean result = applyDetailedQuestStep((DetailedQuestStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep());
+                        boolean result = applyDetailedQuestStep((DetailedQuestStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep());
                         if (result) {
                             return;
                         }
                     }
 
-                    if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ConditionalStep) {
-                        QuestStep conditionalStep = MQuestHelperPlugin.getSelectedQuest().getCurrentStep().getActiveStep();
+                    if (getQuestHelperPlugin().getSelectedQuest().getCurrentStep() instanceof ConditionalStep) {
+                        QuestStep conditionalStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
                         applyStep(conditionalStep);
-                    } else if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof NpcStep) {
-                        applyNpcStep((NpcStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
-                    } else if (MQuestHelperPlugin.getSelectedQuest().getCurrentStep() instanceof ObjectStep){
-                        applyObjectStep((ObjectStep) MQuestHelperPlugin.getSelectedQuest().getCurrentStep());
+                    } else if (getQuestHelperPlugin().getSelectedQuest().getCurrentStep() instanceof NpcStep) {
+                        applyNpcStep((NpcStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
+                    } else if (getQuestHelperPlugin().getSelectedQuest().getCurrentStep() instanceof ObjectStep){
+                        applyObjectStep((ObjectStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
                     }
 
                     sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating(), 1000);
@@ -348,5 +348,9 @@ public class MQuestScript extends Script {
         }
 
         return Rs2Widget.clickWidget(widget.getId());
+    }
+
+    protected QuestHelperPlugin getQuestHelperPlugin() {
+        return (QuestHelperPlugin)Microbot.getPluginManager().getPlugins().stream().filter(x -> x instanceof QuestHelperPlugin).findFirst().orElse(null);
     }
 }
