@@ -12,7 +12,6 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
-import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -52,6 +51,15 @@ public class Rs2Walker {
         }
         return true;
     }
+    
+    public static boolean walkTo(int x, int y, int plane) {
+        return walkTo(x, y, plane, 6);
+    }
+
+    public static boolean walkTo(int x, int y, int plane, int distance) {
+        return walkTo(new WorldPoint(x, y, plane), distance);
+    }
+
     
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, 6);
@@ -633,7 +641,7 @@ public class Rs2Walker {
 
                             //check game objects
                             if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                                boolean interact = Rs2GameObject.interact(gameObject, true);
+                                boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1600, 2000);
@@ -646,7 +654,7 @@ public class Rs2Walker {
                             //check wall objects (tunnels)
                             WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
                             if (Rs2GameObject.hasLineOfSight(wallObject)) {
-                                boolean interact = Rs2GameObject.interact(wallObject, true);
+                                boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1600, 2000);
@@ -659,13 +667,17 @@ public class Rs2Walker {
                             //check ground objects
                             GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
                             if (Rs2GameObject.hasLineOfSight(groundObject)) {
-                                boolean interact = Rs2GameObject.interact(groundObject, true);
+                                boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1600, 2000);
                                     return false;
                                 }
-                                Rs2Player.waitForWalking();
+                                if (b.isAgilityShortcut()) {
+                                    Rs2Player.waitForAnimation();
+                                } else {
+                                    Rs2Player.waitForWalking();
+                                }
                                 return true;
                             }
                         }
