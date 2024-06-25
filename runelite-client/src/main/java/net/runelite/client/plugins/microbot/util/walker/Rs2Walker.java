@@ -12,6 +12,7 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -51,15 +52,6 @@ public class Rs2Walker {
         }
         return true;
     }
-    
-    public static boolean walkTo(int x, int y, int plane) {
-        return walkTo(x, y, plane, 6);
-    }
-
-    public static boolean walkTo(int x, int y, int plane, int distance) {
-        return walkTo(new WorldPoint(x, y, plane), distance);
-    }
-
     
     public static boolean walkTo(int x, int y, int plane) {
         return walkTo(x, y, plane, 6);
