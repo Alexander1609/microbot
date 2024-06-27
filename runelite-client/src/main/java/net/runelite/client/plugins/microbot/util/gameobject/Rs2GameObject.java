@@ -522,7 +522,7 @@ public class Rs2GameObject {
 
             if (objectComposition == null) continue;
 
-            if (objectComposition.getImpostorIds().length > 0) {
+            if (objectComposition.getImpostorIds() != null && objectComposition.getImpostorIds().length > 0) {
                 if (Arrays.stream(objectComposition.getImpostor().getActions())
                         .anyMatch(action -> action != null && (
                                 action.toLowerCase().contains("bank") ||
