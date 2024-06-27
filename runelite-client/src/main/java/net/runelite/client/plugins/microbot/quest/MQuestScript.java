@@ -21,7 +21,6 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
@@ -33,10 +32,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class MQuestScript extends Script {
     public static double version = 0.2;
@@ -49,7 +46,6 @@ public class MQuestScript extends Script {
 
 
     private MQuestConfig config;
-    private ArrayList<String> selectedChatOptions = new ArrayList<>();
 
 
     public boolean run(MQuestConfig config) {
@@ -59,35 +55,33 @@ public class MQuestScript extends Script {
             try {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
+                if (getQuestHelperPlugin().getSelectedQuest() == null) return;
+
+                QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
+                if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
+                    var dialogOptions = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
+                    var dialogChoices = Arrays.asList(dialogOptions.getDynamicChildren());
+
+                    for (var choice : questStep.getChoices().getChoices()){
+                        if (choice.getExpectedPreviousLine() != null)
+                            continue;
+
+                        for (var dialogChoice : dialogChoices){
+                            if (dialogChoice.getText().endsWith(choice.getChoice())){
+                                Rs2Keyboard.keyPress(dialogChoice.getOnKeyListener()[7].toString().charAt(0));
+                                return;
+                            }
+                        }
+                    }
+                }
 
                 if (getQuestHelperPlugin().getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest().isCompleted())) {
                     Widget widget = Rs2Widget.findWidget("Start ");
-                    if (Rs2Widget.hasWidget("select an option") && getQuestHelperPlugin().getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
-                            Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
-                        var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
-                        var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
-                                .collect(Collectors.toMap(x -> (String) x.getOnKeyListener()[7], x -> x));
-                        var keysSorted = new ArrayList<>(childs.keySet());
-                        Collections.sort(keysSorted);
-
-                        for (var key : keysSorted){
-                            var text = childs.get(key).getText();
-                            if (!selectedChatOptions.contains(text)){
-                                selectedChatOptions.add(text);
-                                Rs2Keyboard.keyPress(key.charAt(0));
-                                break;
-                            }
-                        }
-
-                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
-                        return;
-                    }
 
                     if (Rs2Dialogue.isInDialogue()) {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
-                    } else if (!selectedChatOptions.isEmpty())
-                        selectedChatOptions.clear();
+                    }
 
                     boolean isInCutscene = Microbot.getVarbitValue(4606) > 0;
                     if (isInCutscene) {
@@ -121,7 +115,6 @@ public class MQuestScript extends Script {
                      * This portion is needed when using item on another item in your inventory.
                      * If we do not prioritize this, the script will think we are missing items
                      */
-                    QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
                     if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep)) {
                         boolean result = applyDetailedQuestStep((DetailedQuestStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep());
                         if (result) {

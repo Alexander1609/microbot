@@ -1,22 +1,30 @@
 package net.runelite.client.plugins.microbot.accountbuilder;
 
 import lombok.Getter;
+import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.AccountBuilderFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.AccountBuilderQuestTask;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.ChildrenOfTheSunTask;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.time.Duration;
@@ -53,6 +61,9 @@ public class AccountBuilderScript extends Script {
 
     long nextCameraRotationTime = 0;
 
+    long nextBreakTime = Long.MAX_VALUE;
+    long breakEndTime = 0;
+
     public boolean run(AccountBuilderConfig config) {
         taskMap = AccountBuilderTaskList.getTasks();
         task = null;
@@ -63,27 +74,19 @@ public class AccountBuilderScript extends Script {
                 return;
 
             try {
-                if (task == null && !Microbot.isLoggedIn() || Microbot.getVarbitPlayerValue(281) != 1000)
+                if (handlingBreak(config))
+                    return;
+
+                if (!Microbot.isLoggedIn())
+                    new Login(Login.getRandomWorld(config.isMember()));
+
+                if (!Microbot.isLoggedIn() || Microbot.getVarbitPlayerValue(281) != 1000)
                     return;
 
                 if (task == null)
                     sleep(1000, 5000);
 
-                // Move randomly if stuck at some point
-                if (Rs2Player.isInteracting()
-                        || Rs2Player.isAnimating()
-                        || Rs2Player.isMoving()
-                        || Rs2Dialogue.isInDialogue()
-                        || Rs2GrandExchange.isOpen()
-                        || !Rs2Player.getWorldLocation().equals(lastLocation)
-                        || (task != null && task instanceof AccountBuilderQuestTask && ((AccountBuilderQuestTask)task).getCurrentStep() instanceof WidgetStep)){
-                    lastLocation = Rs2Player.getWorldLocation();
-                    timeSinceLastAction = System.currentTimeMillis();
-                } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
-                    var worldPoints = new ArrayList<>(Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet());
-                    var randomIndex = new Random().nextInt(worldPoints.size());
-                    Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
-                }
+                handleStuck();
 
                 if (nextCameraRotationTime < System.currentTimeMillis()){
                     nextCameraRotationTime = System.currentTimeMillis() + 60_000 + new Random().nextInt(240_000);
@@ -165,6 +168,60 @@ public class AccountBuilderScript extends Script {
         return null;
     }
 
+    private void handleStuck(){
+        if (Rs2Player.isInteracting()
+                || Rs2Player.isAnimating()
+                || Rs2Player.isMoving()
+                || Rs2Dialogue.isInDialogue()
+                || Rs2GrandExchange.isOpen()
+                || Rs2Bank.isOpen()
+                || !Rs2Player.getWorldLocation().equals(lastLocation)
+                || (task != null && task instanceof AccountBuilderQuestTask && ((AccountBuilderQuestTask)task).getCurrentStep() instanceof WidgetStep)
+                || (task != null && task.blockStuckPrevention)){
+            lastLocation = Rs2Player.getWorldLocation();
+            timeSinceLastAction = System.currentTimeMillis();
+        } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
+            var worldPoints = new ArrayList<>(Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet());
+            var randomIndex = new Random().nextInt(worldPoints.size());
+            Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
+        }
+    }
+
+    private boolean handlingBreak(AccountBuilderConfig config){
+        if (nextBreakTime == Long.MAX_VALUE)
+            nextBreakTime = System.currentTimeMillis() + ((config.timeUntilBreakStart() + new Random().nextInt(config.timeUntilBreakEnd() - config.timeUntilBreakStart())) * 60_000L);
+
+        if (nextBreakTime < System.currentTimeMillis() && breakEndTime < nextBreakTime){
+            if (Microbot.pauseAllScripts
+                    || task != null && (task instanceof AccountBuilderFightingTask
+                                        || task instanceof AccountBuilderQuestTask
+                                        || task instanceof AccountBuilderQuestTask && !((AccountBuilderQuestTask)task).isQuestRunning()))
+                return false;
+
+            Rs2Player.logout();
+            sleepUntil(() -> !Microbot.isLoggedIn());
+            if (Microbot.isLoggedIn())
+                return false;
+
+            Microbot.pauseAllScripts = true;
+
+            var breakDuration = (config.breakDurationStart() + new Random().nextInt(config.breakDurationEnd() - config.breakDurationStart())) * 60_000L;
+            breakEndTime = System.currentTimeMillis() + breakDuration;
+            taskEndTime += breakDuration;
+        } else if (breakEndTime < System.currentTimeMillis() && nextBreakTime < breakEndTime){
+            new Login(Login.getRandomWorld(config.isMember()));
+            sleepUntil(Microbot::isLoggedIn);
+
+            if (!Microbot.isLoggedIn())
+                return true;
+
+            Microbot.pauseAllScripts = false;
+            nextBreakTime = Long.MAX_VALUE;
+        }
+
+        return breakEndTime > System.currentTimeMillis();
+    }
+
     public void onChatMessage(ChatMessage chatMessage) {
         if (task != null)
             task.onChatMessage(chatMessage);
@@ -180,14 +237,18 @@ public class AccountBuilderScript extends Script {
             task.onGameTick(gameTick);
     }
 
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        if (task != null)
+            task.onGameStateChanged(event);
+    }
+
     @Override
     public void shutdown() {
         super.shutdown();
 
         sleepUntil(() -> mainScheduledFuture.isDone());
-
-        if (ShortestPathPlugin.getMarker() != null)
-            ShortestPathPlugin.exit();
+        Rs2Walker.setTarget(null);
 
         if (task != null)
             task.doTaskCleanup(true);

@@ -1,9 +1,12 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
+import net.runelite.api.GameState;
 import net.runelite.api.Skill;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
@@ -24,6 +27,7 @@ public abstract class AccountBuilderTask {
     private boolean canceled;
 
     protected boolean memberOnly = true;
+    public boolean blockStuckPrevention = false;
     protected Skill skill = null;
     protected int minLevel = 0;
     protected int maxLevel = Integer.MAX_VALUE;
@@ -95,6 +99,7 @@ public abstract class AccountBuilderTask {
     public void onChatMessage(ChatMessage chatMessage) { }
     public void onGameObjectSpawned(GameObjectSpawned event){ }
     public void onGameTick(GameTick gameTick) { }
+    public void onGameStateChanged(GameStateChanged event) { }
 
     protected void sleep(int time) {
         try {

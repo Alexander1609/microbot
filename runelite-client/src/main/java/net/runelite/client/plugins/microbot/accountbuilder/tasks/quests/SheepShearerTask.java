@@ -4,6 +4,7 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
@@ -23,6 +24,14 @@ public class SheepShearerTask extends AccountBuilderQuestTask {
     public SheepShearerTask(){
         super(QuestHelperQuest.SHEEP_SHEARER);
         memberOnly = false;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (Rs2Dialogue.isInDialogue() && Rs2Widget.hasWidget("Climb down"))
+            Rs2Widget.clickWidget("Climb down");
     }
 
     @Override

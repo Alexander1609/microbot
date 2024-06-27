@@ -91,4 +91,22 @@ public class WorldPointUtil {
 
         return Math.max(dx, dy);
     }
+
+    public static boolean isPointInPolygon(WorldPoint point, WorldPoint[] polygon) {
+        int n = polygon.length;
+        int j = n - 1;
+        boolean inside = false;
+
+        for (int i = 0; i < n; i++) {
+            if (polygon[i].getY() < point.getY() && polygon[j].getY() >= point.getY() ||
+                    polygon[j].getY() < point.getY() && polygon[i].getY() >= point.getY()) {
+                if (polygon[i].getX() + (point.getY() - polygon[i].getY()) / (double)(polygon[j].getY() - polygon[i].getY()) * (polygon[j].getX() - polygon[i].getX()) < point.getX()) {
+                    inside = !inside;
+                }
+            }
+            j = i;
+        }
+
+        return inside;
+    }
 }

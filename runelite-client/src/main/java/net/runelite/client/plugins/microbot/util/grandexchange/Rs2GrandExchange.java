@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static net.runelite.client.plugins.microbot.util.Global.*;
@@ -208,6 +209,53 @@ public class Rs2GrandExchange {
             confirm();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
+    public static boolean buyItemAboveXPercent(String itemName, int quantity, int minClicks, int maxClicks) {
+        try {
+            if (!isOpen()) {
+                openExchange();
+            }
+            Pair<GrandExchangeSlots, Integer> slot = getAvailableSlot();
+            Widget buyOffer = getOfferBuyButton(slot.getLeft());
+
+            if (buyOffer == null) return false;
+
+            Microbot.getMouse().click(buyOffer.getBounds());
+            sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
+            sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
+            Rs2Keyboard.typeString(itemName);
+            sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
+            sleep(1200);
+            Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
+            if (itemResult != null) {
+                Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
+                sleepUntil(() -> getPricePerItemButton_X() != null);
+            }
+            sleep(200, 400);
+            var clicks = minClicks + new Random().nextInt(maxClicks - minClicks);
+            for (int i = 0; i < clicks; i++){
+                increasePriceBy5Percent();
+                sleep(100, 200);
+            }
+            setQuantity(quantity);
+            confirm();
+            sleepUntil(() -> !isOfferTextVisible());
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
+    private static boolean increasePriceBy5Percent(){
+        Widget pricePerItemButton5Percent = getPricePerItemButton_Plus5Percent();
+        if (pricePerItemButton5Percent != null) {
+            Microbot.getMouse().click(pricePerItemButton5Percent.getBounds());
+            return true;
+        } else {
+            System.out.println("unable to find widget setprice.");
         }
         return false;
     }

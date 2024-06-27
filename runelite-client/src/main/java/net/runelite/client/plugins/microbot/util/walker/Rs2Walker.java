@@ -151,17 +151,7 @@ public class Rs2Walker {
                             sleep(600, 1000);
                         } else {
                             long movingStart = System.currentTimeMillis();
-
-                            var reachableTiles = Rs2Tile.getReachableTilesFromTile(currentWorldPoint, 2).keySet()
-                                    .stream().filter(x -> x.distanceTo(currentWorldPoint) < 2).count();
-                            var walkableTiles = Rs2Tile.getWalkableTilesAroundTile(currentWorldPoint, 1).size();
-                            if (reachableTiles + 3 >= walkableTiles || !Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), currentWorldPoint))){
-                                Rs2Walker.walkMiniMap(currentWorldPoint);
-                                System.out.println("walk minimap");
-                            } else {
-                                Rs2Walker.walkFastCanvas(currentWorldPoint);
-                                System.out.println("walk canvas");
-                            }
+                            Rs2Walker.walkMiniMap(getPointWithWallDistance(currentWorldPoint));
                             int randomInt = Random.random(3, 5);
                             sleepUntilTrue(() -> currentWorldPoint.distanceTo2D(Rs2Player.getWorldLocation()) < randomInt, 100, 2000);
                             if (System.currentTimeMillis() - movingStart < 120) {
@@ -186,6 +176,12 @@ public class Rs2Walker {
         return false;
     }
 
+    public static WorldPoint getPointWithWallDistance(WorldPoint target){
+        var collisionMap = ShortestPathPlugin.getPathfinderConfig().getMap();
+
+        return target;
+    }
+
     public static boolean walkMiniMap(WorldPoint worldPoint, int zoomDistance) {
         if (Microbot.getClient().getMinimapZoom() != zoomDistance)
             Microbot.getClient().setMinimapZoom(zoomDistance);
@@ -204,6 +200,12 @@ public class Rs2Walker {
         return walkMiniMap(worldPoint, 5);
     }
 
+    public static boolean walkMiniMap(WorldArea area) {
+        var points = area.toWorldPointList();
+        var index = new java.util.Random().nextInt(points.size());
+        return Rs2Walker.walkMiniMap(points.get(index));
+    }
+
     /**
      * Used in instances like vorkath, jad
      *
@@ -218,8 +220,12 @@ public class Rs2Walker {
         //Rs2Reflection.invokeMenu(canvasX, canvasY, MenuAction.WALK.getId(), 0, -1, "Walk here", "", -1, -1);
     }
 
-    public static void walkFastCanvas(WorldPoint worldPoint) {
-        Rs2Player.toggleRunEnergy(true);
+    public static void walkFastCanvas(WorldPoint worldPoint){
+        walkFastCanvas(worldPoint, true);
+    }
+
+    public static void walkFastCanvas(WorldPoint worldPoint, boolean toogleRun) {
+        Rs2Player.toggleRunEnergy(toogleRun);
         Point canv;
         if (Microbot.getClient().isInInstancedRegion()) {
             worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), worldPoint).stream().findFirst().get();
@@ -645,7 +651,7 @@ public class Rs2Walker {
 
                             //check wall objects (tunnels)
                             WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-                            if (Rs2GameObject.hasLineOfSight(wallObject)) {
+                            if (wallObject != null && wallObject.getId() == b.getObjectId()) {
                                 boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));
@@ -658,7 +664,7 @@ public class Rs2Walker {
 
                             //check ground objects
                             GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                            if (Rs2GameObject.hasLineOfSight(groundObject)) {
+                            if (groundObject != null && groundObject.getId() == b.getObjectId()) {
                                 boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
                                 if (!interact) {
                                     Rs2Walker.walkFastCanvas(path.get(i));

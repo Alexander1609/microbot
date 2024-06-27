@@ -43,13 +43,22 @@ public class AccountBuilderOverlay extends OverlayPanel {
                     .left(String.format("Next task: %s", script.nextTask != null ? script.nextTask.getName() : "No next task available"))
                     .build());
 
-            if (script.taskEndTime != 0)
+            if (script.breakEndTime > System.currentTimeMillis())
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left(String.format("Breaking for: %s", getTimeSting(script.breakEndTime - System.currentTimeMillis())))
+                        .build());
+            else if (script.taskEndTime != 0)
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left(String.format("Time till next task: %s", getTimeSting(script.taskEndTime - System.currentTimeMillis())))
                         .build());
             else if (script.task != null && !(script.task instanceof AccountBuilderQuestTask))
                 panelComponent.getChildren().add(LineComponent.builder()
                         .left("Preparing task..")
+                        .build());
+
+            if (script.nextBreakTime > System.currentTimeMillis())
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left(String.format("Next break in: %s", getTimeSting(script.nextBreakTime - System.currentTimeMillis())))
                         .build());
 
             panelComponent.getChildren().add(LineComponent.builder().build());
