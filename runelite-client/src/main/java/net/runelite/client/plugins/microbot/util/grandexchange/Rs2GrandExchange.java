@@ -226,19 +226,25 @@ public class Rs2GrandExchange {
             Microbot.getMouse().click(buyOffer.getBounds());
             sleepUntil(Rs2GrandExchange::isOfferTextVisible, 5000);
             sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
-            Rs2Keyboard.typeString(itemName);
-            sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
-            sleep(1200);
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
             if (itemResult != null) {
-                Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
+                Rs2Widget.clickWidgetFast(itemResult.getLeft(), 0, 1);
                 sleepUntil(() -> getPricePerItemButton_X() != null);
+            } else {
+                Rs2Keyboard.typeString(itemName);
+                sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
+                sleep(1200);
+                itemResult = getSearchResultWidget(itemName);
+                if (itemResult != null) {
+                    Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);
+                    sleepUntil(() -> getPricePerItemButton_X() != null);
+                }
             }
             sleep(200, 400);
             var clicks = minClicks + new Random().nextInt(maxClicks - minClicks);
             for (int i = 0; i < clicks; i++){
                 increasePriceBy5Percent();
-                sleep(100, 200);
+                sleep(200, 400);
             }
             setQuantity(quantity);
             confirm();

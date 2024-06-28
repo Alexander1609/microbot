@@ -39,6 +39,12 @@ public class AccountBuilderTaskList {
         tasks.put(new ChildrenOfTheSunTask(), 1000);
         tasks.put(new TreeGnomeVillageTask(), 1000);
         tasks.put(new KnightsSwordTask(), 1000);
+        tasks.put(new GertrudesCatTask(), 1000);
+        tasks.put(new DruidicRitualTask(), 1000);
+        tasks.put(new TouristTrapTask(), 1000);
+        tasks.put(new RecruitmentDriveTask(), 1000);
+        tasks.put(new SleepingGiantsTask(), 1000);
+        tasks.put(new DaddysHomeTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);
@@ -48,6 +54,7 @@ public class AccountBuilderTaskList {
         tasks.put(new ChoppingOakTask(), 1000);
         tasks.put(new ChoppingWillowTask(), 1000);
         tasks.put(new FishingShrimpsTask(), 1000);
+        tasks.put(new FletchingHeadlessArrowTask(), 1000);
 
         tasks.put(new CollectingBronzePickaxesTask(), 1000);
     }

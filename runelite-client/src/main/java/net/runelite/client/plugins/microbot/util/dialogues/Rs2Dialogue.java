@@ -20,6 +20,10 @@ public class Rs2Dialogue {
             Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
     }
 
+    public static boolean hasContinue(){
+        return Rs2Widget.hasWidget("Click here to continue");
+    }
+
     public static boolean hasSelectAnOption() {
         return Rs2Widget.hasWidget("Select an Option");
     }

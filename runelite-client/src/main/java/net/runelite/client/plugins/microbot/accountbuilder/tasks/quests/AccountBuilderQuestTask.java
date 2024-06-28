@@ -1,14 +1,12 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import lombok.Getter;
-import net.runelite.api.GameState;
-import net.runelite.api.GrandExchangeOfferState;
-import net.runelite.api.MenuAction;
-import net.runelite.api.VarPlayer;
+import net.runelite.api.*;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
+import net.runelite.client.plugins.microbot.globval.WidgetIndices;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
@@ -22,14 +20,18 @@ import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
 import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     private final QuestHelperQuest quest;
@@ -40,8 +42,6 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     protected QuestStep currentStep;
 
     protected boolean useFood = false;
-    protected boolean inventoryCleared = false;
-    protected ArrayList<Integer> itemsBought = new ArrayList<>();
 
     public AccountBuilderQuestTask(QuestHelperQuest quest){
         this.quest = quest;
@@ -147,6 +147,9 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     protected boolean checkRequirements(){
         var requirements = quest.getQuestHelper().getGeneralRequirements();
 
+        if (requirements == null)
+            return true;
+
         for (var requirement : requirements){
             if (!Microbot.getClientThread().runOnClientThread(() -> requirement.check(Microbot.getClient())))
                 return false;
@@ -155,84 +158,11 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         return true;
     }
 
-    protected boolean clearInventory(Integer... except){
-        if (inventoryCleared || Rs2Inventory.isEmpty())
-            return true;
-
-        if (!Rs2Bank.walkToBankAndUseBank())
-            return false;
-
-        if (except.length > 0)
-            inventoryCleared = Rs2Bank.depositAllExcept(except);
-        else{
-            Rs2Bank.depositAll();
-            if (Rs2Inventory.count() == 0)
-                inventoryCleared = true;
-        }
-        return inventoryCleared;
+    protected boolean withdrawBuyRequiredItems(){
+        return withdrawBuyItems(quest.getQuestHelper().getItemRequirements());
     }
 
-    protected boolean withdrawBuyRequiredItems(){
-        var itemRequirements = quest.getQuestHelper().getItemRequirements();
-
-        if (Rs2Bank.bankItems == null || Rs2Bank.bankItems.isEmpty()){
-            Rs2Bank.walkToBankAndUseBank();
-            return false;
-        }
-
-        var itemsToBuy = itemRequirements.stream().filter(x -> !itemsBought.contains(x.getId())
-                && !Rs2Inventory.hasItemAmount(x.getId(), x.getQuantity())
-                && !Rs2Bank.hasBankItem(x.getId(), x.getQuantity())
-                && !x.getAllIds().stream().anyMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity()) || Rs2Bank.hasBankItem(y, x.getQuantity()))).collect(Collectors.toList());
-        if (!itemsToBuy.isEmpty()){
-            if (!Rs2GrandExchange.walkToGrandExchange() || !Rs2GrandExchange.openExchange())
-                return false;
-
-            var clicks = 4;
-            boolean bought = false;
-            while (!bought){
-                Rs2GrandExchange.buyItemAboveXPercent(itemsToBuy.get(0).getName(), itemsToBuy.get(0).getQuantity(), 2, clicks);
-                sleepUntil(() -> Rs2GrandExchange.hasBoughtOffer(itemsToBuy.get(0).getId()), 10000);
-
-                if (Rs2GrandExchange.hasBoughtOffer(itemsToBuy.get(0).getId())){
-                    Rs2GrandExchange.collectToBank();
-                    bought = true;
-                    itemsBought.add(itemsToBuy.get(0).getId());
-                } else {
-                    var slot = Arrays.stream(GrandExchangeSlots.values()).filter(x -> Arrays.stream(Rs2GrandExchange.getSlot(x).getDynamicChildren()).anyMatch(y -> y.getItemId() == itemsToBuy.get(0).getId())).findFirst().orElse(null);
-                    var slotWidget = Rs2GrandExchange.getSlot(slot);
-                    Microbot.doInvoke(new NewMenuEntry(2, slotWidget.getId(), MenuAction.CC_OP.getId(), 2, -1, "Abort offer"), slotWidget.getBounds());
-                    sleep(100, 200);
-                    Rs2GrandExchange.collectToBank();
-                    sleep(100, 200);
-
-                    clicks *= 2;
-                }
-            }
-            return false;
-        }
-
-        for (var item : itemRequirements){
-            var id = item.getId();
-            if (!Rs2Bank.hasBankItem(id, item.getQuantity()) && !Rs2Inventory.hasItemAmount(id, item.getQuantity()))
-                id = item.getAllIds().stream().filter(x -> Rs2Inventory.hasItemAmount(x, item.getQuantity()) || Rs2Bank.hasBankItem(x, item.getQuantity())).findFirst().orElse(-1);
-
-            if (Rs2Inventory.hasItemAmount(id, item.getQuantity()))
-                continue;
-
-            if (!Rs2Bank.walkToBankAndUseBank())
-                return false;
-
-            var invItem = Rs2Inventory.get(id);
-            if (invItem == null || !Rs2Inventory.hasItemAmount(id, item.getQuantity(), invItem.isStackable())){
-                if (item.getQuantity() == 1)
-                    Rs2Bank.withdrawItem(id);
-                else
-                    Rs2Bank.withdrawX(id, item.getQuantity() - Rs2Inventory.count(id));
-                return false;
-            }
-        }
-
-        return true;
+    protected boolean withdrawBuyRequiredItems(ItemRequirement... additionalItems){
+        return withdrawBuyItems(Stream.concat(Arrays.stream(additionalItems), quest.getQuestHelper().getItemRequirements().stream()).collect(Collectors.toList()));
     }
 }

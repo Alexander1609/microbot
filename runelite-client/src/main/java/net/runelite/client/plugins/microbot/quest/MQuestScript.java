@@ -31,7 +31,6 @@ import net.runelite.client.plugins.questhelper.steps.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,7 +45,7 @@ public class MQuestScript extends Script {
 
 
     private MQuestConfig config;
-
+    private static ArrayList<NPC> npcsHandled = new ArrayList<>();
 
     public boolean run(MQuestConfig config) {
         this.config = config;
@@ -60,10 +59,13 @@ public class MQuestScript extends Script {
                 QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
                 if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
                     var dialogOptions = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
-                    var dialogChoices = Arrays.asList(dialogOptions.getDynamicChildren());
+                    var dialogChoices = dialogOptions.getDynamicChildren();
 
                     for (var choice : questStep.getChoices().getChoices()){
                         if (choice.getExpectedPreviousLine() != null)
+                            continue; // TODO
+
+                        if (choice.getExcludedStrings() != null && choice.getExcludedStrings().stream().anyMatch(Rs2Widget::hasWidget))
                             continue;
 
                         for (var dialogChoice : dialogChoices){
@@ -77,6 +79,12 @@ public class MQuestScript extends Script {
 
                 if (getQuestHelperPlugin().getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest().isCompleted())) {
                     Widget widget = Rs2Widget.findWidget("Start ");
+                    if (Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS) && getQuestHelperPlugin().getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
+                            Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
+                        Rs2Keyboard.keyPress('1');
+                        Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
+                        return;
+                    }
 
                     if (Rs2Dialogue.isInDialogue()) {
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
@@ -118,6 +126,8 @@ public class MQuestScript extends Script {
                     if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep)) {
                         boolean result = applyDetailedQuestStep((DetailedQuestStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep());
                         if (result) {
+                            sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 1000);
+                            sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                             return;
                         }
                     }
@@ -131,7 +141,7 @@ public class MQuestScript extends Script {
                         applyObjectStep((ObjectStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
                     }
 
-                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating(), 1000);
+                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 1000);
                     sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                 }
             } catch (Exception ex) {
@@ -179,7 +189,16 @@ public class MQuestScript extends Script {
         }
 
         net.runelite.api.NPC npc = Rs2Npc.getNpc(step.npcID);
-        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc) && step.getText().stream().anyMatch(x -> x.contains("Kill"))) {
+
+        if (step.isAllowMultipleHighlights()){
+            var npcs = Rs2Npc.getNpcs(step.npcID);
+
+            npc = npcs.filter(x -> !npcsHandled.contains(x)).findFirst().orElse(null);
+        }
+
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation())
+                && Rs2Npc.hasLineOfSight(npc)
+                && step.getText().stream().anyMatch(x -> x.toLowerCase().contains("kill"))) {
             if (!Rs2Combat.inCombat())
                 Rs2Npc.interact(step.npcID, "Attack");
         } else if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
@@ -201,7 +220,18 @@ public class MQuestScript extends Script {
                 }
             }
 
-            Rs2Npc.interact(step.npcID, "Talk-to");
+            var itemId = step.getIconItemID();
+            if (itemId != -1){
+                Rs2Inventory.use(itemId);
+                Rs2Npc.interact(step.npcID);
+            } else
+                Rs2Npc.interact(step.npcID, "Talk-to");
+
+            if (step.isAllowMultipleHighlights()){
+                npcsHandled.add(npc);
+                // Might open up a dialog
+                sleepUntil(Rs2Dialogue::isInDialogue);
+            }
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);
         } else if (npc != null && !Rs2Npc.hasLineOfSight(npc)) {
@@ -217,45 +247,10 @@ public class MQuestScript extends Script {
 
 
     public boolean applyObjectStep(ObjectStep step) {
-        var object = Rs2GameObject.getGameObjects(step.objectID, step.getWorldPoint()).stream().findFirst().orElse(null);
+        var object = step.getObjects().stream().findFirst().orElse(null);
         var itemId = step.getIconItemID();
 
-        if (object == null){
-            var localPoint = LocalPoint.fromWorld(Microbot.getClient(), step.getWorldPoint());
-
-            if (localPoint != null){
-                var tile = Microbot.getClient().getScene().getTiles()[Microbot.getClient().getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
-
-                if (tile != null && tile.getWallObject() != null
-                        && tile.getWallObject().getId() == step.objectID
-                        && Rs2GameObject.hasLineOfSight(tile.getWallObject())
-                        && (Rs2Camera.isTileOnScreen(tile.getWallObject()) || tile.getWallObject().getCanvasLocation() != null)){
-
-                    if (itemId == -1)
-                        Rs2GameObject.interact(tile.getWallObject());
-                    else{
-                        Rs2Inventory.use(itemId);
-                        Rs2GameObject.interact(tile.getWallObject());
-                    }
-                    return false;
-                }
-
-                if (tile != null && tile.getDecorativeObject() != null
-                        && tile.getDecorativeObject().getId() == step.objectID
-                        && Rs2GameObject.hasLineOfSight(tile.getDecorativeObject())
-                        && (Rs2Camera.isTileOnScreen(tile.getDecorativeObject()) || tile.getDecorativeObject().getCanvasLocation() != null)){
-                    if (itemId == -1)
-                        Rs2GameObject.interact(tile.getDecorativeObject());
-                    else{
-                        Rs2Inventory.use(itemId);
-                        Rs2GameObject.interact(tile.getDecorativeObject());
-                    }
-                    return false;
-                }
-            }
-        }
-
-        if (Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
+        if (step.getWorldPoint() != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
                 && (!Rs2GameObject.canWalkTo(object, 10) || !Rs2Camera.isTileOnScreen(object))) {
             Rs2Walker.walkTo(step.getWorldPoint(), 1);
 
@@ -267,33 +262,40 @@ public class MQuestScript extends Script {
                 return false;
         }
 
-        var success = false;
         if (Rs2GameObject.hasLineOfSight(object) || object != null && (Rs2Camera.isTileOnScreen(object) || object.getCanvasLocation() != null)){
+            // Stop pathing
+            Rs2Walker.setTarget(null);
+
             if (itemId == -1)
-                success = Rs2GameObject.interact(object);
+                Rs2GameObject.interact(object, chooseCorrectOption(step, object));
             else{
                 Rs2Inventory.use(itemId);
-                success = Rs2GameObject.interact(object);
+                Rs2GameObject.interact(object);
             }
         }
 
-        if (!success) {
-            for (int objectId : step.getAlternateObjectIDs()) {
-                success = Rs2GameObject.interact(objectId, true);
-                if (success) break;
-            }
-        }
-//        if (!success) {
-//            if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
-//                if (config.enableHybridWalking()) {
-//                    Rs2Walker.walkTo(step.getWorldPoint(), config.useNearest());
-//                } else {
-//                    Rs2Walker.walkTo(step.getWorldPoint(), true);
-//                }
-//                return false;
-//            }
-//        }
         return true;
+    }
+
+    private String chooseCorrectOption(QuestStep step, TileObject object){
+        ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(object.getId()));
+
+        if (objComp == null)
+            return "";
+
+        String[] actions;
+        if (objComp.getImpostorIds() != null) {
+            actions = objComp.getImpostor().getActions();
+        } else {
+            actions = objComp.getActions();
+        }
+
+        for (var action : actions){
+            if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
+                return action;
+        }
+
+        return "";
     }
 
     private boolean applyDetailedQuestStep(DetailedQuestStep conditionalStep) {
@@ -340,7 +342,8 @@ public class MQuestScript extends Script {
                 widget = tmpWidget;
         }
 
-        return Rs2Widget.clickWidget(widget.getId());
+        Rs2Widget.clickWidgetFast(widget);
+        return true;
     }
 
     protected QuestHelperPlugin getQuestHelperPlugin() {

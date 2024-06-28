@@ -4422,3 +4422,15 @@
 # Asgarnian ice dungeon
 3008 9550 0	3007 3150 0	Climb-up Ladder 17385
 3008 3150 0	3009 9550 0	Climb-down Trapdoor 1738
+
+# Sawmill
+3310 3508 1	3310 3508 0	Climb-down Ladder 11795
+3310 3508 0	3310 3508 1	Climb-up Ladder 11794
+
+# Desert mining camp
+3290 3035 0	3290 3035 1	Climb-up Ladder 18903
+3290 3037 1	3290 3037 0	Climb-down Ladder 18904
+
+# Kovac
+3366 11483 0	3361 3148 0	Exit Exit 44636
+3361 3148 0	3366 11483 0	Enter Cave 44635
