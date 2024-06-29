@@ -45,6 +45,11 @@ public class AccountBuilderTaskList {
         tasks.put(new RecruitmentDriveTask(), 1000);
         tasks.put(new SleepingGiantsTask(), 1000);
         tasks.put(new DaddysHomeTask(), 1000);
+        tasks.put(new GrandTreeTask(), 1000);
+        tasks.put(new MonksFriendTask(), 1000);
+        tasks.put(new PlagueCityTask(), 1000);
+        tasks.put(new BiohazardTask(), 1000);
+        tasks.put(new HazeelCultTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);

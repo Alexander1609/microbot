@@ -77,8 +77,13 @@ public class AccountBuilderScript extends Script {
                 if (handlingBreak(config))
                     return;
 
-                if (!Microbot.isLoggedIn())
+                if (!Microbot.isLoggedIn()){
+                    if (Microbot.getWorldService() == null)
+                        return;
+
                     new Login(Login.getRandomWorld(config.isMember()));
+                    return;
+                }
 
                 if (!Microbot.isLoggedIn() || Microbot.getVarbitPlayerValue(281) != 1000)
                     return;
@@ -194,7 +199,7 @@ public class AccountBuilderScript extends Script {
         if (nextBreakTime < System.currentTimeMillis() && breakEndTime < nextBreakTime){
             if (Microbot.pauseAllScripts
                     || task != null && (task instanceof AccountBuilderFightingTask
-                                        || task instanceof AccountBuilderQuestTask
+                                        || task instanceof AccountBuilderQuestTask // TODO break and restart quest afterwards
                                         || task instanceof AccountBuilderQuestTask && !((AccountBuilderQuestTask)task).isQuestRunning()))
                 return false;
 

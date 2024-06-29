@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import lombok.Getter;
 import net.runelite.api.*;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -123,6 +124,11 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
                 startupQuest();
             }
         }
+    }
+
+    @Override
+    public void onChatMessage(ChatMessage chatMessage) {
+        questScript.onChatMessage(chatMessage);
     }
 
     protected void startupQuest(){

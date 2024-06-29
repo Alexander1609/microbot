@@ -7,6 +7,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -177,9 +178,69 @@ public class Rs2Walker {
     }
 
     public static WorldPoint getPointWithWallDistance(WorldPoint target){
-        var collisionMap = ShortestPathPlugin.getPathfinderConfig().getMap();
+        var tiles = Rs2Tile.getReachableTilesFromTile(target, 2);
+
+        var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target);
+        if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {
+            int[][] flags = Microbot.getClient().getCollisionMaps()[Microbot.getClient().getPlane()].getFlags();
+
+            if (hasMinimapRelevantMovementFlag(localPoint, flags)){
+                for (var tile : tiles.keySet()){
+                    var localTilePoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), tile);
+                    if (localTilePoint == null)
+                        continue;
+
+                    if (!hasMinimapRelevantMovementFlag(localTilePoint, flags))
+                        return tile;
+                }
+            }
+
+            int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
+
+            Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
+
+            if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_EAST)
+                    || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_WEST)
+                    || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_NORTH)
+                    || movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_SOUTH)){
+                for (var tile : tiles.keySet()){
+                    var localTilePoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), tile);
+                    if (localTilePoint == null)
+                        continue;
+
+                    int tileData = flags[localTilePoint.getSceneX()][localTilePoint.getSceneY()];
+                    Set<MovementFlag> tileFlags = MovementFlag.getSetFlags(data);
+
+                    if (tileFlags.isEmpty())
+                        return tile;
+                }
+            }
+        }
 
         return target;
+    }
+
+    static boolean hasMinimapRelevantMovementFlag(LocalPoint point, int[][] flagMap){
+        int data = flagMap[point.getSceneX()][point.getSceneY()];
+        Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
+
+        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_EAST)
+            && Rs2Tile.isWalkable(point.dx(1)))
+            return true;
+
+        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_WEST)
+                && Rs2Tile.isWalkable(point.dx(-1)))
+            return true;
+
+        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_NORTH)
+                && Rs2Tile.isWalkable(point.dy(1)))
+            return true;
+
+        if (movementFlags.contains(MovementFlag.BLOCK_MOVEMENT_SOUTH)
+                && Rs2Tile.isWalkable(point.dy(-1)))
+            return true;
+
+        return false;
     }
 
     public static boolean walkMiniMap(WorldPoint worldPoint, int zoomDistance) {

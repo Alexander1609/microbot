@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.quest;
 
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.events.ChatMessage;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -12,15 +13,16 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
@@ -43,6 +45,7 @@ public class MQuestScript extends Script {
     public static List<ItemRequirement> itemsMissing = new ArrayList<>();
     public static List<ItemRequirement> grandExchangeItems = new ArrayList<>();
 
+    boolean unreachableTarget = false;
 
     private MQuestConfig config;
     private static ArrayList<NPC> npcsHandled = new ArrayList<>();
@@ -118,6 +121,10 @@ public class MQuestScript extends Script {
                         }
                     }
 
+                    if (questStep instanceof DetailedQuestStep && handleRequirements((DetailedQuestStep) questStep)){
+                        sleep(500, 1000);
+                        return;
+                    }
 
                     /**
                      * This portion is needed when using item on another item in your inventory.
@@ -126,7 +133,7 @@ public class MQuestScript extends Script {
                     if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep)) {
                         boolean result = applyDetailedQuestStep((DetailedQuestStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep());
                         if (result) {
-                            sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 1000);
+                            sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 500);
                             sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                             return;
                         }
@@ -141,14 +148,33 @@ public class MQuestScript extends Script {
                         applyObjectStep((ObjectStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
                     }
 
-                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 1000);
+                    sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 500);
                     sleepUntil(() -> !Rs2Player.isInteracting() && !Rs2Player.isMoving() && !Rs2Player.isAnimating());
                 }
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
+                ex.printStackTrace(System.out);
             }
         }, 0, Random.random(400, 1000), TimeUnit.MILLISECONDS);
         return true;
+    }
+
+    private boolean handleRequirements(DetailedQuestStep questStep) {
+        var requirements = questStep.getRequirements();
+
+        for (var requirement : requirements){
+            if (requirement instanceof ItemRequirement){
+                var itemRequirement = (ItemRequirement) requirement;
+
+                if (itemRequirement.isEquip() && Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0]))
+                    && itemRequirement.getAllIds().stream().noneMatch(Rs2Equipment::isWearing)){
+                    Rs2Inventory.wear(itemRequirement.getAllIds().stream().filter(Rs2Inventory::contains).findFirst().orElse(-1));
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -179,16 +205,7 @@ public class MQuestScript extends Script {
     }
 
     public boolean applyNpcStep(NpcStep step) {
-        for (var requirement : step.getRequirements()){
-            if (requirement instanceof ItemRequirement){
-                var itemRequirement = (ItemRequirement) requirement;
-
-                if (Rs2Inventory.contains(itemRequirement.getId()) && ((ItemRequirement) requirement).isEquip())
-                    Rs2Inventory.equip(itemRequirement.getId());
-            }
-        }
-
-        net.runelite.api.NPC npc = Rs2Npc.getNpc(step.npcID);
+        var npc = Rs2Npc.getNpc(step.npcID);
 
         if (step.isAllowMultipleHighlights()){
             var npcs = Rs2Npc.getNpcs(step.npcID);
@@ -196,12 +213,15 @@ public class MQuestScript extends Script {
             npc = npcs.filter(x -> !npcsHandled.contains(x)).findFirst().orElse(null);
         }
 
-        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation())
-                && Rs2Npc.hasLineOfSight(npc)
-                && step.getText().stream().anyMatch(x -> x.toLowerCase().contains("kill"))) {
-            if (!Rs2Combat.inCombat())
-                Rs2Npc.interact(step.npcID, "Attack");
-        } else if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && Rs2Npc.hasLineOfSight(npc)) {
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && (Rs2Npc.hasLineOfSight(npc) || Rs2Npc.canWalkTo(npc, 10))) {
+            // Stop pathing
+            Rs2Walker.setTarget(null);
+
+            if (step.getText().stream().anyMatch(x -> x.toLowerCase().contains("kill"))) {
+                if (!Rs2Combat.inCombat())
+                    Rs2Npc.interact(step.npcID, "Attack");
+            }
+
             if (step instanceof NpcEmoteStep){
                 var emoteStep = (NpcEmoteStep)step;
 
@@ -211,7 +231,7 @@ public class MQuestScript extends Script {
                     {
                         var id = emoteWidget.getOriginalX() / 42 + ((emoteWidget.getOriginalY() - 6) / 49) * 4;
 
-                        Microbot.doInvoke(new NewMenuEntry("Perform", Emote.JIG.getName(), 1, MenuAction.CC_OP, id, ComponentID.EMOTES_EMOTE_CONTAINER, false), new Rectangle(0, 0, 1, 1));
+                        Microbot.doInvoke(new NewMenuEntry("Perform", emoteWidget.getText(), 1, MenuAction.CC_OP, id, ComponentID.EMOTES_EMOTE_CONTAINER, false), new Rectangle(0, 0, 1, 1));
                         Rs2Player.waitForAnimation();
 
                         if (Rs2Dialogue.isInDialogue())
@@ -250,6 +270,24 @@ public class MQuestScript extends Script {
         var object = step.getObjects().stream().findFirst().orElse(null);
         var itemId = step.getIconItemID();
 
+        if (object != null && unreachableTarget){
+            var tileObjects = Rs2GameObject.getTileObjects();
+
+            for (var tile : Rs2Tile.getWalkableTilesAroundTile(object.getWorldLocation(), 1)){
+                if (tileObjects.stream().noneMatch(x -> x.getWorldLocation().equals(tile))){
+                    if (!Rs2Walker.walkTo(tile) && ShortestPathPlugin.getPathfinder() == null)
+                        return false;
+
+                    sleepUntil(() -> ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone());
+                    if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone())
+                        unreachableTarget = false;
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
         if (step.getWorldPoint() != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
                 && (!Rs2GameObject.canWalkTo(object, 10) || !Rs2Camera.isTileOnScreen(object))) {
             Rs2Walker.walkTo(step.getWorldPoint(), 1);
@@ -267,7 +305,7 @@ public class MQuestScript extends Script {
             Rs2Walker.setTarget(null);
 
             if (itemId == -1)
-                Rs2GameObject.interact(object, chooseCorrectOption(step, object));
+                Rs2GameObject.interact(object, chooseCorrectObjectOption(step, object));
             else{
                 Rs2Inventory.use(itemId);
                 Rs2GameObject.interact(object);
@@ -277,7 +315,7 @@ public class MQuestScript extends Script {
         return true;
     }
 
-    private String chooseCorrectOption(QuestStep step, TileObject object){
+    private String chooseCorrectObjectOption(QuestStep step, TileObject object){
         ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(object.getId()));
 
         if (objComp == null)
@@ -298,37 +336,58 @@ public class MQuestScript extends Script {
         return "";
     }
 
+    private String chooseCorrectItemOption(QuestStep step, int itemId){
+        ItemComposition itemComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemId));
+
+        if (itemComp == null)
+            return "";
+
+        for (var action : itemComp.getInventoryActions()){
+            if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
+                return action;
+        }
+
+        return "";
+    }
+
     private boolean applyDetailedQuestStep(DetailedQuestStep conditionalStep) {
         if (conditionalStep instanceof NpcStep) return false;
-        for (Rs2Item item : Rs2Inventory.items()) {
-            for (Requirement requirement : conditionalStep.getRequirements()) {
-                if (requirement instanceof ItemRequirement) {
-                    ItemRequirement itemRequirement = (ItemRequirement) requirement;
 
-                    if (itemRequirement.getAllIds().contains(item.id)) {
-                        if (itemRequirement.shouldHighlightInInventory(Microbot.getClient())) {
-                            Rs2Inventory.interact(item.id);
-                        }
-                    }
+        boolean usingItems = false;
+        for (Requirement requirement : conditionalStep.getRequirements()) {
+            if (requirement instanceof ItemRequirement) {
+                ItemRequirement itemRequirement = (ItemRequirement) requirement;
 
-                    if (!itemRequirement.getAllIds().contains(item.id) && conditionalStep.getWorldPoint() != null) {
-                        if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) &&
-                                (conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2)
-                                    || conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea())
-                                        && Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), conditionalStep.getWorldPoint()))) {
-                            Rs2GroundItem.loot(itemRequirement.getId());
-                        } else {
-                            Rs2Walker.walkTo(conditionalStep.getWorldPoint(), 2);
-                        }
-                        return true;
-                    } else if (!itemRequirement.getAllIds().contains(item.id)){
+                if (itemRequirement.shouldHighlightInInventory(Microbot.getClient())
+                    && Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0]))) {
+                    var itemId = itemRequirement.getAllIds().stream().filter(Rs2Inventory::contains).findFirst().orElse(-1);
+                    Rs2Inventory.interact(itemId, chooseCorrectItemOption(conditionalStep, itemId));
+                    sleep(100, 200);
+                    usingItems = true;
+                    continue;
+                }
+
+                if (!Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0])) && conditionalStep.getWorldPoint() != null) {
+                    if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) &&
+                            (conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2)
+                            || conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea())
+                            && Rs2Camera.isTileOnScreen(LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), conditionalStep.getWorldPoint()))) {
                         Rs2GroundItem.loot(itemRequirement.getId());
-                        return true;
+                    } else {
+                        Rs2Walker.walkTo(conditionalStep.getWorldPoint(), 2);
                     }
+                    return true;
+                } else if (!Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0]))){
+                    Rs2GroundItem.loot(itemRequirement.getId());
+                    return true;
                 }
             }
         }
-        return false;
+
+        if (!usingItems && conditionalStep.getWorldPoint() != null && !Rs2Walker.walkTo(conditionalStep.getWorldPoint()))
+            return true;
+
+        return usingItems;
     }
 
     private boolean applyWidgetStep(WidgetStep step) {
@@ -348,5 +407,10 @@ public class MQuestScript extends Script {
 
     protected QuestHelperPlugin getQuestHelperPlugin() {
         return (QuestHelperPlugin)Microbot.getPluginManager().getPlugins().stream().filter(x -> x instanceof QuestHelperPlugin).findFirst().orElse(null);
+    }
+
+    public void onChatMessage(ChatMessage chatMessage) {
+        if (chatMessage.getMessage().equalsIgnoreCase("I can't reach that!"))
+            unreachableTarget = true;
     }
 }
