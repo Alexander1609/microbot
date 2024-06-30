@@ -45,7 +45,7 @@ public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
             return false;
         }
 
-        if (!Rs2Inventory.hasItemAmount("goblin mail", 3)){
+        if (Rs2Inventory.count(ItemID.GOBLIN_MAIL) + Rs2Inventory.count(ItemID.ORANGE_GOBLIN_MAIL) + Rs2Inventory.count(ItemID.BLUE_GOBLIN_MAIL) < 3){
             if (!Rs2Bank.walkToBankAndUseBank())
                 return false;
 

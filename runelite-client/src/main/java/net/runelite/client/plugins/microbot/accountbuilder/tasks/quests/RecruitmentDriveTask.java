@@ -32,6 +32,11 @@ public class RecruitmentDriveTask extends AccountBuilderQuestTask {
         super(QuestHelperQuest.RECRUITMENT_DRIVE);
     }
 
+    @Override
+    public boolean requirementsMet() {
+        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 15;
+    }
+
     // TODO Check other challenges (only 5/7 so far)
 
     @Override

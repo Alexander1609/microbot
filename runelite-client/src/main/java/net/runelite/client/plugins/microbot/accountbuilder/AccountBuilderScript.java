@@ -2,21 +2,17 @@ package net.runelite.client.plugins.microbot.accountbuilder;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.AccountBuilderFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.FletchingHeadlessArrowTask;
-import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -25,12 +21,10 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
-import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -255,10 +249,12 @@ public class AccountBuilderScript extends Script {
     public void shutdown() {
         super.shutdown();
 
+        if (task != null){
+            task.doTaskCleanup(true);
+            task = null;
+        }
+
         sleepUntil(() -> mainScheduledFuture.isDone());
         Rs2Walker.setTarget(null);
-
-        if (task != null)
-            task.doTaskCleanup(true);
     }
 }

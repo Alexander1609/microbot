@@ -119,6 +119,8 @@ public class MQuestScript extends Script {
                     }
 
                     if (Rs2Dialogue.isInDialogue()) {
+                        // Stop walker if in dialogue
+                        Rs2Walker.setTarget(null);
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }
@@ -139,7 +141,7 @@ public class MQuestScript extends Script {
                      * This portion is needed when using item on another item in your inventory.
                      * If we do not prioritize this, the script will think we are missing items
                      */
-                    if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep)) {
+                    if (questStep instanceof DetailedQuestStep && !(questStep instanceof NpcStep || questStep instanceof ObjectStep || questStep instanceof DigStep)) {
                         boolean result = applyDetailedQuestStep((DetailedQuestStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep());
                         if (result) {
                             sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 500);
@@ -155,6 +157,8 @@ public class MQuestScript extends Script {
                         applyNpcStep((NpcStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
                     } else if (getQuestHelperPlugin().getSelectedQuest().getCurrentStep() instanceof ObjectStep){
                         applyObjectStep((ObjectStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
+                    } else if (getQuestHelperPlugin().getSelectedQuest().getCurrentStep() instanceof DigStep){
+                        applyDigStep((DigStep) getQuestHelperPlugin().getSelectedQuest().getCurrentStep());
                     }
 
                     sleepUntil(() -> Rs2Player.isInteracting() || Rs2Player.isMoving() || Rs2Player.isAnimating() || Rs2Dialogue.isInDialogue(), 500);
@@ -207,6 +211,8 @@ public class MQuestScript extends Script {
             return applyNpcStep((NpcStep) step);
         } else if (step instanceof WidgetStep){
             return applyWidgetStep((WidgetStep) step);
+        } else if (step instanceof DigStep){
+            return applyDigStep((DigStep) step);
         } else if (step instanceof DetailedQuestStep) {
             return applyDetailedQuestStep((DetailedQuestStep) step);
         }
@@ -255,9 +261,9 @@ public class MQuestScript extends Script {
             var itemId = step.getIconItemID();
             if (itemId != -1){
                 Rs2Inventory.use(itemId);
-                Rs2Npc.interact(step.npcID);
+                Rs2Npc.interact(npc);
             } else
-                Rs2Npc.interact(step.npcID, "Talk-to");
+                Rs2Npc.interact(npc, "Talk-to");
 
             if (step.isAllowMultipleHighlights()){
                 npcsHandled.add(npc);
@@ -304,7 +310,7 @@ public class MQuestScript extends Script {
         }
 
         if (step.getWorldPoint() != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
-                && (!Rs2GameObject.canWalkTo(object, 10) || !Rs2Camera.isTileOnScreen(object))) {
+                && (!Rs2GameObject.canWalkTo(object, 10) || !Rs2GameObject.hasLineOfSight(object))) {
             Rs2Walker.walkTo(step.getWorldPoint(), 1);
 
             if (ShortestPathPlugin.getPathfinder() != null){
@@ -330,6 +336,19 @@ public class MQuestScript extends Script {
         return true;
     }
 
+    private boolean applyDigStep(DigStep step){
+        if (!Rs2Walker.walkTo(step.getWorldPoint()))
+            return false;
+        else if (!Rs2Player.getWorldLocation().equals(step.getWorldPoint()))
+            Rs2Walker.walkFastCanvas(step.getWorldPoint());
+        else {
+            Rs2Inventory.interact(ItemID.SPADE, "Dig");
+            return true;
+        }
+
+        return false;
+    }
+
     private String chooseCorrectObjectOption(QuestStep step, TileObject object){
         ObjectComposition objComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getObjectDefinition(object.getId()));
 
@@ -352,15 +371,13 @@ public class MQuestScript extends Script {
     }
 
     private String chooseCorrectItemOption(QuestStep step, int itemId){
-        ItemComposition itemComp = Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getItemDefinition(itemId));
-
-        if (itemComp == null)
-            return "";
-
-        for (var action : itemComp.getInventoryActions()){
+        for (var action : Rs2Inventory.get(itemId).getInventoryActions()){
             if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
                 return action;
         }
+
+        if (step.getText().stream().anyMatch(x -> x.toLowerCase().contains("use")))
+            return "use";
 
         return "";
     }

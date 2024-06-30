@@ -5,6 +5,7 @@ import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -166,4 +167,7 @@ public class NatualHistoryQuizTask extends AccountBuilderQuestTask {
         while (!Rs2Walker.walkTo(new WorldPoint(3258, 3452, 0)))
             sleep(1000, 1500);
     }
+
+    @Override
+    public void onGameStateChanged(GameStateChanged event) { }
 }

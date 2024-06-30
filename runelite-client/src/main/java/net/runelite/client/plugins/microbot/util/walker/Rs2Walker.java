@@ -675,7 +675,7 @@ public class Rs2Walker {
                             if (b.isShip()) {
                                 if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
                                     Rs2Npc.interact(b.getNpcName(), b.getAction());
-                                    sleep(1200, 1600);
+                                    Rs2Player.waitForWalking();
                                 } else {
                                     Rs2Walker.walkFastCanvas(path.get(i));
                                     sleep(1200, 1600);

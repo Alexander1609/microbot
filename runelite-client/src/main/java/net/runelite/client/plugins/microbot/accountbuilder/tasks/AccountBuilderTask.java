@@ -159,7 +159,7 @@ public abstract class AccountBuilderTask {
             inventoryCleared = Rs2Bank.depositAllExcept(except);
         else{
             Rs2Bank.depositAll();
-            if (Rs2Inventory.count() == 0)
+            if (Rs2Inventory.isEmpty())
                 inventoryCleared = true;
         }
         return inventoryCleared;

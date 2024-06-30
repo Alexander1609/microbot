@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
+    @Getter
     private final QuestHelperQuest quest;
     private final MQuestScript questScript  = new MQuestScript();
     private final FoodScript foodScript = new FoodScript();
@@ -119,7 +120,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
     @Override
     public void onGameStateChanged(GameStateChanged event) {
-        if (event.getGameState() == GameState.LOGGED_IN){
+        if (event.getGameState() == GameState.LOGGED_IN && scheduledFuture != null){
             if (!isQuestRunning()){
                 startupQuest();
             }
@@ -164,11 +165,23 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         return true;
     }
 
+    private List<ItemRequirement> getAllItemRequirements(ItemRequirement... additionalItems){
+        var combinedRequirements = Stream.concat(Arrays.stream(additionalItems), quest.getQuestHelper().getItemRequirements().stream().map(ItemRequirement::copy)).collect(Collectors.toList());
+
+        // Take more coins for possible transports
+        var coinRequirement = combinedRequirements.stream().filter(x -> x.getName().equals("Coins")).findFirst().orElse(null);
+        if (coinRequirement != null) {
+            coinRequirement.setQuantity(coinRequirement.getQuantity() + 300);
+        }
+
+        return combinedRequirements;
+    }
+
     protected boolean withdrawBuyRequiredItems(){
-        return withdrawBuyItems(quest.getQuestHelper().getItemRequirements());
+        return withdrawBuyItems(getAllItemRequirements());
     }
 
     protected boolean withdrawBuyRequiredItems(ItemRequirement... additionalItems){
-        return withdrawBuyItems(Stream.concat(Arrays.stream(additionalItems), quest.getQuestHelper().getItemRequirements().stream()).collect(Collectors.toList()));
+        return withdrawBuyItems(getAllItemRequirements(additionalItems));
     }
 }
