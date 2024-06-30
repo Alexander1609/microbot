@@ -19,19 +19,6 @@ public class RestlessGhostTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        if (Rs2Player.getWorldLocation().distanceTo(new WorldPoint(3105, 3166, 0)) < 2)
-            Rs2GameObject.interact(Rs2Walker.getTile(new WorldPoint(3109, 3167, 0)).getWallObject());
-
-        if (Rs2Inventory.hasItem(ItemID.GHOSTSPEAK_AMULET)) {
-            Rs2Tab.switchToInventoryTab();
-            Rs2Widget.clickWidget("ghostspeak amulet");
-        }
-    }
-
-    @Override
     public boolean doTaskPreparations() {
         if (Rs2Inventory.getEmptySlots() < 2){
             if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank())

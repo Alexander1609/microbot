@@ -329,6 +329,10 @@ public class Rs2Npc {
                 return true;
         }
 
+        var localLocation = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), location);
+        if (localLocation != null && !Rs2Tile.isWalkable(localLocation))
+            return tiles.keySet().stream().anyMatch(x -> x.distanceTo(location) < 2);
+
         return false;
     }
 

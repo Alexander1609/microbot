@@ -178,7 +178,7 @@ public class Rs2Walker {
     }
 
     public static WorldPoint getPointWithWallDistance(WorldPoint target){
-        var tiles = Rs2Tile.getReachableTilesFromTile(target, 2);
+        var tiles = Rs2Tile.getReachableTilesFromTile(target, 1);
 
         var localPoint = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), target);
         if (Microbot.getClient().getCollisionMaps() != null && localPoint != null) {

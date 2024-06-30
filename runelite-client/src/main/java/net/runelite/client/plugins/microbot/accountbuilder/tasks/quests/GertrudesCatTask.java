@@ -27,12 +27,6 @@ public class GertrudesCatTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().stream().anyMatch(x -> x.contains("Use your Doogle Leaves")))
-            Rs2Inventory.combine(ItemID.RAW_SARDINE, ItemID.DOOGLE_LEAVES);
-    }
-
-    @Override
     public boolean doTaskPreparations() {
         return clearInventory() && withdrawBuyRequiredItems();
     }

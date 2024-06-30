@@ -112,16 +112,7 @@ public class RecruitmentDriveTask extends AccountBuilderQuestTask {
                 Microbot.doInvoke(new NewMenuEntry(-1, 25362448, MenuAction.CC_OP.getId(), 1, -1, "Grain"), new Rectangle(0, 0, 1, 1));
                 sleep(500);
             }
-        } else if (step.getText().stream().anyMatch(x -> x.contains("Use a vial of liquid on the tin")))
-            Rs2Inventory.combine(ItemID.VIAL_OF_LIQUID, ItemID.TIN);
-        else if (step.getText().stream().anyMatch(x -> x.contains("Use a vial of Gypsum on the tin")))
-            Rs2Inventory.combine(ItemID.GYPSUM, ItemID.TIN);
-        else if (step.getText().stream().anyMatch(x -> x.contains("Use Tin on the cupric")))
-            Rs2Inventory.combine(ItemID.TIN_5594, ItemID.CUPRIC_ORE_POWDER);
-        else if (step.getText().stream().anyMatch(x -> x.contains("Use Tin on the tin ore")))
-            Rs2Inventory.combine(ItemID.TIN_5596, ItemID.TIN_ORE_POWDER);
-        else if (step.getText().stream().anyMatch(x -> x.contains("Use your chisel,knife")))
-            Rs2Inventory.combine(ItemID.KNIFE_5605, ItemID.TIN_5598);
+        }
     }
 
     @Override

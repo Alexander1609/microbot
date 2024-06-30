@@ -29,12 +29,15 @@ import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
+import net.runelite.client.plugins.questhelper.steps.widget.WidgetHighlight;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class MQuestScript extends Script {
     public static double version = 0.2;
@@ -46,6 +49,7 @@ public class MQuestScript extends Script {
     public static List<ItemRequirement> grandExchangeItems = new ArrayList<>();
 
     boolean unreachableTarget = false;
+    int unreachableTargetCheckDist = 1;
 
     private MQuestConfig config;
     private static ArrayList<NPC> npcsHandled = new ArrayList<>();
@@ -58,6 +62,7 @@ public class MQuestScript extends Script {
                 if (!Microbot.isLoggedIn()) return;
                 if (!super.run()) return;
                 if (getQuestHelperPlugin().getSelectedQuest() == null) return;
+                if (Rs2Player.isAnimating()) return;
 
                 QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
                 if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
@@ -74,6 +79,30 @@ public class MQuestScript extends Script {
                         for (var dialogChoice : dialogChoices){
                             if (dialogChoice.getText().endsWith(choice.getChoice())){
                                 Rs2Keyboard.keyPress(dialogChoice.getOnKeyListener()[7].toString().charAt(0));
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (questStep != null && !questStep.getWidgetsToHighlight().isEmpty()){
+                    var widgetHighlight = questStep.getWidgetsToHighlight().stream()
+                            .filter(x -> x instanceof WidgetHighlight)
+                            .map(x -> (WidgetHighlight)x)
+                            .filter(x -> Rs2Widget.isWidgetVisible(x.getGroupId(), x.getChildId()))
+                            .findFirst().orElse(null);
+
+                    if (widgetHighlight != null){
+                        var widget = Rs2Widget.getWidget(widgetHighlight.getGroupId(), widgetHighlight.getChildId());
+                        if (widget != null){
+                            if (widgetHighlight.getChildChildId() != -1){
+                                var childWidget = widget.getChildren()[widgetHighlight.getChildChildId()];
+                                if (childWidget != null) {
+                                    Rs2Widget.clickWidget(childWidget.getId());
+                                    return;
+                                }
+                            } else {
+                                Rs2Widget.clickWidget(widget.getId());
                                 return;
                             }
                         }
@@ -99,26 +128,6 @@ public class MQuestScript extends Script {
                         if (ShortestPathPlugin.getMarker() != null)
                             ShortestPathPlugin.exit();
                         return;
-                    }
-
-                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.THE_RESTLESS_GHOST.getId()) {
-                        if (Rs2Inventory.hasItem("ghostspeak amulet")) {
-                            Rs2Inventory.wear("ghostspeak amulet");
-                        }
-                    }
-
-                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.RUNE_MYSTERIES.getId()) {
-                        NPC aubury = Rs2Npc.getNpc("Aubury");
-                        if (Rs2Inventory.hasItem("research package") && aubury != null) {
-                            Rs2Npc.interact(aubury, "Talk-to");
-                        }
-                    }
-
-                    if (getQuestHelperPlugin().getSelectedQuest().getQuest().getId() == Quest.COOKS_ASSISTANT.getId()) {
-                        NPC aubury = Rs2Npc.getNpc("Aubury");
-                        if (Rs2Inventory.hasItem("research package") && aubury != null) {
-                            Rs2Npc.interact(aubury, "Talk-to");
-                        }
                     }
 
                     if (questStep instanceof DetailedQuestStep && handleRequirements((DetailedQuestStep) questStep)){
@@ -205,15 +214,18 @@ public class MQuestScript extends Script {
     }
 
     public boolean applyNpcStep(NpcStep step) {
-        var npc = Rs2Npc.getNpc(step.npcID);
+        var npcs = step.getNpcs();
+        var npc = npcs.stream().findFirst().orElse(null);
 
         if (step.isAllowMultipleHighlights()){
-            var npcs = Rs2Npc.getNpcs(step.npcID);
-
-            npc = npcs.filter(x -> !npcsHandled.contains(x)).findFirst().orElse(null);
+            if (npcs.stream().anyMatch(x -> !npcsHandled.contains(x)))
+                npc = npcs.stream().filter(x -> !npcsHandled.contains(x)).findFirst().orElse(null);
+            else
+                npc = npcs.stream().min(Comparator.comparing(x -> Rs2Player.getWorldLocation().distanceTo(x.getWorldLocation()))).orElse(null);
         }
 
-        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && (Rs2Npc.hasLineOfSight(npc) || Rs2Npc.canWalkTo(npc, 10))) {
+        // Workaround for instances
+        if (npc != null && Rs2Camera.isTileOnScreen(npc.getLocalLocation()) && (Microbot.getClient().isInInstancedRegion() || Rs2Npc.canWalkTo(npc, 10))) {
             // Stop pathing
             Rs2Walker.setTarget(null);
 
@@ -254,7 +266,7 @@ public class MQuestScript extends Script {
             }
         } else if (npc != null && !Rs2Camera.isTileOnScreen(npc.getLocalLocation())) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);
-        } else if (npc != null && !Rs2Npc.hasLineOfSight(npc)) {
+        } else if (npc != null && (!Rs2Npc.hasLineOfSight(npc) || !Rs2Npc.canWalkTo(npc, 10))) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);
         } else {
             if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
@@ -271,20 +283,23 @@ public class MQuestScript extends Script {
         var itemId = step.getIconItemID();
 
         if (object != null && unreachableTarget){
-            var tileObjects = Rs2GameObject.getTileObjects();
+            var tileObjects = Rs2GameObject.getTileObjects().stream().filter(x -> x instanceof WallObject).collect(Collectors.toList());
 
-            for (var tile : Rs2Tile.getWalkableTilesAroundTile(object.getWorldLocation(), 1)){
+            for (var tile : Rs2Tile.getWalkableTilesAroundTile(object.getWorldLocation(), unreachableTargetCheckDist)){
                 if (tileObjects.stream().noneMatch(x -> x.getWorldLocation().equals(tile))){
                     if (!Rs2Walker.walkTo(tile) && ShortestPathPlugin.getPathfinder() == null)
                         return false;
 
                     sleepUntil(() -> ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone());
-                    if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone())
+                    if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone()){
                         unreachableTarget = false;
+                        unreachableTargetCheckDist = 1;
+                    }
                     return false;
                 }
             }
 
+            unreachableTargetCheckDist++;
             return false;
         }
 
@@ -401,7 +416,7 @@ public class MQuestScript extends Script {
                 widget = tmpWidget;
         }
 
-        Rs2Widget.clickWidgetFast(widget);
+        Rs2Widget.clickWidget(widget.getId());
         return true;
     }
 

@@ -75,9 +75,7 @@ public class WaterfallQuestTask extends AccountBuilderQuestTask {
 
     @Override
     protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().contains("Read the book."))
-            Rs2Inventory.interact(ItemID.BOOK_ON_BAXTORIAN, "Read");
-        else if (step.getText().stream().anyMatch(x -> x.contains("Leave Glarial's Tomb"))){
+        if (step.getText().stream().anyMatch(x -> x.contains("Leave Glarial's Tomb"))){
             if (isQuestRunning())
                 stopQuest();
 

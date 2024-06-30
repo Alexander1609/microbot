@@ -31,20 +31,6 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().stream().anyMatch(x -> x.contains("Dye the wig with yellow dye")))
-            Rs2Inventory.combine(ItemID.YELLOW_DYE, ItemID.WIG_2421);
-    }
-
-    @Override
-    protected void handleObjectStep(ObjectStep step) {
-        if (step.objectID == ObjectID.PRISON_GATE) {
-            Rs2Inventory.use(ItemID.BRONZE_KEY);
-            Rs2GameObject.interact(Rs2GameObject.findDoor(2881));
-        }
-    }
-
-    @Override
     protected void handleNPCStep(NpcStep step) {
         if (step.npcID == NpcID.CHANCELLOR_HASSAN && Rs2Player.getWorldLocation().distanceTo(new WorldArea(3121, 3240, 5, 4, 0)) == 0){
             Rs2GameObject.interact(Rs2GameObject.findDoor(2881));

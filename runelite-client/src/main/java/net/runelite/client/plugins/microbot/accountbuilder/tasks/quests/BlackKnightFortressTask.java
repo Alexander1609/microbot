@@ -26,19 +26,12 @@ public class BlackKnightFortressTask extends AccountBuilderQuestTask {
 
     @Override
     protected void handleObjectStep(ObjectStep step) {
-        if (step.objectID == ObjectID.STURDY_DOOR){
-            if (!Rs2Equipment.isWearing(ItemID.BRONZE_MED_HELM))
-                Rs2Inventory.interact(ItemID.BRONZE_MED_HELM);
-            else if (!Rs2Equipment.isWearing(ItemID.IRON_CHAINBODY))
-                Rs2Inventory.interact(ItemID.IRON_CHAINBODY);
-        } else if (step.objectID == ObjectID.LADDER_17148 && step.getWorldPoint().equals(new WorldPoint(3025, 3513, 1))){
+        if (step.objectID == ObjectID.LADDER_17148 && step.getWorldPoint().equals(new WorldPoint(3025, 3513, 1))){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(3018, 3505, 8, 8, 1)) == 0)
                 Rs2Walker.walkTo(new WorldPoint(3028, 3514, 1), 2);
         } else if (step.objectID == ObjectID.LADDER_17159){
             if (Rs2Player.getWorldLocation().distanceTo(new WorldArea(3014, 3517, 4, 4, 0)) == 0)
                 Rs2GameObject.interact(2341);
-        } else if (step.objectID == ObjectID.HOLE_2336) {
-            Rs2Inventory.useItemOnObject(ItemID.CABBAGE, ObjectID.HOLE_2336);
         } else if (step.objectID == ObjectID.STAIRCASE_24072){
             boolean stopQuest = true;
 

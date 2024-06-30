@@ -1,19 +1,13 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
-import net.runelite.api.ItemID;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
-import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
-
-import java.util.concurrent.TimeUnit;
 
 public class CookAssistantTask extends AccountBuilderQuestTask {
     boolean bankDone;
@@ -82,64 +76,6 @@ public class CookAssistantTask extends AccountBuilderQuestTask {
             Rs2Player.waitForAnimation();
             return false;
         }
-
-        if (!Rs2Inventory.contains("Egg")){
-            if (!Rs2Walker.walkTo(new WorldPoint(3229, 3299, 0), 3))
-                return false;
-
-            Rs2GroundItem.loot("Egg", 10);
-            Rs2Player.waitForAnimation();
-            return false;
-        }
-
-        if (!Rs2Inventory.contains("Bucket of milk")){
-            if (!Rs2Walker.walkTo(new WorldPoint(3255, 3275, 0), 3))
-                return false;
-
-            Rs2GameObject.interact("Dairy cow");
-            Rs2Player.waitForAnimation();
-            return false;
-        }
-
-        if (!Rs2Inventory.contains("Pot of flour")){
-            if (!Rs2Inventory.contains("Grain") && !depositedWheat){
-                if (!Rs2Walker.walkTo(new WorldPoint(3161, 3293, 0), 2))
-                    return false;
-
-                Rs2GameObject.interact("Wheat", "Pick");
-                Rs2Player.waitForAnimation();
-                return false;
-            }
-
-            if (!depositedWheat){
-                if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 2)))
-                    return false;
-
-                if (Rs2Inventory.contains("Grain")){
-                    Rs2GameObject.interact(24961, "Fill");
-                    Rs2Player.waitForWalking();
-                    Rs2Player.waitForAnimation();
-
-                    Rs2GameObject.interact("Hopper controls", "Operate");
-                    Rs2Player.waitForWalking();
-                    Rs2Player.waitForAnimation();
-
-                    if (!Rs2Inventory.contains("Grain"))
-                        depositedWheat = true;
-                }
-            }
-
-            if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 0)))
-                return false;
-
-            Rs2GameObject.interact(1781, "Empty");
-            Rs2Player.waitForAnimation();
-
-            return false;
-        }
-
-        if (!Rs2Walker.walkTo(new WorldPoint(3208, 3214, 0)))
-            return false;
 
         return true;
     }

@@ -156,20 +156,6 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
                 Rs2Walker.walkTo(new WorldPoint(1650, 4840, 0), 2);
             } else if (!isQuestRunning())
                 startupQuest();
-        } else if (step.objectID == NullObjectID.NULL_29658 && step.getText().stream().anyMatch(x -> x.contains("Search"))){
-            Rs2GameObject.interact(NullObjectID.NULL_29658, "Search");
-        }
-    }
-
-    @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().stream().anyMatch(x -> x.contains("Read the notes."))) {
-            if (Rs2Inventory.contains(ItemID.NOTES_21058))
-                Rs2Inventory.interact(ItemID.NOTES_21058, "Read");
-            else if (Rs2Inventory.contains(ItemID.NOTES_21057))
-                Rs2Inventory.interact(ItemID.NOTES_21057, "Read");
-            else
-                Rs2Inventory.interact(ItemID.NOTES_21056, "Read");
         }
     }
 

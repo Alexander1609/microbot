@@ -23,9 +23,6 @@ public class DruidicRitualTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        if (true)
-            return true;
-
         return clearInventory() && withdrawBuyRequiredItems();
     }
 }

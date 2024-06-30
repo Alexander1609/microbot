@@ -21,14 +21,6 @@ public class ErnestTheChickenTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        if (currentStep.getText().stream().anyMatch(x -> x.contains("Use the poison on the fish food")))
-            Rs2Inventory.combine(ItemID.POISON, ItemID.FISH_FOOD);
-    }
-
-    @Override
     protected void handleObjectStep(ObjectStep step) {
         if (step.objectID == ObjectID.FOUNTAIN){
             if (Rs2Player.getWorldLocation().distanceTo(step.getWorldPoint()) < 5){

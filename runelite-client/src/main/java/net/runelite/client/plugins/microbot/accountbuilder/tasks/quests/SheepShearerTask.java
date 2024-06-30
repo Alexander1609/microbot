@@ -1,5 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
+import net.runelite.api.ItemID;
+import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -14,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 import java.util.Arrays;
 
@@ -35,48 +38,14 @@ public class SheepShearerTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    protected void handleNPCStep(NpcStep step) {
-        if (!woolDone){
-            var woolCountRequired = ((ItemRequirement)step.getRequirements().get(0)).getQuantity();
+    protected void handleObjectStep(ObjectStep step) {
+        if (step.objectID == ObjectID.SPINNING_WHEEL_14889){
+            if (Rs2Player.isAnimating() && isQuestRunning())
+                stopQuest();
 
-            if (Rs2Inventory.contains("Shears") && woolCountRequired > Rs2Inventory.count("Ball of wool")){
-                if (isQuestRunning())
-                    stopQuest();
-
-                if (Rs2Inventory.count("Wool") < woolCountRequired){
-                    if (!Rs2Walker.walkTo(sheepArea, 1))
-                        return;
-
-                    var sheep = Rs2Npc.getNpcs("Sheep", true)
-                            .filter(x -> Arrays.asList(Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getNpcDefinition(x.getId())).getActions()).contains(("Shear")))
-                            .findFirst().orElse(null);
-
-                    if (sheep != null){
-                        Rs2Npc.interact(sheep, "Shear");
-                        Rs2Player.waitForAnimation();
-                    }
-                } else {
-                    if (!Rs2Walker.walkTo(new WorldPoint(3209, 3213, 1), 1))
-                        return;
-
-                    Rs2GameObject.interact("Spinning wheel", "Spin");
-                    sleepUntil(() -> Rs2Widget.getWidget(17694734) != null, 5000);
-                    Rs2Widget.clickWidget(17694734);
-
-                    sleep(5000);
-                    while (true) {
-                        var woolCount = Rs2Inventory.get("Ball of wool").quantity;
-                        sleep(3000);
-                        if (woolCount == Rs2Inventory.get("Ball of wool").quantity)
-                            break;
-                    }
-                }
-            }
-            else if (woolCountRequired == Rs2Inventory.count("Ball of wool") && Rs2Walker.walkTo(new WorldPoint(3188, 3273, 0), 2))
-                woolDone = true;
+            if (!Rs2Inventory.contains(ItemID.WOOL) && !isQuestRunning())
+                startupQuest();
         }
-        else if (!isQuestRunning())
-            startupQuest();
     }
 
     @Override
@@ -89,6 +58,6 @@ public class SheepShearerTask extends AccountBuilderQuestTask {
             return false;
         }
 
-        return Rs2Walker.walkTo(new WorldPoint(3188, 3273, 0), 2);
+        return true;
     }
 }

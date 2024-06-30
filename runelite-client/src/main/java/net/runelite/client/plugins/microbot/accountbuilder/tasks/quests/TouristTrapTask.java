@@ -57,22 +57,10 @@ public class TouristTrapTask extends AccountBuilderQuestTask {
                 Microbot.doInvoke(new NewMenuEntry(-1, 25362453, MenuAction.CC_OP.getId(), 1, -1, "<col=ff9040>Glarial's amulet</col>"), new Rectangle(0, 0, 1, 1));
             else if (!isQuestRunning())
                 startupQuest();
-        } else if (step.objectID == ObjectID.MINE_DOOR_ENTRANCE){
-            if (Rs2Inventory.containsAll(ItemID.SLAVE_BOOTS, ItemID.SLAVE_ROBE, ItemID.SLAVE_SHIRT)){
-                Rs2Inventory.wear(ItemID.SLAVE_BOOTS);
-                Rs2Inventory.wear(ItemID.SLAVE_ROBE);
-                Rs2Inventory.wear(ItemID.SLAVE_SHIRT);
-            }
         } else if (step.objectID == ObjectID.MINE_CART_2684 && !Rs2Dialogue.isInDialogue() && step.getText().stream().anyMatch(x -> x.contains("Return in the mine cart you came in on."))){
             Rs2GameObject.interact(ObjectID.MINE_CART_2684, "Search");
             Rs2Player.waitForWalking();
         }
-    }
-
-    @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().stream().anyMatch(x -> x.contains("Add 10 feathers to")) && !Rs2Dialogue.isInDialogue())
-            Rs2Inventory.combine(ItemID.PROTOTYPE_DART_TIP, ItemID.FEATHER);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
@@ -45,6 +46,7 @@ public class AccountBuilderScript extends Script {
     AccountBuilderTask task;
 
     @Getter
+    @Setter
     AccountBuilderTask nextTask;
 
     @Getter
@@ -53,6 +55,7 @@ public class AccountBuilderScript extends Script {
     @Getter
     long taskEndTime;
 
+    @Getter
     Map<AccountBuilderTask, Integer> taskMap;
     boolean taskRunning = false;
 

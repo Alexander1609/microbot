@@ -47,12 +47,6 @@ public class BelowIceMountainTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step.getText().stream().anyMatch(x -> x.contains("Use the knife on the bread")))
-            Rs2Inventory.combine(ItemID.KNIFE, ItemID.BREAD);
-    }
-
-    @Override
     protected void handleNPCStep(NpcStep step) {
         if (step.npcID == NpcID.ANCIENT_GUARDIAN){
             if (isQuestRunning())
