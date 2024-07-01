@@ -34,8 +34,10 @@ public class WaterfallQuestTask extends AccountBuilderQuestTask {
     private Map<GameObject, Integer> pillars;
 
     public WaterfallQuestTask(){
-        super(QuestHelperQuest.WATERFALL_QUEST);
+        super(QuestHelperQuest.WATERFALL_QUEST, false);
     }
+
+    // TODO Heal up and wait for run energy
 
     @Override
     public void init() {
@@ -119,7 +121,7 @@ public class WaterfallQuestTask extends AccountBuilderQuestTask {
                 }, x -> 0));
 
             var pillar = pillars.entrySet().stream().filter(x -> x.getValue() < 3).findFirst().orElse(null);
-            if (false && pillar != null){
+            if (pillar != null){
                 int id;
                 if (pillar.getValue() < 1)
                     id = ItemID.AIR_RUNE;
@@ -133,8 +135,10 @@ public class WaterfallQuestTask extends AccountBuilderQuestTask {
                 Rs2GameObject.interact(pillar.getKey());
                 Rs2Player.waitForWalking(200);
                 sleepUntil(() -> Rs2Dialogue.isInDialogue(), 5000);
+                sleep(200);
 
                 if (!Rs2Inventory.contains(id) || Rs2Inventory.get(id).quantity < count){
+                    Rs2Dialogue.clickContinue();
                     pillars.put(pillar.getKey(), pillar.getValue() + 1);
                 }
             } else if (Rs2Equipment.hasEquipped(ItemID.GLARIALS_AMULET)){

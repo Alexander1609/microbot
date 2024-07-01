@@ -83,7 +83,7 @@ public class PiratesTreasureTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems();
+        return clearInventory() && withdrawBuyItems();
     }
 
     @Override

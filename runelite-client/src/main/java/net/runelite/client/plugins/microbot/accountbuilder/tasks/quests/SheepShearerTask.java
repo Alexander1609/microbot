@@ -21,11 +21,8 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 import java.util.Arrays;
 
 public class SheepShearerTask extends AccountBuilderQuestTask {
-    WorldArea sheepArea = new WorldArea(3193, 3258, 18, 17, 0);
-    boolean woolDone = false;
-
     public SheepShearerTask(){
-        super(QuestHelperQuest.SHEEP_SHEARER);
+        super(QuestHelperQuest.SHEEP_SHEARER, false);
         memberOnly = false;
     }
 

@@ -115,7 +115,6 @@ public class Rs2Walker {
                  */
                 for (int i = indexOfStartPoint; i < ShortestPathPlugin.getPathfinder().getPath().size() - 1; i++) {
                     WorldPoint currentWorldPoint = ShortestPathPlugin.getPathfinder().getPath().get(i);
-                    indexOfStartPoint = getClosestTileIndex(path);
 
                     /**
                      * CHECK DOORS
@@ -134,7 +133,7 @@ public class Rs2Walker {
                     if (!Microbot.getClient().isInInstancedRegion()) {
                         Microbot.status = "Checking for transports...";
                         startTime = System.currentTimeMillis();
-                        doorOrTransportResult = handleTransports(path, indexOfStartPoint);
+                        doorOrTransportResult = handleTransports(path, i);
                         endTime = System.currentTimeMillis();
                         totalTime = endTime - startTime;
                         System.out.println("Handling transports took " + totalTime + "ms");
@@ -165,7 +164,7 @@ public class Rs2Walker {
                     }
                 }
 
-                if (Rs2Player.getWorldLocation().distanceTo(target) < distance || Rs2Player.getWorldLocation().distanceTo(target) == 1) {
+                if (Rs2Tile.getWalkableTilesAroundPlayer(distance).contains(target)) {
                     System.out.println("walk minimap");
                     Rs2Walker.walkMiniMap(target);
                     sleep(600, 1200);
@@ -641,112 +640,106 @@ public class Rs2Walker {
      * @return
      */
     public static boolean handleTransports(List<WorldPoint> path, int indexOfStartPoint) {
-        for (WorldPoint a : ShortestPathPlugin.getTransports().keySet()
-                .stream()
-                .filter(x -> x.distanceTo(Rs2Player.getWorldLocation()) <= 12)
-                .sorted(Comparator.comparingInt(worldPoint -> worldPoint.distanceTo(Rs2Player.getWorldLocation())))
-                .collect(Collectors.toList())) {
+        for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new ArrayList<>())) {
+            for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
 
-            for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(a, new ArrayList<>())) {
-                for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
+                if (Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
+                    continue;
+                }
 
-                    if (Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
+                for (int i = indexOfStartPoint; i < path.size(); i++) {
+                    if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
-                    }
+                    if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
 
-                    for (int i = indexOfStartPoint; i < path.size(); i++) {
-                        if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
-                            continue;
-                        if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
+                    int indexOfOrigin = IntStream.range(0, path.size())
+                            .filter(f -> path.get(f).equals(b.getOrigin()))
+                            .findFirst()
+                            .orElse(-1);
+                    int indexOfDestination = IntStream.range(0, path.size())
+                            .filter(f -> path.get(f).equals(b.getDestination()))
+                            .findFirst()
+                            .orElse(-1);
+                    if (indexOfDestination == -1) continue;
+                    if (indexOfOrigin == -1) continue;
+                    if (indexOfDestination < indexOfOrigin) continue;
 
-                        int indexOfOrigin = IntStream.range(0, path.size())
-                                .filter(f -> path.get(f).equals(b.getOrigin()))
-                                .findFirst()
-                                .orElse(-1);
-                        int indexOfDestination = IntStream.range(0, path.size())
-                                .filter(f -> path.get(f).equals(b.getDestination()))
-                                .findFirst()
-                                .orElse(-1);
-                        if (indexOfDestination == -1) continue;
-                        if (indexOfOrigin == -1) continue;
-                        if (indexOfDestination < indexOfOrigin) continue;
-
-                        if (path.get(i).equals(origin)) {
-                            if (b.isShip()) {
-                                if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
-                                    Rs2Npc.interact(b.getNpcName(), b.getAction());
-                                    Rs2Player.waitForWalking();
-                                } else {
-                                    Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1200, 1600);
-                                }
-                            }
-
-                            if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
-                                handleTrapdoor(b);
-                            }
-
-                            if (b.isSpiritTree()) {
-                                b.handleSpiritTree();
-                            }
-
-
-                            if (b.isGnomeGlider()) {
-                                b.handleGlider();
-                            }
-
-                            if (b.isFairyRing()) {
-                                b.handleFairyRing();
-                            }
-
-
-                            GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-
-                            //check game objects
-                            if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                                boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
-                                if (!interact) {
-                                    Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1600, 2000);
-                                    return false;
-                                }
+                    if (path.get(i).equals(origin)) {
+                        if (b.isShip()) {
+                            if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
+                                Rs2Npc.interact(b.getNpcName(), b.getAction());
                                 Rs2Player.waitForWalking();
-                               return true;
-                            }
-
-                            //check wall objects (tunnels)
-                            WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
-                            if (wallObject != null && wallObject.getId() == b.getObjectId()) {
-                                boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
-                                if (!interact) {
-                                    Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1600, 2000);
-                                    return false;
-                                }
-                                Rs2Player.waitForWalking();
-                                return true;
-                            }
-
-                            //check ground objects
-                            GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
-                            if (groundObject != null && groundObject.getId() == b.getObjectId()) {
-                                boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
-                                if (!interact) {
-                                    Rs2Walker.walkFastCanvas(path.get(i));
-                                    sleep(1600, 2000);
-                                    return false;
-                                }
-                                if (b.isAgilityShortcut()) {
-                                    Rs2Player.waitForAnimation();
-                                } else {
-                                    Rs2Player.waitForWalking();
-                                }
-                                return true;
+                            } else {
+                                Rs2Walker.walkFastCanvas(path.get(i));
+                                sleep(1200, 1600);
                             }
                         }
 
+                        if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                            handleTrapdoor(b);
+                        }
 
+                        if (b.isSpiritTree()) {
+                            b.handleSpiritTree();
+                        }
+
+
+                        if (b.isGnomeGlider()) {
+                            b.handleGlider();
+                        }
+
+                        if (b.isFairyRing()) {
+                            b.handleFairyRing();
+                        }
+
+
+                        GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+
+                        //check game objects
+                        if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
+                            Rs2Player.waitForWalking();
+                           return true;
+                        }
+
+
+                        //check wall objects (tunnels)
+                        WallObject wallObject = Rs2GameObject.getWallObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                        if (wallObject != null && wallObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(wallObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
+                            Rs2Player.waitForWalking();
+                            return true;
+                        }
+
+                        //check ground objects
+                        GroundObject groundObject = Rs2GameObject.getGroundObjects(b.getObjectId(), b.getOrigin()).stream().filter(x -> !x.getWorldLocation().equals(Rs2Player.getWorldLocation())).findFirst().orElse(null);
+                        if (groundObject != null && groundObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(groundObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
+                                return false;
+                            }
+                            if (b.isAgilityShortcut()) {
+                                Rs2Player.waitForAnimation();
+                            } else {
+                                Rs2Player.waitForWalking();
+                            }
+                            return true;
+                        }
                     }
+
+
                 }
             }
         }

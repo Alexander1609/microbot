@@ -12,7 +12,8 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class SleepingGiantsTask extends AccountBuilderQuestTask {
     public SleepingGiantsTask(){
-        super(QuestHelperQuest.SLEEPING_GIANTS);
+        super(QuestHelperQuest.SLEEPING_GIANTS,
+                new ItemRequirement("Bronze nails", ItemID.BRONZE_NAILS, 10));
     }
 
     @Override
@@ -38,7 +39,7 @@ public class SleepingGiantsTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems(new ItemRequirement("Bronze nails", ItemID.BRONZE_NAILS, 10));
+        return clearInventory() && withdrawBuyItems();
     }
 
     @Override

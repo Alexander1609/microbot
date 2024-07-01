@@ -10,7 +10,6 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
-import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.AccountBuilderFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -62,7 +61,6 @@ public class AccountBuilderScript extends Script {
     long breakEndTime = 0;
 
     public boolean run(AccountBuilderConfig config) {
-        taskMap = AccountBuilderTaskList.getTasks();
         task = null;
         taskRunning = false;
 
@@ -96,6 +94,9 @@ public class AccountBuilderScript extends Script {
                     Rs2Camera.setPitch(300 + new Random().nextInt(84));
                     Rs2Camera.setAngle(new Random().nextInt(360));
                 }
+
+                if (taskMap == null)
+                    return;
 
                 if (task == null && nextTask == null)
                     nextTask = getNewRandomTask();

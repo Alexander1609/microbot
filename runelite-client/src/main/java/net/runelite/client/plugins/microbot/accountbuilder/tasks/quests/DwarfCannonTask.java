@@ -18,7 +18,7 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class DwarfCannonTask extends AccountBuilderQuestTask {
     public DwarfCannonTask(){
-        super(QuestHelperQuest.DWARF_CANNON);
+        super(QuestHelperQuest.DWARF_CANNON, false);
     }
 
     @Override

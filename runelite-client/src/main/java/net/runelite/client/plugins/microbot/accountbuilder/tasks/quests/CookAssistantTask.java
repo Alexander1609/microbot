@@ -14,7 +14,7 @@ public class CookAssistantTask extends AccountBuilderQuestTask {
     boolean depositedWheat;
 
     public CookAssistantTask(){
-        super(QuestHelperQuest.COOKS_ASSISTANT);
+        super(QuestHelperQuest.COOKS_ASSISTANT, false);
         memberOnly = false;
     }
 

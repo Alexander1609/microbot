@@ -256,8 +256,10 @@ public class ShortestPathPlugin extends Plugin {
             return;
         }
 
+        var path = pathfinder.getPath();
+
         if (Rs2Player.getWorldLocation().distanceTo(pathfinder.getTarget()) < config.reachedDistance()
-                && Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), config.reachedDistance()).containsKey(pathfinder.getTarget())) {
+                && Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), config.reachedDistance()).containsKey(path.get(path.size() - 1))) {
             setTarget(null);
             if (Microbot.getClientThread().scheduledFuture != null) {
                 Microbot.getClientThread().scheduledFuture.cancel(true);

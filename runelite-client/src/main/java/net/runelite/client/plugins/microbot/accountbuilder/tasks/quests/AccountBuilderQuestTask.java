@@ -4,35 +4,22 @@ import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
-import net.runelite.client.plugins.microbot.globval.WidgetIndices;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
-import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
-import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeSlots;
-import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
-import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
+import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestPointRequirement;
-import net.runelite.client.plugins.questhelper.requirements.quest.QuestRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Getter
@@ -45,8 +32,23 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
     protected boolean useFood = false;
 
-    public AccountBuilderQuestTask(QuestHelperQuest quest){
+    public AccountBuilderQuestTask(QuestHelperQuest quest, ItemRequirement... additionalRequirements){
+        this(quest, true, additionalRequirements);
+    }
+
+    public AccountBuilderQuestTask(QuestHelperQuest quest, boolean buyItems, ItemRequirement... additionalRequirements){
         this.quest = quest;
+
+        itemRequirements.addAll(List.of(additionalRequirements));
+
+        if (buyItems && quest != null && quest.getQuestHelper().getItemRequirements() != null)
+            itemRequirements.addAll(quest.getQuestHelper().getItemRequirements().stream().map(ItemRequirement::copy).collect(Collectors.toList()));
+
+        // Increase coin requirement for possible ship transports
+        var coinRequirement = itemRequirements.stream().filter(x -> x.getName().equals("Coins")).findFirst().orElse(null);
+        if (coinRequirement != null) {
+            coinRequirement.setQuantity(coinRequirement.getQuantity() + Random.random(200, 300));
+        }
     }
 
     public String getName() {
@@ -163,25 +165,5 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         }
 
         return true;
-    }
-
-    private List<ItemRequirement> getAllItemRequirements(ItemRequirement... additionalItems){
-        var combinedRequirements = Stream.concat(Arrays.stream(additionalItems), quest.getQuestHelper().getItemRequirements().stream().map(ItemRequirement::copy)).collect(Collectors.toList());
-
-        // Take more coins for possible transports
-        var coinRequirement = combinedRequirements.stream().filter(x -> x.getName().equals("Coins")).findFirst().orElse(null);
-        if (coinRequirement != null) {
-            coinRequirement.setQuantity(coinRequirement.getQuantity() + 300);
-        }
-
-        return combinedRequirements;
-    }
-
-    protected boolean withdrawBuyRequiredItems(){
-        return withdrawBuyItems(getAllItemRequirements());
-    }
-
-    protected boolean withdrawBuyRequiredItems(ItemRequirement... additionalItems){
-        return withdrawBuyItems(getAllItemRequirements(additionalItems));
     }
 }

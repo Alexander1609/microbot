@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
-import net.runelite.api.GameState;
+import lombok.Setter;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
@@ -8,7 +8,7 @@ import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -22,12 +22,10 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import org.apache.commons.lang3.ArrayUtils;
 
+import javax.inject.Inject;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -36,6 +34,9 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 public abstract class AccountBuilderTask {
+    @Setter
+    ItemManager itemManager;
+
     protected ScheduledExecutorService executorService = Executors.newScheduledThreadPool(100);
     protected ScheduledFuture<?> scheduledFuture;
     protected boolean canceled;
@@ -49,6 +50,8 @@ public abstract class AccountBuilderTask {
     protected int minTickTime = 500;
     protected int maxTickTime = 1500;
 
+    protected ArrayList<ItemRequirement> itemRequirements = new ArrayList<>();
+
     public abstract String getName();
 
     public boolean requirementsMet(){
@@ -61,6 +64,12 @@ public abstract class AccountBuilderTask {
 
         if (memberOnly && !Rs2Player.isMember())
             return false;
+
+        if (!itemRequirements.isEmpty()){
+            var gpRequired = getMissingItemPrice();
+            if (gpRequired > 0 && !Rs2Bank.hasBankItem("Coins", gpRequired))
+                return false;
+        }
 
         return true;
     }
@@ -165,13 +174,24 @@ public abstract class AccountBuilderTask {
         return inventoryCleared;
     }
 
-    protected boolean withdrawBuyItems(ItemRequirement... itemRequirements){
-        return withdrawBuyItems(Arrays.asList(itemRequirements));
+    protected int getMissingItemPrice(){
+        int total = 0;
+
+        for (var itemRequirement : itemRequirements)
+            if (itemRequirement.getId() != -1
+                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Bank.hasBankItem(x, itemRequirement.getQuantity()))
+                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity())))
+                total += itemRequirement.getAllIds().stream().min(Comparator.comparing(x -> Microbot.getClientThread().runOnClientThread(() -> itemManager.getItemPriceWithSource(x, false)))).orElse(0) * itemRequirement.getQuantity();
+
+        // Fixed increase for possible overpay
+        total = (int) (total * 1.5);
+
+        return total;
     }
 
     protected ArrayList<Integer> itemsBought = new ArrayList<>();
 
-    protected boolean withdrawBuyItems(List<ItemRequirement> itemRequirements){
+    protected boolean withdrawBuyItems(){
         if (Rs2Bank.bankItems == null || Rs2Bank.bankItems.isEmpty()){
             Rs2Bank.walkToBankAndUseBank();
             return false;
@@ -180,7 +200,7 @@ public abstract class AccountBuilderTask {
         var itemsToBuy = itemRequirements.stream().filter(x -> !itemsBought.contains(x.getId())
                 && !Rs2Inventory.hasItemAmount(x.getId(), x.getQuantity())
                 && !Rs2Bank.hasBankItem(x.getId(), x.getQuantity())
-                && !x.getAllIds().stream().anyMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity()) || Rs2Bank.hasBankItem(y, x.getQuantity()) || itemsBought.contains(y))).collect(Collectors.toList());
+                && x.getAllIds().stream().noneMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity()) || Rs2Bank.hasBankItem(y, x.getQuantity()) || itemsBought.contains(y))).collect(Collectors.toList());
         if (!itemsToBuy.isEmpty()){
             if (!Rs2GrandExchange.walkToGrandExchange() || !Rs2GrandExchange.openExchange())
                 return false;
@@ -197,8 +217,11 @@ public abstract class AccountBuilderTask {
                     bought = true;
                     itemsBought.add(itemsToBuy.get(0).getId());
                 } else {
-                    var slot = Arrays.stream(GrandExchangeSlots.values()).filter(x -> Arrays.stream(Rs2GrandExchange.getSlot(x).getDynamicChildren()).anyMatch(y -> y.getItemId() == itemsToBuy.get(0).getId())).findFirst().orElse(null);
+                    var slot = Arrays.stream(GrandExchangeSlots.values()).filter(x -> Arrays.stream(Objects.requireNonNull(Rs2GrandExchange.getSlot(x)).getDynamicChildren()).anyMatch(y -> y.getItemId() == itemsToBuy.get(0).getId())).findFirst().orElse(null);
+                    assert slot != null;
                     var slotWidget = Rs2GrandExchange.getSlot(slot);
+                    assert slotWidget != null;
+
                     Microbot.doInvoke(new NewMenuEntry(2, slotWidget.getId(), MenuAction.CC_OP.getId(), 2, -1, "Abort offer"), slotWidget.getBounds());
                     sleepUntil(() -> Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getItemId() == itemsToBuy.get(0).getId() && x.getState() == GrandExchangeOfferState.CANCELLED_BUY), 5000);
                     sleep(1000, 2000);
@@ -225,9 +248,12 @@ public abstract class AccountBuilderTask {
 
             var invItem = Rs2Inventory.get(id);
             if (invItem == null || !Rs2Inventory.hasItemAmount(id, item.getQuantity(), invItem.isStackable())){
-                if (item.getQuantity() == 1)
-                    Rs2Bank.withdrawItem(id);
-                else
+                if (item.getQuantity() == 1) {
+                    if (item.isEquip())
+                        Rs2Bank.withdrawAndEquip(id);
+                    else
+                        Rs2Bank.withdrawItem(id);
+                } else
                     Rs2Bank.withdrawX(id, item.getQuantity() - Rs2Inventory.count(id));
                 return false;
             }

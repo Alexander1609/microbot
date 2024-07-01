@@ -15,14 +15,14 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class ErnestTheChickenTask extends AccountBuilderQuestTask {
     public ErnestTheChickenTask(){
-        super(QuestHelperQuest.ERNEST_THE_CHICKEN);
+        super(QuestHelperQuest.ERNEST_THE_CHICKEN, false);
         useFood = true;
         memberOnly = false;
     }
 
     @Override
     protected void handleObjectStep(ObjectStep step) {
-        if (step.objectID == ObjectID.FOUNTAIN){
+        if (step.objectID == ObjectID.FOUNTAIN && step.getText().stream().anyMatch(x -> x.contains("Use the poisoned fish food on the fountain"))){
             if (Rs2Player.getWorldLocation().distanceTo(step.getWorldPoint()) < 5){
                 Rs2Inventory.use(ItemID.POISONED_FISH_FOOD);
                 Rs2GameObject.interact(ObjectID.FOUNTAIN);

@@ -16,7 +16,7 @@ public class ChildrenOfTheSunTask extends AccountBuilderQuestTask {
     int guardStep = 0;
 
     public ChildrenOfTheSunTask(){
-        super(QuestHelperQuest.CHILDREN_OF_THE_SUN);
+        super(QuestHelperQuest.CHILDREN_OF_THE_SUN, false);
         minTickTime = 50;
         maxTickTime = 100;
     }

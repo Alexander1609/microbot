@@ -19,7 +19,7 @@ public class BlackKnightFortressTask extends AccountBuilderQuestTask {
     String food = "Shrimps";
 
     public BlackKnightFortressTask(){
-        super(QuestHelperQuest.BLACK_KNIGHTS_FORTRESS);
+        super(QuestHelperQuest.BLACK_KNIGHTS_FORTRESS, false);
         useFood = true;
         memberOnly = false;
     }
@@ -75,7 +75,7 @@ public class BlackKnightFortressTask extends AccountBuilderQuestTask {
         }
 
         if (!Rs2Inventory.hasItem(ItemID.BRONZE_MED_HELM)){
-            if (!Rs2Walker.walkTo(new WorldPoint(3123, 3357, 0), 1))
+            if (!Rs2Walker.walkTo(new WorldPoint(3123, 3357, 0)))
                 return false;
 
             Rs2GroundItem.loot(ItemID.BRONZE_MED_HELM);

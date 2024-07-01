@@ -20,7 +20,7 @@ public class BelowIceMountainTask extends AccountBuilderQuestTask {
     boolean depositedWheat = false;
 
     public BelowIceMountainTask(){
-        super(QuestHelperQuest.BELOW_ICE_MOUNTAIN);
+        super(QuestHelperQuest.BELOW_ICE_MOUNTAIN, false);
         useFood = true;
         memberOnly = false;
     }

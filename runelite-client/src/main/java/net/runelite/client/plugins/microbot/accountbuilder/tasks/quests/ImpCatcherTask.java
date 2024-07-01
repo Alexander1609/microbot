@@ -22,7 +22,7 @@ public class ImpCatcherTask extends AccountBuilderQuestTask {
     long lastImpTime = Long.MAX_VALUE;
 
     public ImpCatcherTask(){
-        super(QuestHelperQuest.IMP_CATCHER);
+        super(QuestHelperQuest.IMP_CATCHER, false);
         memberOnly = false;
     }
 

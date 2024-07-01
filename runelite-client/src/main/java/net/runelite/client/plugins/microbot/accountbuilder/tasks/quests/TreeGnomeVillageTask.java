@@ -24,14 +24,16 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class TreeGnomeVillageTask extends AccountBuilderQuestTask {
     NPC warlord;
+    boolean hasAdventurerGear = true;
+    boolean gettingAdventurerGear = false;
 
     public TreeGnomeVillageTask(){
-        super(QuestHelperQuest.TREE_GNOME_VILLAGE);
+        super(QuestHelperQuest.TREE_GNOME_VILLAGE, false);
     }
 
     @Override
     public boolean requirementsMet() {
-        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() >= 40 && Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 10;
+        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() >= 35 && Microbot.getClient().getRealSkillLevel(Skill.MAGIC) >= 10;
     }
 
     @Override
@@ -126,13 +128,48 @@ public class TreeGnomeVillageTask extends AccountBuilderQuestTask {
     @Override
     public boolean doTaskPreparations() {
         if (!Rs2Equipment.isWearing(ItemID.STAFF_OF_EARTH)){
-            if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
-                return false;
+            if (hasAdventurerGear){
+                if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
+                    return false;
 
-            Rs2Bank.depositEquipment();
+                Rs2Bank.depositEquipment();
 
-            Rs2Bank.withdrawAndEquip(ItemID.STAFF_OF_EARTH);
-            Rs2Bank.withdrawAndEquip(ItemID.AMULET_OF_ACCURACY);
+                if (!Rs2Bank.hasBankItem(ItemID.STAFF_OF_EARTH, 1))
+                    hasAdventurerGear = false;
+                else {
+                    Rs2Bank.withdrawAndEquip(ItemID.STAFF_OF_EARTH);
+                    Rs2Bank.withdrawAndEquip(ItemID.AMULET_OF_ACCURACY);
+                }
+            } else {
+                if (Rs2Inventory.getEmptySlots() < 28 && !gettingAdventurerGear){
+                    if (!Rs2Bank.walkToBankAndUseBank())
+                        return false;
+
+                    Rs2Bank.depositAll();
+                    return false;
+                } else
+                    gettingAdventurerGear = true;
+
+                if (!Rs2Inventory.hasItem(ItemID.STAFF_OF_EARTH) || Rs2Dialogue.isInDialogue()){
+                    if (!Rs2Walker.walkTo(new WorldPoint(3232, 3233, 0), 2))
+                        return false;
+
+                    if (!Rs2Dialogue.isInDialogue()) {
+                        Rs2Npc.interact(NpcID.ADVENTURER_JON_9244, "Claim");
+                        sleepUntil(Rs2Dialogue::isInDialogue, 5_000);
+                    }
+                    else if (Rs2Dialogue.hasSelectAnOption())
+                        Rs2Walker.walkFastCanvas(Rs2Player.getWorldLocation());
+                    else
+                        Rs2Dialogue.clickContinue();
+                } else {
+                    if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank() || !Rs2Bank.isOpen())
+                        return false;
+
+                    Rs2Bank.depositAll();
+                    hasAdventurerGear = true;
+                }
+            }
 
             return false;
         }

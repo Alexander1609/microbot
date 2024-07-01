@@ -26,7 +26,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
     boolean depositedWheat = false;
 
     public PrinceAliRescueTask(){
-        super(QuestHelperQuest.PRINCE_ALI_RESCUE);
+        super(QuestHelperQuest.PRINCE_ALI_RESCUE, false);
         memberOnly = false;
     }
 
@@ -40,6 +40,14 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
     @Override
     public boolean requirementsMet() {
         return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 10;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (Rs2Widget.hasWidget("No. I think"))
+            Rs2Widget.clickWidget("No. I think");
     }
 
     @Override
@@ -277,6 +285,8 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
                 Rs2Inventory.combine(ItemID.TINDERBOX, ItemID.LOGS);
                 Rs2Player.waitForAnimation();
             }
+
+            return false;
         }
 
         if (!Rs2Inventory.contains(ItemID.ROPE)) {

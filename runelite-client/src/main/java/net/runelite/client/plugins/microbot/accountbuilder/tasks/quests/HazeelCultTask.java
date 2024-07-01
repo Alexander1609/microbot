@@ -11,7 +11,7 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class HazeelCultTask extends AccountBuilderQuestTask {
     public HazeelCultTask(){
-        super(QuestHelperQuest.HAZEEL_CULT);
+        super(QuestHelperQuest.HAZEEL_CULT, false);
     }
 
     @Override

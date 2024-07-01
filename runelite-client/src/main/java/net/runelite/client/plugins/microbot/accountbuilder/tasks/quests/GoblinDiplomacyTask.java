@@ -15,7 +15,7 @@ import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 
 public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
     public GoblinDiplomacyTask(){
-        super(QuestHelperQuest.GOBLIN_DIPLOMACY);
+        super(QuestHelperQuest.GOBLIN_DIPLOMACY, false);
         memberOnly = false;
     }
 

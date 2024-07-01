@@ -1,14 +1,12 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.globval.enums.InterfaceTab;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
@@ -21,14 +19,21 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class GrandTreeTask extends AccountBuilderQuestTask {
     boolean talkedWithForeman = false;
 
     public GrandTreeTask(){
-        super(QuestHelperQuest.THE_GRAND_TREE);
+        super(QuestHelperQuest.THE_GRAND_TREE,
+                new ItemRequirement("Wizard hat", ItemID.WIZARD_HAT, 1, true),
+                new ItemRequirement("Zamorak monk top", ItemID.ZAMORAK_MONK_TOP, 1, true),
+                new ItemRequirement("Zamorak monk bottom", ItemID.ZAMORAK_MONK_BOTTOM, 1, true),
+                new ItemRequirement("Amulet of magic", ItemID.AMULET_OF_MAGIC, 1, true),
+                new ItemRequirement("Leather boots", ItemID.LEATHER_BOOTS, 1, true),
+                new ItemRequirement("Staff of fire", ItemID.STAFF_OF_FIRE, 1, true),
+                new ItemRequirement("Mind rune", ItemID.MIND_RUNE, 200),
+                new ItemRequirement("Air rune", ItemID.AIR_RUNE, 400));
+
         skill = Skill.MAGIC;
         minLevel = 13;
     }
@@ -114,24 +119,8 @@ public class GrandTreeTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        if (!clearInventory() || !withdrawBuyRequiredItems(
-                new ItemRequirement("Wizard hat", ItemID.WIZARD_HAT),
-                new ItemRequirement("Zamorak monk top", ItemID.ZAMORAK_MONK_TOP),
-                new ItemRequirement("Zamorak monk bottom", ItemID.ZAMORAK_MONK_BOTTOM),
-                new ItemRequirement("Amulet of magic", ItemID.AMULET_OF_MAGIC),
-                new ItemRequirement("Leather boots", ItemID.LEATHER_BOOTS),
-                new ItemRequirement("Staff of fire", ItemID.STAFF_OF_FIRE),
-                new ItemRequirement("Mind rune", ItemID.MIND_RUNE, 200),
-                new ItemRequirement("Air rune", ItemID.AIR_RUNE, 400)
-        ))
+        if (!clearInventory() || !withdrawBuyItems())
             return false;
-
-        Rs2Inventory.equip(ItemID.WIZARD_HAT);
-        Rs2Inventory.equip(ItemID.ZAMORAK_MONK_TOP);
-        Rs2Inventory.equip(ItemID.ZAMORAK_MONK_BOTTOM);
-        Rs2Inventory.equip(ItemID.AMULET_OF_MAGIC);
-        Rs2Inventory.equip(ItemID.LEATHER_BOOTS);
-        Rs2Inventory.equip(ItemID.STAFF_OF_FIRE);
 
         if (Rs2Bank.isOpen())
             Rs2Bank.closeBank();

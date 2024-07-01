@@ -15,7 +15,7 @@ public class RomeoJulietTask extends AccountBuilderQuestTask {
     QuestStep currentStep;
 
     public RomeoJulietTask(){
-        super(QuestHelperQuest.ROMEO__JULIET);
+        super(QuestHelperQuest.ROMEO__JULIET, false);
         memberOnly = false;
     }
 

@@ -24,7 +24,7 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
     long targetWardrobeTime;
 
     public MisthalinMysteryTask(){
-        super(QuestHelperQuest.MISTHALIN_MYSTERY);
+        super(QuestHelperQuest.MISTHALIN_MYSTERY, false);
         memberOnly = false;
     }
 

@@ -19,6 +19,6 @@ public class BiohazardTask extends AccountBuilderQuestTask {
     @Override
     public boolean doTaskPreparations() {
         // TODO gas mask might be equipped
-        return clearInventory() && withdrawBuyRequiredItems();
+        return clearInventory() && withdrawBuyItems();
     }
 }

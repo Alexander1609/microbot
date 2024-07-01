@@ -26,6 +26,6 @@ public class MonksFriendTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems();
+        return clearInventory() && withdrawBuyItems();
     }
 }

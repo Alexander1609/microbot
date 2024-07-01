@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class WitchsPotionTask extends AccountBuilderQuestTask {
     public WitchsPotionTask(){
-        super(QuestHelperQuest.WITCHS_POTION);
+        super(QuestHelperQuest.WITCHS_POTION, false);
         memberOnly = false;
     }
 
@@ -54,7 +54,7 @@ public class WitchsPotionTask extends AccountBuilderQuestTask {
                 else
                     Rs2Shop.buyItem("Eye of newt", "1");
             } else if (!Rs2Inventory.contains(ItemID.BURNT_MEAT)){
-                if (!Rs2Inventory.contains(ItemID.RAW_RAT_MEAT)){
+                if (!Rs2Inventory.contains(ItemID.RAW_RAT_MEAT) && !Rs2Inventory.contains(ItemID.COOKED_MEAT)){
                     if (Rs2Player.getWorldLocation().distanceTo(new WorldPoint(2998, 3186, 0)) < 10){
                         if (Rs2GroundItem.loot(ItemID.RAW_RAT_MEAT))
                             return;

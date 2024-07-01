@@ -6,7 +6,6 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
-import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
@@ -14,7 +13,6 @@ import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
-import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
@@ -22,7 +20,10 @@ import java.awt.*;
 
 public class TouristTrapTask extends AccountBuilderQuestTask {
     public TouristTrapTask(){
-        super(QuestHelperQuest.THE_TOURIST_TRAP);
+        super(QuestHelperQuest.THE_TOURIST_TRAP,
+                new ItemRequirement("Waterskin(4)", ItemID.WATERSKIN4, 5),
+                new ItemRequirement("Bronze pickaxe", ItemID.BRONZE_PICKAXE, 1),
+                new ItemRequirement("Shantay pass", ItemID.SHANTAY_PASS, 1));
     }
 
     @Override
@@ -102,10 +103,6 @@ public class TouristTrapTask extends AccountBuilderQuestTask {
         Rs2Bank.withdrawAndEquip("Mithril kiteshield");
         Rs2Bank.withdrawAndEquip("Mithril platelegs");
 
-        return clearInventory() && withdrawBuyRequiredItems(
-                new ItemRequirement("Waterskin(4)", ItemID.WATERSKIN4, 5),
-                new ItemRequirement("Bronze pickaxe", ItemID.BRONZE_PICKAXE, 1),
-                new ItemRequirement("Shantay pass", ItemID.SHANTAY_PASS, 1)
-        );
+        return clearInventory() && withdrawBuyItems();
     }
 }

@@ -33,8 +33,7 @@ import net.runelite.client.plugins.questhelper.steps.widget.WidgetHighlight;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -238,6 +237,8 @@ public class MQuestScript extends Script {
             if (step.getText().stream().anyMatch(x -> x.toLowerCase().contains("kill"))) {
                 if (!Rs2Combat.inCombat())
                     Rs2Npc.interact(step.npcID, "Attack");
+
+                return true;
             }
 
             if (step instanceof NpcEmoteStep){
@@ -376,10 +377,10 @@ public class MQuestScript extends Script {
                 return action;
         }
 
-        if (step.getText().stream().anyMatch(x -> x.toLowerCase().contains("use")))
-            return "use";
+        //if (step.getText().stream().anyMatch(x -> x.toLowerCase().contains("use")))
+        //    return "use";
 
-        return "";
+        return "use";
     }
 
     private boolean applyDetailedQuestStep(DetailedQuestStep conditionalStep) {

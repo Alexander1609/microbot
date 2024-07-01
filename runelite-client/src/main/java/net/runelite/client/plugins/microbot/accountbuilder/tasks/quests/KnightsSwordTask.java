@@ -18,6 +18,6 @@ public class KnightsSwordTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems();
+        return clearInventory() && withdrawBuyItems();
     }
 }

@@ -11,7 +11,8 @@ import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class DaddysHomeTask extends AccountBuilderQuestTask {
     public DaddysHomeTask(){
-        super(QuestHelperQuest.DADDYS_HOME);
+        super(QuestHelperQuest.DADDYS_HOME,
+                new ItemRequirement("Bronze nails", ItemID.BRONZE_NAILS, 100));
     }
 
     @Override
@@ -31,7 +32,7 @@ public class DaddysHomeTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems(new ItemRequirement("Bronze nails", ItemID.BRONZE_NAILS, 100));
+        return clearInventory() && withdrawBuyItems();
     }
 
     @Override

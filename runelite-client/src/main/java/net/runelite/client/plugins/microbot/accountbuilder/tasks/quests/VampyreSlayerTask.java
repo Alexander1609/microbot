@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 
 public class VampyreSlayerTask extends AccountBuilderQuestTask {
     public VampyreSlayerTask(){
-        super(QuestHelperQuest.VAMPYRE_SLAYER);
+        super(QuestHelperQuest.VAMPYRE_SLAYER, false);
         useFood = true;
         memberOnly = false;
     }

@@ -30,6 +30,6 @@ public class MurderMysteryTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyRequiredItems();
+        return clearInventory() && withdrawBuyItems();
     }
 }

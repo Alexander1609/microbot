@@ -23,13 +23,16 @@ public class FletchingHeadlessArrowTask extends AccountBuilderTask {
     public FletchingHeadlessArrowTask(){
         skill = Skill.FLETCHING;
         maxLevel = 10;
+
+        itemRequirements.add(new ItemRequirement("Arrow shaft", ItemID.ARROW_SHAFT, 1165));
+        itemRequirements.add(new ItemRequirement("Feather", ItemID.FEATHER, 1165));
     }
 
     long lastAnimateTime = 0;
 
     @Override
     public boolean requirementsMet() {
-        return super.requirementsMet() && Rs2Bank.hasBankItem("Coins", 10000);
+        return super.requirementsMet();
     }
 
     @Override
@@ -55,9 +58,6 @@ public class FletchingHeadlessArrowTask extends AccountBuilderTask {
 
     @Override
     public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyItems(
-                new ItemRequirement("Arrow shaft", ItemID.ARROW_SHAFT, 1165),
-                new ItemRequirement("Feather", ItemID.FEATHER, 1165)
-        );
+        return clearInventory() && withdrawBuyItems();
     }
 }

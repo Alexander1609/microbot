@@ -7,7 +7,7 @@ import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 
 public class RuneMysteriesTask extends AccountBuilderQuestTask {
     public RuneMysteriesTask(){
-        super(QuestHelperQuest.RUNE_MYSTERIES);
+        super(QuestHelperQuest.RUNE_MYSTERIES, false);
         memberOnly = false;
     }
 

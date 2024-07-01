@@ -12,7 +12,7 @@ import net.runelite.client.plugins.questhelper.steps.NpcStep;
 
 public class EnterTheAbyssTask extends AccountBuilderQuestTask {
     public EnterTheAbyssTask(){
-        super(QuestHelperQuest.ENTER_THE_ABYSS);
+        super(QuestHelperQuest.ENTER_THE_ABYSS, false);
     }
 
     @Override
