@@ -141,7 +141,7 @@ public class ArdougneEasy extends ComplexStateQuestHelper
 
 		sellSilk = new NpcStep(this, NpcID.SILK_MERCHANT_8728, new WorldPoint(2655, 3300, 0),
 			"Sell silk to the Silk trader in East Ardougne for 60 coins each.");// finish dialog
-		sellSilk.addDialogSteps("120 coins.", "I'll give it do you for 60.");
+		sellSilk.addDialogSteps("120 coins.", "I'll give it to you for 60.");
 
 		eastArdyAltar = new ObjectStep(this, ObjectID.ALTAR, new WorldPoint(2618, 3309, 0),
 			"Use the altar in East Ardougne's church (requires less than full Prayer points).");

@@ -228,12 +228,13 @@ public class Rs2GrandExchange {
             sleepUntil(() -> Rs2Widget.hasWidget("What would you like to buy?"));
             Pair<Widget, Integer> itemResult = getSearchResultWidget(itemName);
             if (itemResult != null) {
+                sleep(500, 1200);
                 Rs2Widget.clickWidgetFast(itemResult.getLeft(), 0, 1);
                 sleepUntil(() -> getPricePerItemButton_X() != null);
             } else {
-                Rs2Keyboard.typeString(itemName);
+                Rs2Keyboard.typeStringUntil(itemName, () -> getSearchResultWidget(itemName) != null);
                 sleepUntil(() -> !Rs2Widget.hasWidget("Start typing the name"), 5000); //GE Search Results
-                sleep(1200);
+                sleep(500, 1200);
                 itemResult = getSearchResultWidget(itemName);
                 if (itemResult != null) {
                     Rs2Widget.clickWidgetFast(itemResult.getLeft(), itemResult.getRight(), 1);

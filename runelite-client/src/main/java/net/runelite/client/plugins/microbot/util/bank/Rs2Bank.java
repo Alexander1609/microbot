@@ -197,6 +197,12 @@ public class Rs2Bank {
         return findBankItem(Objects.requireNonNull(rs2Item).name, false, amount) != null;
     }
 
+    public static int count(int id){
+        Rs2Item rs2Item = findBankItem(id);
+        if (rs2Item == null) return 0;
+        return rs2Item.quantity;
+    }
+
     /**
      * Deposits all equipped items into the bank.
      * This method finds and clicks the "Deposit Equipment" button in the bank interface.

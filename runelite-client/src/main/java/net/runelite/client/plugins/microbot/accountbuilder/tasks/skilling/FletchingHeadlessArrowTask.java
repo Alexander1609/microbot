@@ -42,6 +42,9 @@ public class FletchingHeadlessArrowTask extends AccountBuilderTask {
             return;
         }
 
+        if (Rs2Bank.isOpen())
+            Rs2Bank.closeBank();
+
         minTickTime = 50;
         maxTickTime = 50;
 

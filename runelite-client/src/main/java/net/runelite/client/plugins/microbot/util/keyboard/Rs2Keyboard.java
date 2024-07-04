@@ -5,6 +5,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.function.BooleanSupplier;
 
 import static java.awt.event.KeyEvent.CHAR_UNDEFINED;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
@@ -16,6 +17,10 @@ public class Rs2Keyboard {
     }
 
     public static void typeString(final String word) {
+        typeStringUntil(word, () -> false);
+    }
+
+    public static void typeStringUntil(final String word, BooleanSupplier awaitedCondition) {
         boolean originalFocusValue = Microbot.getClient().getCanvas().isFocusable();
         if (!originalFocusValue) {
             Microbot.getClient().getCanvas().setFocusable(!originalFocusValue);
@@ -29,6 +34,9 @@ public class Rs2Keyboard {
             getCanvas().dispatchEvent(keyEvent);
 
             Global.sleep(100, 200);
+
+            if (awaitedCondition.getAsBoolean())
+                break;
         }
 
         if (!originalFocusValue) {

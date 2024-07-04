@@ -18,6 +18,7 @@ import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 import net.runelite.client.plugins.questhelper.steps.DetailedQuestStep;
 import net.runelite.client.plugins.questhelper.steps.NpcStep;
 import net.runelite.client.plugins.questhelper.steps.ObjectStep;
@@ -28,7 +29,9 @@ public class TreeGnomeVillageTask extends AccountBuilderQuestTask {
     boolean gettingAdventurerGear = false;
 
     public TreeGnomeVillageTask(){
-        super(QuestHelperQuest.TREE_GNOME_VILLAGE, false);
+        super(QuestHelperQuest.TREE_GNOME_VILLAGE,
+                new ItemRequirement("Swordfish", ItemID.SWORDFISH, 15));
+        useFood = true;
     }
 
     @Override
@@ -48,6 +51,10 @@ public class TreeGnomeVillageTask extends AccountBuilderQuestTask {
             if (!Rs2Walker.walkTo(new WorldPoint(2523, 3256, 0))){
                 if (isQuestRunning())
                     stopQuest();
+
+                Rs2Walker.setTarget(null);
+                Rs2Npc.interact(NpcID.TRACKER_GNOME_2);
+                sleepUntil(Rs2Dialogue::isInDialogue, 5000);
             } else if (!isQuestRunning())
                 startupQuest();
         } else if (step.npcID == NpcID.KHAZARD_WARLORD_7622){
@@ -232,6 +239,6 @@ public class TreeGnomeVillageTask extends AccountBuilderQuestTask {
         var childs = Rs2Widget.getWidget(201, 1).getDynamicChildren();
         Rs2Widget.clickWidgetFast(childs[3], 3);
 
-        return true;
+        return withdrawBuyItems();
     }
 }

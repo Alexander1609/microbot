@@ -12,6 +12,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeSlots;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -34,9 +35,6 @@ import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 public abstract class AccountBuilderTask {
-    @Setter
-    ItemManager itemManager;
-
     protected ScheduledExecutorService executorService = Executors.newScheduledThreadPool(100);
     protected ScheduledFuture<?> scheduledFuture;
     protected boolean canceled;
@@ -158,8 +156,10 @@ public abstract class AccountBuilderTask {
     protected boolean inventoryCleared = false;
 
     protected boolean clearInventory(Integer... except){
-        if (inventoryCleared || Rs2Inventory.isEmpty())
+        if (inventoryCleared || Rs2Inventory.isEmpty()) {
+            inventoryCleared = true;
             return true;
+        }
 
         if (!Rs2Bank.walkToBankAndUseBank())
             return false;
@@ -180,8 +180,9 @@ public abstract class AccountBuilderTask {
         for (var itemRequirement : itemRequirements)
             if (itemRequirement.getId() != -1
                     && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Bank.hasBankItem(x, itemRequirement.getQuantity()))
-                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity())))
-                total += itemRequirement.getAllIds().stream().min(Comparator.comparing(x -> Microbot.getClientThread().runOnClientThread(() -> itemManager.getItemPriceWithSource(x, false)))).orElse(0) * itemRequirement.getQuantity();
+                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity()))) {
+                total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).min()).orElseThrow() * itemRequirement.getQuantity();
+            }
 
         // Fixed increase for possible overpay
         total = (int) (total * 1.5);
@@ -199,6 +200,7 @@ public abstract class AccountBuilderTask {
 
         var itemsToBuy = itemRequirements.stream().filter(x -> !itemsBought.contains(x.getId())
                 && !Rs2Inventory.hasItemAmount(x.getId(), x.getQuantity())
+                && (!x.isEquip() || x.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))
                 && !Rs2Bank.hasBankItem(x.getId(), x.getQuantity())
                 && x.getAllIds().stream().noneMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity()) || Rs2Bank.hasBankItem(y, x.getQuantity()) || itemsBought.contains(y))).collect(Collectors.toList());
         if (!itemsToBuy.isEmpty()){
@@ -209,21 +211,25 @@ public abstract class AccountBuilderTask {
             var clicks = 4;
             boolean bought = false;
             while (!bought && !canceled){
-                Rs2GrandExchange.buyItemAboveXPercent(itemsToBuy.get(0).getName(), itemsToBuy.get(0).getQuantity(), minClicks, clicks);
-                sleepUntil(() -> Rs2GrandExchange.hasBoughtOffer(itemsToBuy.get(0).getId()), 10000);
+                int itemToBuy = itemsToBuy.get(0).getAllIds().stream().collect(Collectors.toMap(x -> x, x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(x, false))))
+                        .entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).orElse(null).getKey();
+                var itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemToBuy));
 
-                if (Rs2GrandExchange.hasBoughtOffer(itemsToBuy.get(0).getId())){
+                Rs2GrandExchange.buyItemAboveXPercent(itemComposition.getName(), itemsToBuy.get(0).getQuantity(), minClicks, clicks);
+                sleepUntil(() -> Rs2GrandExchange.hasBoughtOffer(itemToBuy), 10000);
+
+                if (Rs2GrandExchange.hasBoughtOffer(itemToBuy)){
                     Rs2GrandExchange.collectToBank();
                     bought = true;
-                    itemsBought.add(itemsToBuy.get(0).getId());
+                    itemsBought.add(itemToBuy);
                 } else {
-                    var slot = Arrays.stream(GrandExchangeSlots.values()).filter(x -> Arrays.stream(Objects.requireNonNull(Rs2GrandExchange.getSlot(x)).getDynamicChildren()).anyMatch(y -> y.getItemId() == itemsToBuy.get(0).getId())).findFirst().orElse(null);
+                    var slot = Arrays.stream(GrandExchangeSlots.values()).filter(x -> Arrays.stream(Objects.requireNonNull(Rs2GrandExchange.getSlot(x)).getDynamicChildren()).anyMatch(y -> y.getItemId() == itemToBuy)).findFirst().orElse(null);
                     assert slot != null;
                     var slotWidget = Rs2GrandExchange.getSlot(slot);
                     assert slotWidget != null;
 
                     Microbot.doInvoke(new NewMenuEntry(2, slotWidget.getId(), MenuAction.CC_OP.getId(), 2, -1, "Abort offer"), slotWidget.getBounds());
-                    sleepUntil(() -> Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getItemId() == itemsToBuy.get(0).getId() && x.getState() == GrandExchangeOfferState.CANCELLED_BUY), 5000);
+                    sleepUntil(() -> Arrays.stream(Microbot.getClient().getGrandExchangeOffers()).anyMatch(x -> x.getItemId() == itemToBuy && x.getState() == GrandExchangeOfferState.CANCELLED_BUY), 5000);
                     sleep(1000, 2000);
                     Rs2GrandExchange.collectToBank();
                     sleep(100, 200);
@@ -236,11 +242,20 @@ public abstract class AccountBuilderTask {
         }
 
         for (var item : itemRequirements){
-            var id = item.getId();
-            if (!Rs2Bank.hasBankItem(id, item.getQuantity()) && !Rs2Inventory.hasItemAmount(id, item.getQuantity()))
+            if (item.isEquip() && item.getAllIds().stream().anyMatch(Rs2Equipment::isWearing))
+                continue;
+
+            int id;
+            if (!Rs2Bank.hasBankItem(item.getId(), item.getQuantity()) && !Rs2Inventory.hasItemAmount(item.getId(), item.getQuantity()))
                 id = item.getAllIds().stream().filter(x -> Rs2Inventory.hasItemAmount(x, item.getQuantity()) || Rs2Bank.hasBankItem(x, item.getQuantity())).findFirst().orElse(-1);
+            else
+                id = item.getId();
 
             if (Rs2Inventory.hasItemAmount(id, item.getQuantity()))
+                continue;
+
+            if (Rs2Inventory.getEmptySlots() < item.getQuantity() && !Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(id).isStackable())
+                    || Rs2Inventory.getEmptySlots() == 0)
                 continue;
 
             if (!Rs2Bank.walkToBankAndUseBank())

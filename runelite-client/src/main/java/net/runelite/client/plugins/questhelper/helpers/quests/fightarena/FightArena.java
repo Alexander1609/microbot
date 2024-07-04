@@ -167,7 +167,7 @@ public class FightArena extends BasicQuestHelper
 			"Equip Khazard armour, talk to the Khazard Guard in the southeast of the prison.", khazardHelmetEquipped, khazardPlatebodyEquipped);
 		buyKhaliBrew = new NpcStep(this, NpcID.KHAZARD_BARMAN, new WorldPoint(2567, 3140, 0),
 			"Buy Khali brew for 5 coins from the nearby bar to the west.", coins);
-		buyKhaliBrew.addDialogStep(2, "I'd like a Khali brew please.");
+		buyKhaliBrew.addDialogStep(2, "I'd like a Khali Brew please.");
 		giveKhaliBrew = new NpcStep(this, NpcID.HEAD_GUARD, new WorldPoint(2615, 3143, 0),
 			"Take the brew back to the Khazard Guard.", khazardHelmetEquipped, khazardPlatebodyEquipped, khaliBrew);
 		getCellKeys = new NpcStep(this, NpcID.HEAD_GUARD, new WorldPoint(2615, 3143, 0),

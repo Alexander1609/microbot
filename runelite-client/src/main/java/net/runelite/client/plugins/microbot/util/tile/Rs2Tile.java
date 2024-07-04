@@ -115,6 +115,9 @@ public class Rs2Tile {
         Client client = Microbot.getClient();
         if (client.getCollisionMaps() != null) {
             int[][] flags = client.getCollisionMaps()[client.getPlane()].getFlags();
+            if (localPoint.getSceneX() > 103 || localPoint.getSceneY() > 103)
+                return true;
+
             int data = flags[localPoint.getSceneX()][localPoint.getSceneY()];
 
             Set<MovementFlag> movementFlags = MovementFlag.getSetFlags(data);
@@ -133,6 +136,9 @@ public class Rs2Tile {
     public static List<WorldPoint> getWalkableTilesAroundTile(WorldPoint point, int radius) {
         List<WorldPoint> worldPoints = new ArrayList<>();
         LocalPoint playerLocalPosition = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), point);
+
+        if (playerLocalPosition == null)
+            return worldPoints;
 
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dy = -radius; dy <= radius; dy++) {

@@ -35,11 +35,11 @@ public class AccountBuilderTaskList {
         tasks.put(new PiratesTreasureTask(), 1000);
 
         tasks.put(new NatualHistoryQuizTask(), 1000);
-        tasks.put(new DwarfCannonTask(), 1000);
+        //tasks.put(new DwarfCannonTask(), 1000);
         tasks.put(new WaterfallQuestTask(), 1000);
         tasks.put(new ChildrenOfTheSunTask(), 1000);
         tasks.put(new TreeGnomeVillageTask(), 1000);
-        tasks.put(new KnightsSwordTask(), 1000);
+        //tasks.put(new KnightsSwordTask(), 1000);
         tasks.put(new GertrudesCatTask(), 1000);
         tasks.put(new DruidicRitualTask(), 1000);
         tasks.put(new TouristTrapTask(), 1000);
@@ -51,8 +51,12 @@ public class AccountBuilderTaskList {
         tasks.put(new PlagueCityTask(), 1000);
         tasks.put(new BiohazardTask(), 1000);
         tasks.put(new HazeelCultTask(), 1000);
-        tasks.put(new MurderMysteryTask(), 1000);
+        //tasks.put(new MurderMysteryTask(), 1000);
         //tasks.put(new EnterTheAbyssTask(), 1000);
+        tasks.put(new PriestInPerilTask(), 1000);
+        //tasks.put(new FightArenaTask(), 1000);
+
+        tasks.put(new ArdougneEasyDiaryTask(), 1000);
 
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);

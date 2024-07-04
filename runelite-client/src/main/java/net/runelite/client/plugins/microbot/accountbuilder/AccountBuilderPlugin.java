@@ -50,9 +50,6 @@ public class AccountBuilderPlugin extends Plugin {
     private AccountBuilderConfig config;
 
     @Inject
-    ItemManager itemManager;
-
-    @Inject
     private ClientToolbar clientToolbar;
 
     @Provides
@@ -87,9 +84,7 @@ public class AccountBuilderPlugin extends Plugin {
             if (QuestHelperQuest.getQuestHelpers(false).stream().anyMatch(x -> !x.isHasInitialized()))
                 return false;
 
-            var taskMap = AccountBuilderTaskList.getTasks();
-            taskMap.keySet().forEach(x -> x.setItemManager(itemManager));
-            script.taskMap = taskMap;
+            script.taskMap = AccountBuilderTaskList.getTasks();
 
             var panel = new AccountBuilderPanel(this);
             navButton = NavigationButton.builder()

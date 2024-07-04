@@ -115,7 +115,7 @@ public class AccountBuilderScript extends Script {
                 if (task != null && task.isCompleted())
                     finishTask();
 
-                if (task != null && task.requirementsMet() && !taskRunning) {
+                if (task != null && !taskRunning && task.requirementsMet()) {
                     if (!Microbot.isLoggedIn()) return;
                     if (!super.run()) return;
                     if (Rs2Player.isWalking() || Rs2Player.isAnimating()) return;
