@@ -643,17 +643,17 @@ public class Rs2Walker {
         for (Transport b : ShortestPathPlugin.getTransports().getOrDefault(path.get(indexOfStartPoint), new ArrayList<>())) {
             for (WorldPoint origin : WorldPoint.toLocalInstance(Microbot.getClient(), b.getOrigin())) {
 
-                if (Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
+                if (b.getOrigin() != null && Rs2Player.getWorldLocation().getPlane() != b.getOrigin().getPlane()) {
                     continue;
                 }
 
                 for (int i = indexOfStartPoint; i < path.size(); i++) {
-                    if (origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
+                    if (origin != null && origin.getPlane() != Rs2Player.getWorldLocation().getPlane())
                         continue;
                     if (path.stream().noneMatch(x -> x.equals(b.getDestination()))) continue;
 
                     int indexOfOrigin = IntStream.range(0, path.size())
-                            .filter(f -> path.get(f).equals(b.getOrigin()))
+                            .filter(f -> b.getOrigin() == null || path.get(f).equals(b.getOrigin()))
                             .findFirst()
                             .orElse(-1);
                     int indexOfDestination = IntStream.range(0, path.size())
@@ -664,39 +664,47 @@ public class Rs2Walker {
                     if (indexOfOrigin == -1) continue;
                     if (indexOfDestination < indexOfOrigin) continue;
 
-                        if (!Rs2Tile.isTileReachable(path.get(i))) {
-                            continue;
-                        }
+                    if (origin != null && !Rs2Tile.isTileReachable(path.get(i))) {
+                        continue;
+                    }
 
-                    if (path.get(i).equals(origin)) {
+                    if (origin == null || path.get(i).equals(origin)) {
+                        boolean handled = false;
                         if (b.isShip()) {
-                            if (Rs2Npc.getNpcInLineOfSight(b.getNpcName()) != null) {
-                                Rs2Npc.interact(b.getNpcName(), b.getAction());
+                            var npc = Rs2Npc.getNpc(b.getNpcName());
+                            if (Rs2Npc.canWalkTo(npc, 20)) {
+                                Rs2Npc.interact(npc, b.getAction());
                                 Rs2Player.waitForWalking();
+                                handled = true;
                             } else {
                                 Rs2Walker.walkFastCanvas(path.get(i));
                                 sleep(1200, 1600);
                             }
                         }
-                        }
 
-                        if (b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
-                            handleTrapdoor(b);
+                        if (origin != null && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
+                            handled |= handleTrapdoor(b);
                         }
 
                         if (b.isSpiritTree()) {
-                            b.handleSpiritTree();
+                            handled |= b.handleSpiritTree();
                         }
 
 
                         if (b.isGnomeGlider()) {
-                            b.handleGlider();
+                            handled |= b.handleGlider();
                         }
 
                         if (b.isFairyRing()) {
-                            b.handleFairyRing();
+                            handled |= b.handleFairyRing();
                         }
 
+                        if (b.isPlayerItem()){
+                            handled |= b.handleItemTeleport();
+                        }
+
+                        if (handled)
+                            return true;
 
                         GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
@@ -709,7 +717,7 @@ public class Rs2Walker {
                                 return false;
                             }
                             Rs2Player.waitForWalking();
-                           return true;
+                            return true;
                         }
 
 
@@ -743,8 +751,7 @@ public class Rs2Walker {
                             return true;
                         }
                     }
-
-
+                }
             }
         }
         return false;
