@@ -213,6 +213,12 @@ public class Rs2Bank {
         return count(name, false);
     }
 
+    public static int count(int id){
+        Rs2Item rs2Item = findBankItem(id);
+        if (rs2Item == null) return 0;
+        return rs2Item.quantity;
+    }
+
     /**
      * Deposits all equipped items into the bank.
      * This method finds and clicks the "Deposit Equipment" button in the bank interface.
@@ -1061,6 +1067,14 @@ public class Rs2Bank {
             Rs2Walker.walkTo(bankLocation.getWorldPoint());
         }
         return false;
+    }
+
+    public static boolean walkToBank(BankLocation bankLocation) {
+        if (Rs2Bank.isOpen()) return true;
+        Rs2Player.toggleRunEnergy(true);
+        Microbot.status = "Walking to nearest bank " + bankLocation.toString();
+        Rs2Walker.walkTo(bankLocation.getWorldPoint());
+        return bankLocation.getWorldPoint().distanceTo2D(Microbot.getClient().getLocalPlayer().getWorldLocation()) <= 8;
     }
 
     /**

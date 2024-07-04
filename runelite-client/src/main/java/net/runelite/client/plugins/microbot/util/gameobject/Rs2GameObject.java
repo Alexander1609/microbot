@@ -127,8 +127,6 @@ public class Rs2GameObject {
 
         List<GameObject> gameObjects = getGameObjects();
 
-        if (gameObjects == null) return null;
-
         for (net.runelite.api.GameObject gameObject : gameObjects) {
             if (gameObject.getId() == id)
                 return gameObject;
@@ -364,6 +362,30 @@ public class Rs2GameObject {
         }
 
         return null;
+    }
+
+    public static List<GameObject> findClosestObjects(String objectName, boolean exact, int distance, WorldPoint anchorPoint) {
+        return getGameObjectsWithinDistance(distance, anchorPoint)
+                .stream()
+                .filter(x -> {
+                    ObjectComposition objComp = convertGameObjectToObjectComposition(x);
+
+                    if (objComp == null) return false;
+
+                    String compName;
+                    try {
+                        compName = !objComp.getName().equals("null") ? objComp.getName() : (objComp.getImpostor() != null ? objComp.getImpostor().getName() : null);
+                    } catch (Exception e) {
+                        return false;
+                    }
+
+                    if (compName == null) return false;
+
+                    return !exact && compName.toLowerCase().contains(objectName.toLowerCase())
+                            || compName.equalsIgnoreCase(objectName);
+                })
+                .sorted(Comparator.comparing(x -> x.getWorldLocation().distanceTo(anchorPoint)))
+                .collect(Collectors.toList());
     }
 
     public static GameObject findObject(String objectName, boolean exact, int distance, boolean hasLineOfSight, WorldPoint anchorPoint) {
@@ -1035,6 +1057,10 @@ public class Rs2GameObject {
     }
 
     public static boolean hasLineOfSight(TileObject tileObject) {
+        return hasLineOfSight(Rs2Player.getWorldLocation(), tileObject);
+    }
+
+    public static boolean hasLineOfSight(WorldPoint point, TileObject tileObject) {
         if (tileObject == null) return false;
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
@@ -1043,15 +1069,42 @@ public class Rs2GameObject {
                     worldPoint,
                     gameObject.sizeX(),
                     gameObject.sizeY())
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea());
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), point.toWorldArea());
         } else {
             return new WorldArea(
                     tileObject.getWorldLocation(),
                     2,
                     2)
-                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(Rs2Player.getWorldLocation().getX(),
-                            Rs2Player.getWorldLocation().getY(), 2, 2, Rs2Player.getWorldLocation().getPlane()));
+                    .hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), new WorldArea(point.getX(),
+                            point.getY(), 2, 2, point.getPlane()));
         }
+    }
+
+    public static boolean canWalkTo(TileObject tileObject, int distance) {
+        if (tileObject == null) return false;
+        WorldArea objectArea;
+
+        if (tileObject instanceof GameObject) {
+            GameObject gameObject = (GameObject) tileObject;
+            WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
+            objectArea = new WorldArea(
+                    worldPoint,
+                    gameObject.sizeX(),
+                    gameObject.sizeY());
+        } else {
+            objectArea = new WorldArea(
+                    tileObject.getWorldLocation(),
+                    2,
+                    2);
+        }
+
+        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
+        for (var tile : tiles.keySet()){
+            if (tile.distanceTo(objectArea) < 2)
+                return true;
+        }
+
+        return false;
     }
 
     @SneakyThrows

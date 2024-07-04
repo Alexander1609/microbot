@@ -2,7 +2,9 @@ package net.runelite.client.plugins.microbot.util.security;
 
 import net.runelite.client.config.ConfigProfile;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.MicrobotOverlay;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
+import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.util.WorldUtil;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldRegion;
@@ -47,16 +49,18 @@ public class Login {
         } catch (Exception e) {
             System.out.println("Changing world failed");
         }
-        Microbot.getClient().setUsername(username);
-        try {
-            Microbot.getClient().setPassword(Encryption.decrypt(password));
-        } catch (Exception e) {
+        if (!username.equals("default")){
+            Microbot.getClient().setUsername(username);
+            try {
+                Microbot.getClient().setPassword(Encryption.decrypt(password));
+            } catch (Exception e) {
             System.out.println("no password has been set in the profile");
+            }
+            sleep(300);
+            Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
+            sleep(300);
+            Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
         }
-        sleep(300);
-        Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
-        sleep(300);
-        Rs2Keyboard.keyPress(KeyEvent.VK_ENTER);
         if (Microbot.getClient().getLoginIndex() == 10) {
             int loginScreenWidth = 804;
             int startingWidth = (Microbot.getClient().getCanvasWidth() / 2) - (loginScreenWidth / 2);
