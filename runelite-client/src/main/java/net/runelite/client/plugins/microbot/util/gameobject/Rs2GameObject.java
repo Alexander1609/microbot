@@ -1080,33 +1080,6 @@ public class Rs2GameObject {
         }
     }
 
-    public static boolean canWalkTo(TileObject tileObject, int distance) {
-        if (tileObject == null) return false;
-        WorldArea objectArea;
-
-        if (tileObject instanceof GameObject) {
-            GameObject gameObject = (GameObject) tileObject;
-            WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
-            objectArea = new WorldArea(
-                    worldPoint,
-                    gameObject.sizeX(),
-                    gameObject.sizeY());
-        } else {
-            objectArea = new WorldArea(
-                    tileObject.getWorldLocation(),
-                    2,
-                    2);
-        }
-
-        var tiles = Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), distance);
-        for (var tile : tiles.keySet()){
-            if (tile.distanceTo(objectArea) < 2)
-                return true;
-        }
-
-        return false;
-    }
-
     @SneakyThrows
     public static List<Integer> getObjectIdsByName(String name) {
         List<Integer> ids = new ArrayList<>();
