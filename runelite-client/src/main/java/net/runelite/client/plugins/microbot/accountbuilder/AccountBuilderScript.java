@@ -20,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.security.Login;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
+import net.runelite.client.plugins.questhelper.steps.PuzzleStep;
 import net.runelite.client.plugins.questhelper.steps.WidgetStep;
 
 import java.time.Duration;
@@ -180,6 +181,7 @@ public class AccountBuilderScript extends Script {
                 || Rs2Bank.isOpen()
                 || !Rs2Player.getWorldLocation().equals(lastLocation)
                 || (task != null && task instanceof AccountBuilderQuestTask && ((AccountBuilderQuestTask)task).getCurrentStep() instanceof WidgetStep)
+                || (task != null && task instanceof AccountBuilderQuestTask && ((AccountBuilderQuestTask)task).getCurrentStep() instanceof PuzzleStep)
                 || (task != null && task.blockStuckPrevention)){
             lastLocation = Rs2Player.getWorldLocation();
             timeSinceLastAction = System.currentTimeMillis();

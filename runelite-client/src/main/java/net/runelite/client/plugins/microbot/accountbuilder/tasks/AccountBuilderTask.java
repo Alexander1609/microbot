@@ -180,7 +180,8 @@ public abstract class AccountBuilderTask {
         for (var itemRequirement : itemRequirements)
             if (itemRequirement.getId() != -1
                     && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Bank.hasBankItem(x, itemRequirement.getQuantity()))
-                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity()))) {
+                    && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity()))
+                    && (itemRequirement.getQuantity() > 1 || itemRequirement.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))) {
                 total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).min()).orElseThrow() * itemRequirement.getQuantity();
             }
 

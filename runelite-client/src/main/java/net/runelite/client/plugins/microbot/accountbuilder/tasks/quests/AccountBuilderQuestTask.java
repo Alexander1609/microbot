@@ -11,11 +11,16 @@ import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
 import net.runelite.client.plugins.questhelper.steps.*;
 
 import java.util.List;
@@ -164,6 +169,56 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
                 return false;
         }
 
+        var recommended = quest.getQuestHelper().getGeneralRecommended();
+        if (recommended != null){
+            for (var requirement : recommended){
+                if (requirement instanceof CombatLevelRequirement
+                        && !Microbot.getClientThread().runOnClientThread(() -> requirement.check(Microbot.getClient())))
+                    return false;
+            }
+        }
+
         return true;
+    }
+
+    @Override
+    protected boolean withdrawBuyItems() {
+        var success = super.withdrawBuyItems();
+
+        if (!success)
+            return false;
+
+        var recommendedItems = quest.getQuestHelper().getItemRecommended();
+        for (var item : recommendedItems){
+            var amount = item.getQuantity();
+            if (ItemCollections.COINS.getItems().contains(item.getId())){
+                amount += Random.random(200, 400);
+            }
+
+            List<Integer> itemIds = null;
+            if (item.getId() == ItemID.ARDOUGNE_TELEPORT)
+                itemIds = ItemCollections.ARDY_CLOAKS.getItems();
+
+            if (itemIds == null)
+                itemIds = item.getAllIds();
+
+            int finalAmount = amount;
+            if (amount == 1 && itemIds.stream().anyMatch(Rs2Equipment::isWearing)
+                || itemIds.stream().anyMatch(x -> Rs2Inventory.hasItemAmount(x, finalAmount)))
+                continue;
+
+            for (var itemId : itemIds){
+                if (Rs2Bank.hasBankItem(itemId, amount)){
+                    if (!Rs2Bank.walkToBankAndUseBank())
+                        return false;
+
+                    Rs2Bank.withdrawX(itemId, amount);
+                    sleep(100, 200);
+                    break;
+                }
+            }
+        }
+
+        return success;
     }
 }

@@ -1115,6 +1115,12 @@ public class Rs2GameObject {
         if (tileObject instanceof GameObject) {
             GameObject gameObject = (GameObject) tileObject;
             WorldPoint worldPoint = WorldPoint.fromScene(Microbot.getClient(), gameObject.getSceneMinLocation().getX(), gameObject.getSceneMinLocation().getY(), gameObject.getPlane());
+
+            if (Microbot.getClient().isInInstancedRegion()){
+                var localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
+                worldPoint = WorldPoint.fromLocalInstance(Microbot.getClient(), localPoint);
+            }
+
             objectArea = new WorldArea(
                     worldPoint,
                     gameObject.sizeX(),

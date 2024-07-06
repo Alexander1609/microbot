@@ -52,9 +52,14 @@ public class AccountBuilderTaskList {
         tasks.put(new BiohazardTask(), 1000);
         tasks.put(new HazeelCultTask(), 1000);
         //tasks.put(new MurderMysteryTask(), 1000);
-        //tasks.put(new EnterTheAbyssTask(), 1000);
+        tasks.put(new EnterTheAbyssTask(), 1000);
         tasks.put(new PriestInPerilTask(), 1000);
         //tasks.put(new FightArenaTask(), 1000);
+        tasks.put(new TribalTotemTask(), 1000);
+        tasks.put(new NatureSpiritTask(), 1000);
+        tasks.put(new ElementalWorkshopITask(), 1000);
+        tasks.put(new ElementalWorkshopIITask(), 1000);
+        tasks.put(new TowerOfLifeTask(), 1000);
 
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
 
@@ -67,6 +72,7 @@ public class AccountBuilderTaskList {
         tasks.put(new ChoppingWillowTask(), 1000);
         tasks.put(new FishingShrimpsTask(), 1000);
         tasks.put(new FletchingHeadlessArrowTask(), 1000);
+        tasks.put(new BuildingCrudeChairTask(), 1000);
 
         tasks.put(new CollectingBronzePickaxesTask(), 1000);
     }
