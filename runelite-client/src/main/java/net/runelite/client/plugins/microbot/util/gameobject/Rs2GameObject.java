@@ -544,23 +544,21 @@ public class Rs2GameObject {
     }
 
     public static TileObject findObject(List<Integer> ids) {
-        int distance = 0;
-        TileObject tileObject = null;
+        int distance = 17; // render distance seems to be around 17
         for (int id : ids) {
             TileObject object = findObjectById(id);
             if (object == null) continue;
-            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance || tileObject == null) {
+            if (Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation()) < distance) {
                 if (Rs2Player.getWorldLocation().getPlane() != object.getPlane()) continue;
                 if (object instanceof GroundObject && !Rs2Walker.canReach(object.getWorldLocation()))
                     continue;
 
                 if (object instanceof GameObject && !Rs2Walker.canReach(object.getWorldLocation(), ((GameObject) object).sizeX(), ((GameObject) object).sizeY()))
                     continue;
-                tileObject = object;
-                distance = Rs2Player.getWorldLocation().distanceTo(object.getWorldLocation());
+                return object;
             }
         }
-        return tileObject;
+        return null;
     }
 
     public static TileObject findObject(int[] ids) {
@@ -1015,11 +1013,12 @@ public class Rs2GameObject {
                     }
                 }
 
-                while (index < actions.length && actions[index] == null)
-                    index++;
-
                 if (index == actions.length)
                     index = 0;
+            }
+
+            if (index == -1) {
+                Microbot.log("Failed to interact with object " + object.getId() + " " + action);
             }
 
 
