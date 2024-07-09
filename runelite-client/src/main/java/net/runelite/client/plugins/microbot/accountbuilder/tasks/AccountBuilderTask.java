@@ -44,6 +44,7 @@ public abstract class AccountBuilderTask {
     protected Skill skill = null;
     protected int minLevel = 0;
     protected int maxLevel = Integer.MAX_VALUE;
+    protected boolean ignoreUntradables = false;
 
     protected int minTickTime = 500;
     protected int maxTickTime = 1500;
@@ -65,7 +66,7 @@ public abstract class AccountBuilderTask {
 
         if (!itemRequirements.isEmpty()){
             var gpRequired = getMissingItemPrice();
-            if (gpRequired > 0 && !Rs2Bank.hasBankItem("Coins", gpRequired))
+            if (gpRequired == Integer.MAX_VALUE ||  gpRequired > 0 && !Rs2Bank.hasBankItem("Coins", gpRequired))
                 return false;
         }
 
@@ -182,7 +183,11 @@ public abstract class AccountBuilderTask {
                     && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Bank.hasBankItem(x, itemRequirement.getQuantity()))
                     && itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity()))
                     && (itemRequirement.getQuantity() > 1 || itemRequirement.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))) {
-                total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).min()).orElseThrow() * itemRequirement.getQuantity();
+                var tradable = itemRequirement.getAllIds().stream().anyMatch(x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(x)).isTradeable());
+                if (tradable)
+                    total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * itemRequirement.getQuantity();
+                else if (!ignoreUntradables)
+                    return Integer.MAX_VALUE;
             }
 
         // Fixed increase for possible overpay
@@ -199,7 +204,8 @@ public abstract class AccountBuilderTask {
             return false;
         }
 
-        var itemsToBuy = itemRequirements.stream().filter(x -> !itemsBought.contains(x.getId())
+        var itemsToBuy = itemRequirements.stream().filter(x -> x.getId() != -1
+                && !itemsBought.contains(x.getId())
                 && !Rs2Inventory.hasItemAmount(x.getId(), x.getQuantity())
                 && (!x.isEquip() || x.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))
                 && !Rs2Bank.hasBankItem(x.getId(), x.getQuantity())
@@ -243,7 +249,7 @@ public abstract class AccountBuilderTask {
         }
 
         for (var item : itemRequirements){
-            if (item.isEquip() && item.getAllIds().stream().anyMatch(Rs2Equipment::isWearing))
+            if (item.isEquip() && item.getAllIds().stream().anyMatch(Rs2Equipment::isWearing) || item.getId() == -1)
                 continue;
 
             int id;

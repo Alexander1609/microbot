@@ -60,6 +60,9 @@ public class AccountBuilderTaskList {
         tasks.put(new ElementalWorkshopITask(), 1000);
         tasks.put(new ElementalWorkshopIITask(), 1000);
         tasks.put(new TowerOfLifeTask(), 1000);
+        tasks.put(new MerlinsCrystalTask(), 1000);
+        tasks.put(new RFDStartTask(), 1000);
+        tasks.put(new RFDGobilGeneralsTask(), 1000);
 
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
 

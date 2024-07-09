@@ -62,6 +62,7 @@ public class AccountBuilderScript extends Script {
     long breakEndTime = 0;
 
     public boolean run(AccountBuilderConfig config) {
+        Microbot.enableAutoRunOn = true;
         task = null;
         taskRunning = false;
 
@@ -138,6 +139,7 @@ public class AccountBuilderScript extends Script {
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
                 ex.printStackTrace(System.out);
+                Microbot.log("[AB Exception] " + ex.getMessage());
             } finally {
                 lock.unlock();
             }
@@ -187,6 +189,9 @@ public class AccountBuilderScript extends Script {
             timeSinceLastAction = System.currentTimeMillis();
         } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
             var worldPoints = new ArrayList<>(Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet());
+            if (worldPoints.isEmpty())
+                return;
+
             var randomIndex = new Random().nextInt(worldPoints.size());
             Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
         }

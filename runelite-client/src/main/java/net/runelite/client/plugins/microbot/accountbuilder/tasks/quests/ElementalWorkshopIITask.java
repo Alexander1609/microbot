@@ -86,11 +86,11 @@ public class ElementalWorkshopIITask extends AccountBuilderQuestTask {
 
     @Override
     public boolean requirementsMet() {
-        return true || super.requirementsMet();
+        return super.requirementsMet();
     }
 
     @Override
     public boolean doTaskPreparations() {
-        return true || clearInventory() && withdrawBuyItems();
+        return clearInventory() && withdrawBuyItems();
     }
 }

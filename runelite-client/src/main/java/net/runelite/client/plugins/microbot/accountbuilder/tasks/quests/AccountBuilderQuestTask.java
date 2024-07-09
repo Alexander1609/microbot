@@ -189,32 +189,35 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
             return false;
 
         var recommendedItems = quest.getQuestHelper().getItemRecommended();
-        for (var item : recommendedItems){
-            var amount = item.getQuantity();
-            if (ItemCollections.COINS.getItems().contains(item.getId())){
-                amount += Random.random(200, 400);
-            }
+        if (recommendedItems != null){
 
-            List<Integer> itemIds = null;
-            if (item.getId() == ItemID.ARDOUGNE_TELEPORT)
-                itemIds = ItemCollections.ARDY_CLOAKS.getItems();
+            for (var item : recommendedItems){
+                var amount = item.getQuantity();
+                if (ItemCollections.COINS.getItems().contains(item.getId())){
+                    amount += Random.random(200, 400);
+                }
 
-            if (itemIds == null)
-                itemIds = item.getAllIds();
+                List<Integer> itemIds = null;
+                if (item.getId() == ItemID.ARDOUGNE_TELEPORT)
+                    itemIds = ItemCollections.ARDY_CLOAKS.getItems();
 
-            int finalAmount = amount;
-            if (amount == 1 && itemIds.stream().anyMatch(Rs2Equipment::isWearing)
-                || itemIds.stream().anyMatch(x -> Rs2Inventory.hasItemAmount(x, finalAmount)))
-                continue;
+                if (itemIds == null)
+                    itemIds = item.getAllIds();
 
-            for (var itemId : itemIds){
-                if (Rs2Bank.hasBankItem(itemId, amount)){
-                    if (!Rs2Bank.walkToBankAndUseBank())
-                        return false;
+                int finalAmount = amount;
+                if (amount == 1 && itemIds.stream().anyMatch(Rs2Equipment::isWearing)
+                        || itemIds.stream().anyMatch(x -> Rs2Inventory.hasItemAmount(x, finalAmount)))
+                    continue;
 
-                    Rs2Bank.withdrawX(itemId, amount);
-                    sleep(100, 200);
-                    break;
+                for (var itemId : itemIds){
+                    if (Rs2Bank.hasBankItem(itemId, amount)){
+                        if (!Rs2Bank.walkToBankAndUseBank())
+                            return false;
+
+                        Rs2Bank.withdrawX(itemId, amount);
+                        sleep(100, 200);
+                        break;
+                    }
                 }
             }
         }
