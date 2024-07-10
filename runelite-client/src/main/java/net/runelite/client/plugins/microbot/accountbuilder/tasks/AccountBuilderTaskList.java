@@ -67,6 +67,8 @@ public class AccountBuilderTaskList {
         tasks.put(new HolyGrailTask(), 1000);
         //tasks.put(new LostTribeTask(), 1000);
         tasks.put(new LostCityTask(), 1000);
+        tasks.put(new FairytaleITask(), 1000);
+        tasks.put(new FairytaleIIUnlockTask(), 1000);
 
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
 

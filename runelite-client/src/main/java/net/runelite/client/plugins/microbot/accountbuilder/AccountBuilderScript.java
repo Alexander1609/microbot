@@ -112,7 +112,9 @@ public class AccountBuilderScript extends Script {
 
                     task.init();
 
-                    if (config.debugMode())
+                    if (task.getFollowUpTask() != null)
+                        nextTask = task.getFollowUpTask();
+                    else if (config.debugMode())
                         nextTask = null;
                     else
                         nextTask = getNewRandomTask();

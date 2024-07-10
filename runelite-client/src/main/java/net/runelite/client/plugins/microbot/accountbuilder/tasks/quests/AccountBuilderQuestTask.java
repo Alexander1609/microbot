@@ -114,9 +114,9 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
     @Override
     public void run() {
-        questScript.run(new MQuestConfig(){ });
-
         startupQuest();
+
+        Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().startUpQuest(quest.getQuestHelper()); return null; });
 
         if (useFood){
             foodScript.run(new PlayerAssistConfig() {
@@ -133,11 +133,17 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Override
     public void tick() {
         var step = quest.getQuestHelper().getCurrentStep();
+        var prevStep = currentStep;
         if (step != null)
             currentStep = step;
 
         while (currentStep instanceof ConditionalStep)
             currentStep = currentStep.getActiveStep();
+
+        if (prevStep != currentStep && !isQuestRunning()) {
+            startupQuest();
+            blockStuckPrevention = false;
+        }
 
         if (currentStep instanceof ObjectStep)
             handleObjectStep((ObjectStep) currentStep);
@@ -149,16 +155,24 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
             handleDetailedStep((DetailedQuestStep) currentStep);
     }
 
-    protected void handleObjectStep(ObjectStep step) { }
-    protected void handleNPCEmoteStep(NpcEmoteStep step) { }
-    protected void handleNPCStep(NpcStep step) { }
-    protected void handleDetailedStep(DetailedQuestStep step) { }
+    protected void handleObjectStep(ObjectStep step) {
+        if (step != null && !isQuestRunning()) startupQuest();
+    }
+    protected void handleNPCEmoteStep(NpcEmoteStep step) {
+        if (step != null && !isQuestRunning()) startupQuest();
+    }
+    protected void handleNPCStep(NpcStep step) {
+        if (step != null && !isQuestRunning()) startupQuest();
+    }
+    protected void handleDetailedStep(DetailedQuestStep step) {
+        if (step != null && !isQuestRunning()) startupQuest();
+    }
 
     @Override
     public void onGameStateChanged(GameStateChanged event) {
         if (event.getGameState() == GameState.LOGGED_IN && scheduledFuture != null){
-            if (!isQuestRunning()){
-                startupQuest();
+            if (Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest() == null)){
+                Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().startUpQuest(quest.getQuestHelper()); return null; });
             }
         }
     }
@@ -174,18 +188,15 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     }
 
     protected void startupQuest(){
-        Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().startUpQuest(quest.getQuestHelper()); return null; });
+        questScript.run(new MQuestConfig(){ });
     }
 
     protected void stopQuest(){
-        Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().shutDownQuestFromSidebar(); return null; });
-
-        if (ShortestPathPlugin.getMarker() != null)
-            ShortestPathPlugin.exit();
+        questScript.shutdown();
     }
 
     public boolean isQuestRunning(){
-        return Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest() != null);
+        return questScript.isRunning();
     }
 
     protected QuestHelperPlugin getQuestHelperPlugin() {

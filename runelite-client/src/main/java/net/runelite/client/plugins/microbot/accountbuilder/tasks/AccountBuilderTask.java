@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
+import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.MenuAction;
@@ -45,6 +46,8 @@ public abstract class AccountBuilderTask {
     protected int minLevel = 0;
     protected int maxLevel = Integer.MAX_VALUE;
     protected boolean ignoreUntradables = false;
+    @Getter
+    protected AccountBuilderTask followUpTask = null;
 
     protected int minTickTime = 500;
     protected int maxTickTime = 1500;

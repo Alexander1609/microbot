@@ -27,7 +27,7 @@ public class LostCityTask extends AccountBuilderQuestTask {
                 new ItemRequirement("Earth rune", ItemID.EARTH_RUNE, 300),
                 new ItemRequirement("Air rune", ItemID.AIR_RUNE, 300),
                 new ItemRequirement("Swordfish", ItemID.SWORDFISH, 10),
-                new ItemRequirement("Swordfish", ItemID.LUMBRIDGE_TELEPORT, 2));
+                new ItemRequirement("Lumbridge teleport", ItemID.LUMBRIDGE_TELEPORT, 2));
 
         useFood = true;
     }
@@ -104,6 +104,8 @@ public class LostCityTask extends AccountBuilderQuestTask {
     @Override
     public void doTaskCleanup(boolean shutdown) {
         super.doTaskCleanup(shutdown);
+
+        // TODO leave zanaris
 
         while (Rs2Inventory.count(ItemID.DRAMEN_BRANCH) > 2) {
             Rs2Inventory.combine(ItemID.KNIFE, ItemID.DRAMEN_BRANCH);
