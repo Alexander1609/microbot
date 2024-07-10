@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grandexchange.GrandExchangeSlots;
 import net.runelite.client.plugins.microbot.util.grandexchange.Rs2GrandExchange;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -141,14 +142,11 @@ public class FairytaleITask extends AccountBuilderQuestTask {
                 Rs2Player.waitForWalking();
                 sleep(4000);
             }
-
-            /*if (Microbot.getClient().getEnergy() < 2000)
+        } else if (step.npcID == NpcID.FAIRY_GODFATHER_5837 && Microbot.getClient().isInInstancedRegion()){
+            if (!Rs2Walker.walkTo(new WorldPoint(2395, 4380, 0)))
                 return;
 
-            Rs2Npc.interact(NpcID.TANGLEFOOT, "Attack");
-            Rs2Player.waitForAnimation();
-            Rs2Walker.walkFastCanvas(new WorldPoint(2371, 4391, 0));
-            Rs2Player.waitForWalking();*/
+            Rs2GameObject.interact(12004);
         }
     }
 
@@ -159,6 +157,8 @@ public class FairytaleITask extends AccountBuilderQuestTask {
         if (step.objectID == ObjectID.GROTTO && (itemsToBuy.isEmpty() || itemsToBuy.stream().anyMatch(x -> !itemsBought.contains(x)))){
             if (isQuestRunning())
                 stopQuest();
+
+            // TODO Handle the 3 untradeable items
 
             if (!itemsToBuy.isEmpty()){
                 if (!Rs2GrandExchange.walkToGrandExchange() || !Rs2GrandExchange.openExchange())
