@@ -35,7 +35,7 @@ public class PiratesTreasureTask extends AccountBuilderQuestTask {
 
     @Override
     protected void handleNPCStep(NpcStep step) {
-        if (step.npcID == NpcID.ZAMBO){
+        if (step.npcID == NpcID.ZEMBO){
             if (Rs2Widget.hasWidget("Karamjan rum")){
                 var widget = Rs2Widget.findWidget("Karamjan rum");
                 Rs2Widget.clickWidgetFast(widget, 2, 2);
