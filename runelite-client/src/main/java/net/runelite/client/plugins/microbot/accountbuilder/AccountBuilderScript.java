@@ -100,7 +100,7 @@ public class AccountBuilderScript extends Script {
                 if (taskMap == null)
                     return;
 
-                if (task == null && nextTask == null)
+                if (task == null && nextTask == null && !config.debugMode())
                     nextTask = getNewRandomTask();
 
                 if (nextTask != null && (task == null || (taskEndTime != 0 && System.currentTimeMillis() > taskEndTime))) {
@@ -111,18 +111,22 @@ public class AccountBuilderScript extends Script {
                     taskStartTime = taskEndTime = 0;
 
                     task.init();
-                    nextTask = getNewRandomTask();
+
+                    if (config.debugMode())
+                        nextTask = null;
+                    else
+                        nextTask = getNewRandomTask();
                 }
 
                 if (task != null && task.isCompleted())
                     finishTask();
 
-                if (task != null && !taskRunning && task.requirementsMet()) {
+                if (task != null && !taskRunning && (config.debugMode() || task.requirementsMet())) {
                     if (!Microbot.isLoggedIn()) return;
                     if (!super.run()) return;
                     if (Rs2Player.isWalking() || Rs2Player.isAnimating()) return;
 
-                    if (!task.doTaskPreparations())
+                    if (!config.debugMode() && !task.doTaskPreparations())
                         return;
 
                     if (!(task instanceof AccountBuilderQuestTask)){
@@ -137,6 +141,8 @@ public class AccountBuilderScript extends Script {
                     task.run();
                 }
             } catch (Exception ex) {
+                if (ex instanceof InterruptedException) return;
+
                 System.out.println(ex.getMessage());
                 ex.printStackTrace(System.out);
                 Microbot.log("[AB Exception] " + ex.getMessage());

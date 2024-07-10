@@ -20,10 +20,14 @@ import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirements;
 import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRequirement;
+import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.steps.*;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
@@ -46,8 +50,33 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
         itemRequirements.addAll(List.of(additionalRequirements));
 
-        if (buyItems && quest != null && quest.getQuestHelper().getItemRequirements() != null)
-            itemRequirements.addAll(quest.getQuestHelper().getItemRequirements().stream().map(ItemRequirement::copy).collect(Collectors.toList()));
+        if (buyItems && quest != null && quest.getQuestHelper().getItemRequirements() != null){
+            for (var requirement : quest.getQuestHelper().getItemRequirements()){
+                if (requirement instanceof ItemRequirements){
+                    var requirements = (ItemRequirements)requirement;
+
+                    if (requirements.getLogicType() == LogicType.AND)
+                        itemRequirements.addAll(requirements.getItemRequirements());
+                    else if (requirements.getLogicType() == LogicType.OR){
+                        var owned = requirements.getItemRequirements().stream().filter(x ->
+                                x.getAllIds().stream().anyMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity())
+                                    || x.getQuantity() == 1 && Rs2Equipment.isWearing(y)
+                                    || Rs2Bank.hasBankItem(y, x.getQuantity())))
+                                .findFirst().orElse(null);
+                        if (owned != null)
+                            itemRequirements.add(owned);
+                        else
+                            itemRequirements.add(requirements.getItemRequirements().stream().collect(Collectors.toMap(x -> x, x -> x.getAllIds().stream().collect(Collectors.toMap(y -> y, y -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(y, false))))
+                                                            .entrySet().stream().filter(y -> y.getValue() > 0).min(Map.Entry.comparingByValue()).orElse(null).getKey())).entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).get().getKey());
+                    } else
+                        throw new UnsupportedOperationException();
+
+                    continue;
+                }
+
+                itemRequirements.add(requirement.copy());
+            }
+        }
 
         // Increase coin requirement for possible ship transports
         var coinRequirement = itemRequirements.stream().filter(x -> x.getName().equals("Coins")).findFirst().orElse(null);
@@ -135,6 +164,11 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     }
 
     @Override
+    public boolean doTaskPreparations() {
+        return clearInventory() && withdrawBuyItems();
+    }
+
+    @Override
     public void onChatMessage(ChatMessage chatMessage) {
         questScript.onChatMessage(chatMessage);
     }
@@ -192,6 +226,8 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         if (recommendedItems != null){
 
             for (var item : recommendedItems){
+                if (item.getId() == -1) continue;
+
                 var amount = item.getQuantity();
                 if (ItemCollections.COINS.getItems().contains(item.getId())){
                     amount += Random.random(200, 400);

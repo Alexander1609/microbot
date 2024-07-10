@@ -186,7 +186,7 @@ public abstract class AccountBuilderTask {
                 var tradable = itemRequirement.getAllIds().stream().anyMatch(x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(x)).isTradeable());
                 if (tradable)
                     total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * itemRequirement.getQuantity();
-                else if (!ignoreUntradables)
+                else if (!ignoreUntradables && !itemRequirement.isObtainable())
                     return Integer.MAX_VALUE;
             }
 
@@ -205,9 +205,10 @@ public abstract class AccountBuilderTask {
         }
 
         var itemsToBuy = itemRequirements.stream().filter(x -> x.getId() != -1
+                && !x.isObtainable()
                 && !itemsBought.contains(x.getId())
                 && !Rs2Inventory.hasItemAmount(x.getId(), x.getQuantity())
-                && (!x.isEquip() || x.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))
+                && x.getAllIds().stream().noneMatch(Rs2Equipment::isWearing)
                 && !Rs2Bank.hasBankItem(x.getId(), x.getQuantity())
                 && x.getAllIds().stream().noneMatch(y -> Rs2Inventory.hasItemAmount(y, x.getQuantity()) || Rs2Bank.hasBankItem(y, x.getQuantity()) || itemsBought.contains(y))).collect(Collectors.toList());
         if (!itemsToBuy.isEmpty()){
@@ -249,7 +250,7 @@ public abstract class AccountBuilderTask {
         }
 
         for (var item : itemRequirements){
-            if (item.isEquip() && item.getAllIds().stream().anyMatch(Rs2Equipment::isWearing) || item.getId() == -1)
+            if (item.isEquip() && item.getAllIds().stream().anyMatch(Rs2Equipment::isWearing) || item.getId() == -1 || item.isObtainable())
                 continue;
 
             int id;

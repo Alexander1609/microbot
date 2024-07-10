@@ -101,6 +101,9 @@ public class ItemRequirement extends AbstractRequirement
 
 	protected boolean shouldAggregate = true;
 
+	@Getter
+	protected boolean obtainable = false;
+
 	/**
 	 * Denotes whether the quantity-check should take into consideration item charges.
 	 * With this enabled, 1xRing of dueling(7) will count as 7 quantity.
@@ -300,6 +303,7 @@ public class ItemRequirement extends AbstractRequirement
 		newItem.setUrlSuffix(getUrlSuffix());
 		newItem.additionalOptions = additionalOptions;
 		newItem.isChargedItem = isChargedItem;
+		newItem.obtainable = obtainable;
 
 		return newItem;
 	}
@@ -312,6 +316,7 @@ public class ItemRequirement extends AbstractRequirement
 	public void canBeObtainedDuringQuest()
 	{
 		appendToTooltip("Can be obtained during the quest.");
+		obtainable = true;
 	}
 
 	public String getName()

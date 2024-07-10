@@ -77,8 +77,12 @@ public class MQuestScript extends Script {
                 if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
                     var dialogOptions = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
                     var dialogChoices = dialogOptions.getDynamicChildren();
+                    var choices = questStep.getChoices().getChoices();
 
-                    for (var choice : questStep.getChoices().getChoices()){
+                    if (questStep != getQuestHelperPlugin().getSelectedQuest().getCurrentStep())
+                        choices.addAll(getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getChoices().getChoices());
+
+                    for (var choice : choices){
                         if (choice.getExpectedPreviousLine() != null)
                             continue; // TODO
 
@@ -292,7 +296,7 @@ public class MQuestScript extends Script {
         } else if (npc != null && (!Rs2Npc.hasLineOfSight(npc) || !Rs2Npc.canWalkTo(npc, 10))) {
             Rs2Walker.walkTo(npc.getWorldLocation(), 2);
         } else {
-            if (step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
+            if (step.getWorldPoint() != null && step.getWorldPoint().distanceTo(Microbot.getClient().getLocalPlayer().getWorldLocation()) > 3) {
                 Rs2Walker.walkTo(step.getWorldPoint(), 2);
                 return false;
             }
@@ -333,10 +337,10 @@ public class MQuestScript extends Script {
             return false;
         }
 
-        if (step.getWorldPoint() != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(step.getWorldPoint()) > 1
+        WorldPoint stepLocation = object == null ? step.getWorldPoint() : object.getWorldLocation();
+        if (stepLocation != null && Microbot.getClient().getLocalPlayer().getWorldLocation().distanceTo2D(stepLocation) > 1
                 && !Rs2GameObject.canWalkTo(object, 10)) {
             WorldPoint targetTile = null;
-            WorldPoint stepLocation = object == null ? step.getWorldPoint() : object.getWorldLocation();
             int radius = 0;
             while (targetTile == null) {
                 radius++;

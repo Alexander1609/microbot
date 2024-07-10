@@ -120,7 +120,7 @@ public class LostCity extends BasicQuestHelper
 		combatGear = new ItemRequirement("Runes, or a way of dealing damage which you can smuggle onto Entrana. Runes for Crumble Undead (level 39 Magic) are best.", -1, -1).isNotConsumed();
 		combatGear.setDisplayItemId(ItemID.SKULL);
 		teleport = new ItemRequirement("Teleport to Lumbridge. Home teleport will work if off cooldown.", ItemID.LUMBRIDGE_TELEPORT);
-		dramenBranch = new ItemRequirement("Dramen branch", ItemID.DRAMEN_BRANCH);
+		dramenBranch = new ItemRequirement("Dramen branch", ItemID.DRAMEN_BRANCH, 6);
 		dramenStaff = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF);
 		dramenStaffEquipped = new ItemRequirement("Dramen staff", ItemID.DRAMEN_STAFF, 1, true);
 	}
@@ -153,6 +153,7 @@ public class LostCity extends BasicQuestHelper
 		talkToShamus = new NpcStep(this, NpcID.SHAMUS, new WorldPoint(3138, 3212, 0), "Talk to Shamus.");
 		talkToShamus.addDialogStep("I've been in that shed, I didn't see a city.");
 		goToEntrana = new NpcStep(this, NpcID.MONK_OF_ENTRANA_1167, new WorldPoint(3047, 3236, 0), "Bank all weapons and armour you have (including the axe), and go to Port Sarim to get a boat to Entrana.", combatGear);
+		goToEntrana.addDialogStep("Yes, okay, I'm ready to go.");
 		goDownHole = new ObjectStep(this, ObjectID.LADDER_2408, new WorldPoint(2820, 3374, 0), "Climb down the ladder on the north side of the island. Once you go down, you can only escape via teleport.");
 		goDownHole.addDialogStep("Well that is a risk I will have to take.");
 		getAxe = new DetailedQuestStep(this, new WorldPoint(2843, 9760, 0), "Kill zombies until one drops a bronze axe.");

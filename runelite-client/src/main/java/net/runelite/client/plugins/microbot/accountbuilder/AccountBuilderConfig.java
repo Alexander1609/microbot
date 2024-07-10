@@ -18,6 +18,15 @@ public interface AccountBuilderConfig extends Config {
     String generalSection = "general";
 
     @ConfigItem(
+            keyName = "Debug",
+            name = "Debug",
+            description = "Debug",
+            position = 0,
+            section = generalSection
+    )
+    default boolean debugMode() { return false; }
+
+    @ConfigItem(
             keyName = "Is Member",
             name = "Is Member",
             description = "use Member worlds",

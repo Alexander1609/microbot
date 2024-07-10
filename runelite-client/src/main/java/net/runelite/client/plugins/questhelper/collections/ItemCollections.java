@@ -1480,6 +1480,14 @@ public enum ItemCollections
 		ItemID.ARDOUGNE_CLOAK_4,
 		ItemID.ARDOUGNE_MAX_CAPE
 	)),
+
+	KANDARIN_HEADGEARS(ImmutableList.of(
+			ItemID.KANDARIN_HEADGEAR_4,
+			ItemID.KANDARIN_HEADGEAR_3,
+			ItemID.KANDARIN_HEADGEAR_2,
+			ItemID.KANDARIN_HEADGEAR_1
+	)),
+
 	TEAM_CAPE(ImmutableList.of(
 		ItemID.TEAM1_CAPE,
 		ItemID.TEAM2_CAPE,

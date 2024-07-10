@@ -251,6 +251,7 @@ public class HolyGrail extends BasicQuestHelper
 		talkToMerlin.addDialogStep("Where can I find Sir Galahad?");
 
 		goToEntrana = new NpcStep(this, NpcID.MONK_OF_ENTRANA_1167, new WorldPoint(3048, 3235, 0), "Talk to a monk of Entrana. Bank all combat gear.", true);
+		goToEntrana.addDialogStep("Yes, okay, I'm ready to go.");
 		talkToHighPriest = new NpcStep(this, NpcID.HIGH_PRIEST, new WorldPoint(2851, 3348, 0), "Talk to the High Priest.");
 		talkToHighPriest.addDialogSteps("Ask about the Holy Grail Quest", "Ok, I will go searching.");
 
