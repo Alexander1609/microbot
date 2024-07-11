@@ -38,6 +38,8 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class MQuestScript extends Script {
     public static double version = 0.2;
@@ -77,10 +79,10 @@ public class MQuestScript extends Script {
                 if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
                     var dialogOptions = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
                     var dialogChoices = dialogOptions.getDynamicChildren();
-                    var choices = questStep.getChoices().getChoices();
-
-                    if (questStep != getQuestHelperPlugin().getSelectedQuest().getCurrentStep())
-                        choices.addAll(getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getChoices().getChoices());
+                    var choices = getAllActiveSteps(questStep).stream()
+                            .map(x -> x.getChoices().getChoices())
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList());
 
                     for (var choice : choices){
                         if (choice.getExpectedPreviousLine() != null)
@@ -147,10 +149,9 @@ public class MQuestScript extends Script {
                         return;
                     }
 
-                    if (questStep instanceof DetailedQuestStep && handleRequirements((DetailedQuestStep) questStep)){
-                        sleep(500, 1000);
-                        return;
-                    }
+                    for (var step : getAllActiveSteps(questStep))
+                        if (handleRequirements(step))
+                            return;
 
                     /**
                      * This portion is needed when using item on another item in your inventory.
@@ -189,8 +190,14 @@ public class MQuestScript extends Script {
         return true;
     }
 
-    private boolean handleRequirements(DetailedQuestStep questStep) {
-        var requirements = questStep.getRequirements();
+    private boolean handleRequirements(QuestStep questStep) {
+        List<Requirement> requirements;
+        if (questStep instanceof DetailedQuestStep)
+            requirements = ((DetailedQuestStep)questStep).getRequirements();
+        else if (questStep instanceof ConditionalStep)
+            requirements = ((ConditionalStep)questStep).getRequirements();
+        else
+            return false;
 
         for (var requirement : requirements){
             if (requirement instanceof ItemRequirement){
@@ -324,7 +331,7 @@ public class MQuestScript extends Script {
                     if (!Rs2Walker.walkTo(tile) && ShortestPathPlugin.getPathfinder() == null)
                         return false;
 
-                    sleepUntil(() -> ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone());
+                    sleepUntil(() -> (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone()) && !Rs2Player.isWalking(), 30_000);
                     if (ShortestPathPlugin.getPathfinder() == null || ShortestPathPlugin.getPathfinder().isDone()){
                         unreachableTarget = false;
                         unreachableTargetCheckDist = 1;
@@ -421,8 +428,9 @@ public class MQuestScript extends Script {
             actions = objComp.getActions();
         }
 
+        var text = getFullText(step);
         for (var action : actions){
-            if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
+            if (action != null && text.toLowerCase().contains(action.toLowerCase()))
                 return action;
         }
 
@@ -435,8 +443,9 @@ public class MQuestScript extends Script {
         if (npcComp == null)
             return "Talk-to";
 
+        var text = getFullText(step);
         for (var action : npcComp.getActions()){
-            if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
+            if (action != null && text.toLowerCase().contains(action.toLowerCase()))
                 return action;
         }
 
@@ -444,8 +453,9 @@ public class MQuestScript extends Script {
     }
 
     private String chooseCorrectItemOption(QuestStep step, int itemId){
+        var text = getFullText(step);
         for (var action : Rs2Inventory.get(itemId).getInventoryActions()){
-            if (action != null && step.getText().stream().anyMatch(x -> x.toLowerCase().contains(action.toLowerCase())))
+            if (action != null && text.toLowerCase().contains(action.toLowerCase()))
                 return action;
         }
 
@@ -507,12 +517,59 @@ public class MQuestScript extends Script {
         return true;
     }
 
-    protected QuestHelperPlugin getQuestHelperPlugin() {
+    protected static QuestHelperPlugin getQuestHelperPlugin() {
         return (QuestHelperPlugin)Microbot.getPluginManager().getPlugins().stream().filter(x -> x instanceof QuestHelperPlugin).findFirst().orElse(null);
     }
 
     public void onChatMessage(ChatMessage chatMessage) {
         if (chatMessage.getMessage().equalsIgnoreCase("I can't reach that!"))
             unreachableTarget = true;
+    }
+
+    public static String getFullText(QuestStep step){
+        StringBuilder result = new StringBuilder();
+
+        for (var cStep : getAllActiveSteps(step))
+            if (cStep.getText() != null)
+                result.append(String.join(";", cStep.getText()));
+
+        return result.toString();
+    }
+
+    private static Stack<QuestStep> getAllActiveSteps(QuestStep step){
+        var steps = new Stack<QuestStep>();
+
+        var selectedQuest = getQuestHelperPlugin().getSelectedQuest();
+        if (selectedQuest == null) return steps;
+
+        var currentStep = selectedQuest.getCurrentStep();
+        steps.add(currentStep);
+
+        if (currentStep != step)
+            steps = findSubStep(steps, step);
+
+        return steps;
+    }
+
+    private static Stack<QuestStep> findSubStep(Stack<QuestStep> steps, QuestStep step){
+        var subSteps = new ArrayList<>(steps.peek().getSubsteps());
+
+        if (steps.peek() instanceof ConditionalStep)
+            subSteps.addAll(((ConditionalStep) steps.peek()).getSteps());
+
+        for (var cStep : subSteps){
+            var cSteps = new Stack<QuestStep>();
+            cSteps.addAll(steps);
+            cSteps.add(cStep);
+
+            if (cStep == step)
+                return cSteps;
+
+            cSteps = findSubStep(cSteps, step);
+            if (cSteps != null)
+                return cSteps;
+        }
+
+        return null;
     }
 }

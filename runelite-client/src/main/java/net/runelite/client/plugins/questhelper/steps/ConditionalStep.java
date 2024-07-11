@@ -25,6 +25,7 @@
 package net.runelite.client.plugins.questhelper.steps;
 
 import com.google.inject.Inject;
+import lombok.Getter;
 import net.runelite.client.plugins.questhelper.requirements.Requirement;
 import net.runelite.client.plugins.questhelper.requirements.npc.DialogRequirement;
 import net.runelite.client.plugins.questhelper.requirements.runelite.RuneliteRequirement;
@@ -69,6 +70,7 @@ public class ConditionalStep extends QuestStep implements OwnerStep
 
 	protected QuestStep currentStep;
 
+	@Getter
 	protected List<Requirement> requirements = new ArrayList<>();
 
 	public ConditionalStep(QuestHelper questHelper, QuestStep step, Requirement... requirements)

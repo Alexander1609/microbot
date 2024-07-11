@@ -253,6 +253,20 @@ public class Rs2Equipment {
         return equipmentItems.stream().anyMatch(x -> x.getSlot() == EquipmentInventorySlot.SHIELD.getSlotIdx());
     }
 
+    public static boolean remove(int id){
+        var item = get(id);
+        if (item == null) return false;
+        invokeMenu(item, "Remove");
+        return true;
+    }
+
+    public static boolean remove(EquipmentInventorySlot slot){
+        var item = get(slot);
+        if (item == null) return false;
+        invokeMenu(item, "Remove");
+        return true;
+    }
+
     private static void invokeMenu(Rs2Item rs2Item, String action) {
         if (rs2Item == null) return;
 
@@ -273,6 +287,9 @@ public class Rs2Equipment {
                 }
             }
         }
+
+        if (action.equalsIgnoreCase("remove"))
+            identifier = 1;
 
         if (rs2Item.getSlot() == EquipmentInventorySlot.CAPE.getSlotIdx()) {
             param1 = 25362448;
