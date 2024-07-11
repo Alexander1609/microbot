@@ -131,6 +131,10 @@ public class Transport {
     @Getter
     private boolean isPlayerItem;
 
+    /** Whether the transport is a player-held item */
+    @Getter
+    private boolean isNpc;
+
     /** The additional travel time */
     @Setter
     @Getter
@@ -308,6 +312,7 @@ public class Transport {
         isTeleportationLever = TransportType.TELEPORTATION_LEVER.equals(transportType);
         isTeleportationPortal = TransportType.TELEPORTATION_PORTAL.equals(transportType);
         isPlayerItem = TransportType.PLAYER_ITEM.equals(transportType);
+        isNpc = TransportType.NPC.equals(transportType);
         isMember = TransportType.TELEPORTATION_LEVER.equals(transportType)
                 ||  TransportType.SPIRIT_TREE.equals(transportType)
                 || TransportType.GNOME_GLIDER.equals(transportType)
@@ -408,6 +413,7 @@ public class Transport {
         addTransports(transports, "levers.tsv", TransportType.TELEPORTATION_LEVER);
         addTransports(transports, "portals.tsv", TransportType.TELEPORTATION_PORTAL);
         addTransports(transports, "items.tsv", TransportType.PLAYER_ITEM);
+        addTransports(transports, "npcs.tsv", TransportType.NPC);
 
         return transports;
     }
@@ -426,6 +432,7 @@ public class Transport {
         TELEPORTATION_LEVER,
         TELEPORTATION_PORTAL,
         PLAYER_ITEM,
+        NPC,
     }
 
     private static boolean completedQuests(Transport transport) {

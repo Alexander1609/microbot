@@ -62,7 +62,8 @@ public class PathfinderConfig {
         useGnomeGliders,
         useSpiritTrees,
         useTeleportationLevers,
-        useTeleportationPortals;
+        useTeleportationPortals,
+        useNpcs;
     private PlayerItemTransportSetting playerItemsSetting;
     private int agilityLevel;
     private int rangedLevel;
@@ -105,6 +106,7 @@ public class PathfinderConfig {
         useTeleportationLevers = config.useTeleportationLevers();
         useTeleportationPortals = config.useTeleportationPortals();
         playerItemsSetting = config.playerItemTransportSetting();
+        useNpcs = config.useNpcs();
 
         if (GameState.LOGGED_IN.equals(client.getGameState())) {
             agilityLevel = client.getBoostedSkillLevel(Skill.AGILITY);
@@ -298,6 +300,7 @@ public class PathfinderConfig {
         final boolean isPrayerLocked = transportPrayerLevel > 1;
         final boolean isQuestLocked = transport.isQuestLocked();
         final boolean isPlayerItem = transport.isPlayerItem();
+        final boolean isNpc = transport.isNpc();
 
         if (isAgilityShortcut) {
             if (!useAgilityShortcuts || agilityLevel < transportAgilityLevel) {
@@ -363,6 +366,10 @@ public class PathfinderConfig {
                         return false;
                     }
             }
+        }
+
+        if (isNpc && !useNpcs){
+            return false;
         }
 
         if (!varbitChecks(transport)) {

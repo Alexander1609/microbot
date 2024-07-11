@@ -591,7 +591,7 @@ public class Rs2Walker {
 
                     if (origin == null || path.get(i).equals(origin)) {
                         boolean handled = false;
-                        if (b.isShip()) {
+                        if (b.isShip() || b.isNpc()) {
                             var npc = Rs2Npc.getNpc(b.getNpcName());
                             if (Rs2Npc.canWalkTo(npc, 20)) {
                                 Rs2Npc.interact(npc, b.getAction());
