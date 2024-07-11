@@ -191,7 +191,7 @@ public class ArdougneEasyDiaryTask extends AccountBuilderQuestTask {
         sleep(500, 1000);
         Rs2Inventory.interact("Antique lamp", "Rub");
         sleepUntil(() -> Rs2Widget.isWidgetVisible(240, 0), 5000);
-        Rs2Widget.clickWidget(240, 9);
+        Rs2Widget.clickWidget(240, 9); // Agility
         sleep(500, 1000);
         Rs2Widget.clickWidget(240, 26);
     }

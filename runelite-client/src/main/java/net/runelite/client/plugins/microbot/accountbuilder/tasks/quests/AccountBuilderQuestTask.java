@@ -11,6 +11,7 @@ import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -25,15 +26,19 @@ import net.runelite.client.plugins.questhelper.requirements.player.CombatLevelRe
 import net.runelite.client.plugins.questhelper.requirements.util.LogicType;
 import net.runelite.client.plugins.questhelper.steps.*;
 
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Getter
     private final QuestHelperQuest quest;
     private final MQuestScript questScript  = new MQuestScript();
+    ReentrantLock questScriptLock = new ReentrantLock();
     private final FoodScript foodScript = new FoodScript();
 
     @Getter
@@ -65,9 +70,13 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
                                 .findFirst().orElse(null);
                         if (owned != null)
                             itemRequirements.add(owned);
-                        else
-                            itemRequirements.add(requirements.getItemRequirements().stream().collect(Collectors.toMap(x -> x, x -> x.getAllIds().stream().collect(Collectors.toMap(y -> y, y -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(y, false))))
-                                                            .entrySet().stream().filter(y -> y.getValue() > 0).min(Map.Entry.comparingByValue()).orElse(null).getKey())).entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).get().getKey());
+                        else{
+                            var itemPriceMap = requirements.getItemRequirements().stream().collect(Collectors.toMap(x -> x, x ->
+                                                x.getAllIds().stream().collect(Collectors.toMap(y -> y, y -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(y, false))))
+                                                .entrySet().stream().filter(y -> y.getValue() > 0).min(Map.Entry.comparingByValue()).orElseGet(() -> new AbstractMap.SimpleEntry<>(-1, -1)).getKey()));
+
+                            itemRequirements.add(itemPriceMap.entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).get().getKey());
+                        }
                     } else
                         throw new UnsupportedOperationException();
 
@@ -103,7 +112,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     public void doTaskCleanup(boolean shutdown) {
         super.doTaskCleanup(shutdown);
 
-        questScript.shutdown();
+        stopQuest();
         foodScript.shutdown();
 
         if (quest != null && !shutdown){
@@ -155,18 +164,10 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
             handleDetailedStep((DetailedQuestStep) currentStep);
     }
 
-    protected void handleObjectStep(ObjectStep step) {
-        if (step != null && !isQuestRunning()) startupQuest();
-    }
-    protected void handleNPCEmoteStep(NpcEmoteStep step) {
-        if (step != null && !isQuestRunning()) startupQuest();
-    }
-    protected void handleNPCStep(NpcStep step) {
-        if (step != null && !isQuestRunning()) startupQuest();
-    }
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (step != null && !isQuestRunning()) startupQuest();
-    }
+    protected void handleObjectStep(ObjectStep step) { }
+    protected void handleNPCEmoteStep(NpcEmoteStep step) { }
+    protected void handleNPCStep(NpcStep step) { }
+    protected void handleDetailedStep(DetailedQuestStep step) { }
 
     @Override
     public void onGameStateChanged(GameStateChanged event) {
@@ -187,12 +188,23 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         questScript.onChatMessage(chatMessage);
     }
 
-    protected void startupQuest(){
-        questScript.run(new MQuestConfig(){ });
+    protected void startupQuest() {
+        if (!Global.sleepUntilTrue(() ->  questScriptLock.tryLock(), 100, 2000))
+            return;
+
+        if (!questScript.isRunning())
+            questScript.run(new MQuestConfig(){ });
+
+        questScriptLock.unlock();
     }
 
     protected void stopQuest(){
+        if (!Global.sleepUntilTrue(() ->  questScriptLock.tryLock(), 100, 2000))
+            return;
+
         questScript.shutdown();
+
+        questScriptLock.unlock();
     }
 
     public boolean isQuestRunning(){

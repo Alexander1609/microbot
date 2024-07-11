@@ -65,10 +65,12 @@ public class AccountBuilderTaskList {
         tasks.put(new RFDGobilGeneralsTask(), 1000);
         tasks.put(new DeathPlateauTask(), 1000);
         tasks.put(new HolyGrailTask(), 1000);
-        //tasks.put(new LostTribeTask(), 1000);
+        tasks.put(new LostTribeTask(), 1000);
         tasks.put(new LostCityTask(), 1000);
         tasks.put(new FairytaleITask(), 1000);
         tasks.put(new FairytaleIIUnlockTask(), 1000);
+        tasks.put(new KandarinEasyDiaryTask(), 1000);
+        tasks.put(new DeathToTheDorgeshuunTask(), 1000);
 
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
 
