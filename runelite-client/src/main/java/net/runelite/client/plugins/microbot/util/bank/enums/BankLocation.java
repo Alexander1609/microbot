@@ -56,6 +56,7 @@ public enum BankLocation {
     HUNTERS_GUILD(new WorldPoint(1542, 3041, 0)),
     ISLE_OF_SOULS(new WorldPoint(2212, 2859, 0)),
     JATIZSO(new WorldPoint(2416, 3801, 0)),
+    KELDAGRIM(new WorldPoint(2837, 10207, 0)),
     LANDS_END(new WorldPoint(1512, 3421, 0)),
     LEGENDS_GUILD(new WorldPoint(2732, 3379, 2)),
     LOVAKENGJ(new WorldPoint(1526, 3739, 0)),

@@ -337,6 +337,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 		talkToVermundi = new NpcStep(this, NpcID.VERMUNDI, new WorldPoint(2887, 10188, 0), "Talk to Vermundi west of " +
 			"Blasidar. If you already have, open the Quest Journal to re-sync.");
 		talkToVermundi.addDialogStep("Yes, I'm looking for some special clothes.");
+		talkToVermundi.finishDialogue();
 
 		talkToLibrarian = new NpcStep(this, NpcID.LIBRARIAN, new WorldPoint(2861, 10226, 0), "Talk to the Librarian.");
 		talkToLibrarian.addDialogStep("Do you know anything about King Alvis' clothes?");
@@ -369,6 +370,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 		// Boots fit for a king
 		talkToSaro = new NpcStep(this, NpcID.SARO, new WorldPoint(2827, 10198, 0), "Talk to Saro in West Keldagrim.");
 		talkToSaro.addDialogStep("Yes, I'm looking for a pair of special boots.");
+		talkToSaro.finishDialogue();
 
 		talkToDromund = new NpcStep(this, NpcID.DROMUND, new WorldPoint(2838, 10224, 0), "Talk to Dromund.");
 
@@ -481,7 +483,7 @@ public class TheGiantDwarf extends BasicQuestHelper
 	@Override
 	public List<ItemRequirement> getItemRecommended()
 	{
-		return Arrays.asList(houseTeleport, rellekkaTeleport, fairyRings, staminaPotions, varrockTeleport, clay10, copperOre10, tinOre10, ironOre10, coal10, silverOre10, goldOre10, mithrilOre10, bronzeBar10, ironbar10, silverBar10, goldBar10, steelBar10, mithrilBar10);
+		return Arrays.asList(houseTeleport, rellekkaTeleport, fairyRings, staminaPotions, varrockTeleport);//, clay10, copperOre10, tinOre10, ironOre10, coal10, silverOre10, goldOre10, mithrilOre10, bronzeBar10, ironbar10, silverBar10, goldBar10, steelBar10, mithrilBar10);
 	}
 
 	@Override

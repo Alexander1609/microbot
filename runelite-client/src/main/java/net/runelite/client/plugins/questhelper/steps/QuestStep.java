@@ -152,6 +152,9 @@ public abstract class QuestStep implements Module
 
 	protected String lastDialogSeen = "";
 
+	@Getter
+	private boolean finishDialogue = false;
+
 	public QuestStep(QuestHelper questHelper)
 	{
 		this.questHelper = questHelper;
@@ -507,4 +510,8 @@ public abstract class QuestStep implements Module
 	{
 		return spriteManager.getSprite(SpriteID.TAB_QUESTS, 0);
 	}
+
+    public void finishDialogue() {
+		finishDialogue = true;
+    }
 }

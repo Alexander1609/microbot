@@ -92,7 +92,15 @@ public class MotherlodeMineTask extends AccountBuilderTask {
     @Override
     public void doTaskCleanup(boolean shutdown) {
         // Wait until all paydirt has been deposited
-        sleepUntil(() -> !Rs2Inventory.contains(ItemID.PAYDIRT), 180_000);
+        var paydirtPresent = Rs2Inventory.contains(ItemID.PAYDIRT);
+        while (paydirtPresent){
+            sleepUntil(() -> !Rs2Inventory.contains(ItemID.PAYDIRT), 60_000);
+
+            // Validate
+            sleep(500);
+            if (!Rs2Inventory.contains(ItemID.PAYDIRT))
+                paydirtPresent = false;
+        }
 
         super.doTaskCleanup(shutdown);
 
