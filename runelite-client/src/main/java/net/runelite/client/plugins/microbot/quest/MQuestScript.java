@@ -479,7 +479,7 @@ public class MQuestScript extends Script {
                     continue;
                 }
 
-                if (!Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0])) && conditionalStep.getWorldPoint() != null) {
+                if (itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity())) && conditionalStep.getWorldPoint() != null) {
                     if (Rs2Walker.canReach(conditionalStep.getWorldPoint()) &&
                             (conditionalStep.getWorldPoint().distanceTo(Rs2Player.getWorldLocation()) < 2)
                             || conditionalStep.getWorldPoint().toWorldArea().hasLineOfSightTo(Microbot.getClient().getTopLevelWorldView(), Microbot.getClient().getLocalPlayer().getWorldLocation().toWorldArea())
@@ -489,7 +489,7 @@ public class MQuestScript extends Script {
                         Rs2Walker.walkTo(conditionalStep.getWorldPoint(), 2);
                     }
                     return true;
-                } else if (!Rs2Inventory.contains(itemRequirement.getAllIds().toArray(new Integer[0]))){
+                } else if (itemRequirement.getAllIds().stream().noneMatch(x -> Rs2Inventory.hasItemAmount(x, itemRequirement.getQuantity()))){
                     Rs2GroundItem.loot(itemRequirement.getId());
                     return true;
                 }
@@ -554,10 +554,13 @@ public class MQuestScript extends Script {
     private static Stack<QuestStep> findSubStep(Stack<QuestStep> steps, QuestStep step){
         var subSteps = new ArrayList<>(steps.peek().getSubsteps());
 
-        if (steps.peek() instanceof ConditionalStep)
+        var currentStep = steps.peek();
+        if (currentStep instanceof ConditionalStep)
             subSteps.addAll(((ConditionalStep) steps.peek()).getSteps());
 
         for (var cStep : subSteps){
+            if (cStep == currentStep) continue;
+
             var cSteps = new Stack<QuestStep>();
             cSteps.addAll(steps);
             cSteps.add(cStep);
