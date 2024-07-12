@@ -79,6 +79,7 @@ public class AccountBuilderTaskList {
         tasks.put(new XMarksTheSpotTask(), 1000);
         tasks.put(new ClientOfKourendTask(), 1000);
         tasks.put(new TheGiantDwarfTask(), 1000);
+        tasks.put(new TheQueenOfThievesTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);

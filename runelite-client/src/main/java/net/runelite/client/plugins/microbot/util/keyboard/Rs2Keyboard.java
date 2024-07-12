@@ -33,7 +33,7 @@ public class Rs2Keyboard {
 
             getCanvas().dispatchEvent(keyEvent);
 
-            Global.sleep(100, 200);
+            Global.sleep(100, 600);
 
             if (awaitedCondition.getAsBoolean())
                 break;
