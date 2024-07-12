@@ -13,6 +13,7 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
@@ -598,7 +599,7 @@ public class Rs2Walker {
 
                     if (origin == null || path.get(i).equals(origin)) {
                         boolean handled = false;
-                        if (b.isShip() || b.isNpc()) {
+                        if (b.isShip() || b.isNpc() || b.isBoat()) {
                             var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
                             NPC npc = null;
                             String action = "";
