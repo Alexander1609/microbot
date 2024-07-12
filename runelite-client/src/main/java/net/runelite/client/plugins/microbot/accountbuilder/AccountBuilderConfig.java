@@ -27,6 +27,15 @@ public interface AccountBuilderConfig extends Config {
     default boolean debugMode() { return false; }
 
     @ConfigItem(
+            keyName = "AutoStart",
+            name = "AutoStart",
+            description = "AutoStart",
+            position = 0,
+            section = generalSection
+    )
+    default boolean autostart() { return true; }
+
+    @ConfigItem(
             keyName = "Is Member",
             name = "Is Member",
             description = "use Member worlds",

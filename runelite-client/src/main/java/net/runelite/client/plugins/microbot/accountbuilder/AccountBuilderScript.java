@@ -98,7 +98,7 @@ public class AccountBuilderScript extends Script {
                 if (taskMap == null)
                     return;
 
-                if (task == null && nextTask == null && !config.debugMode())
+                if (task == null && nextTask == null && !config.debugMode() && config.autostart())
                     nextTask = getNewRandomTask();
 
                 if (nextTask != null && (task == null || (taskEndTime != 0 && System.currentTimeMillis() > taskEndTime))) {
