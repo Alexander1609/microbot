@@ -56,6 +56,7 @@ public class MQuestScript extends Script {
     private MQuestConfig config;
     private static ArrayList<NPC> npcsHandled = new ArrayList<>();
     private static ArrayList<TileObject> objectsHandeled = new ArrayList<>();
+    private ArrayList<String> selectedChatOptions = new ArrayList<>();
 
     QuestStep dialogueStartedStep = null;
 
@@ -128,7 +129,21 @@ public class MQuestScript extends Script {
                     Widget widget = Rs2Widget.findWidget("Start ");
                     if (Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS) && getQuestHelperPlugin().getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
                             Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
-                        Rs2Keyboard.keyPress('1');
+                        var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+                        var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
+                                .collect(Collectors.toMap(x -> (String) x.getOnKeyListener()[7], x -> x));
+                        var keysSorted = new ArrayList<>(childs.keySet());
+                        Collections.sort(keysSorted);
+
+                        for (var key : keysSorted){
+                            var text = childs.get(key).getText();
+                            if (!selectedChatOptions.contains(text)){
+                                selectedChatOptions.add(text);
+                                Rs2Keyboard.keyPress(key.charAt(0));
+                                break;
+                            }
+                        }
+
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     }
@@ -140,6 +155,7 @@ public class MQuestScript extends Script {
                         return;
                     } else {
                         dialogueStartedStep = null;
+                        selectedChatOptions.clear();
                     }
 
                     boolean isInCutscene = Microbot.getVarbitValue(4606) > 0;
