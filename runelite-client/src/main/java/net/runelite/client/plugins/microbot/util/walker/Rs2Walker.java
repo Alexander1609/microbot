@@ -599,9 +599,19 @@ public class Rs2Walker {
                     if (origin == null || path.get(i).equals(origin)) {
                         boolean handled = false;
                         if (b.isShip() || b.isNpc()) {
-                            var npc = Rs2Npc.getNpc(b.getNpcName());
+                            var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
+                            NPC npc = null;
+                            String action = "";
+                            for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)){
+                                npc = Rs2Npc.getNpc(npcAndAction.substring(n + 1));
+                                if (npc != null){
+                                    action = npcAndAction.substring(0, n);
+                                    break;
+                                }
+                            }
+
                             if (Rs2Npc.canWalkTo(npc, 20)) {
-                                Rs2Npc.interact(npc, b.getAction());
+                                Rs2Npc.interact(npc, action);
                                 Rs2Player.waitForWalking();
                                 handled = true;
                             } else {
