@@ -127,7 +127,7 @@ public class ClientOfKourend extends BasicQuestHelper
 	public void setupSteps()
 	{
 		talkToVeos = new NpcStep(this, NpcID.VEOS_10727, new WorldPoint(1824, 3690, 0),
-			"Talk to Veos on the Port Piscarilius docks. You can travel to him by talking to Veos in Port Sarim.");
+			"Talk to Veos on the Port Piscarilius docks.");
 		talkToVeos.addDialogStep("Sounds interesting! How can I help?");
 		talkToVeos.addDialogStep("Can you take me to Great Kourend?");
 		talkToVeos.addDialogStep("Have you got any quests for me?");

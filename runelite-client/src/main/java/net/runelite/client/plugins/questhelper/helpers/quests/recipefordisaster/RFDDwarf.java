@@ -201,7 +201,8 @@ public class RFDDwarf extends BasicQuestHelper
 			" it up. Otherwise, wear other gloves or telegrab it. If it despawns you'll need to bring Rohak more " +
 			"ingredients.",	rockCakeHot);
 		coolRockCake = new NpcStep(this, NpcID.ICEFIEND, new WorldPoint(3008, 3471, 0),
-			"Kill an icefiend to cool the rock cake.", rockCakeHot);
+			"Kill an icefiend to cool the rock cake.", true, rockCakeHot);
+		((NpcStep)coolRockCake).addAlternateNpcs(NpcID.ICEFIEND_4813);
 		coolRockCakeSidebar = new NpcStep(this, NpcID.ICEFIEND, new WorldPoint(3008, 3471, 0),
 			"If you didn't pick up the rock cake with ice gloves, kill an icefiend to cool the rock cake.",
 			rockCakeHot);

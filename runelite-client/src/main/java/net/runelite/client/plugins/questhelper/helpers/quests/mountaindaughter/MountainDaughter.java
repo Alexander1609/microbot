@@ -109,7 +109,7 @@ public class MountainDaughter extends BasicQuestHelper
 		steps.put(10, speakToSpirit);
 
 		ConditionalStep helpTheCamp = new ConditionalStep(this, enterCampOverRocks);
-		helpTheCamp.addStep(finishedFoodAndDiplomacy, returnToSpirit);
+		helpTheCamp.addStep(finishedFoodAndDiplomacy, speakToSpirit);
 		helpTheCamp.addStep(new Conditions(givenGuaranteeToSvidi, finishedFood), returnToHamalAboutDiplomacy);
 
 		// Get fruit
@@ -149,7 +149,10 @@ public class MountainDaughter extends BasicQuestHelper
 
 		ConditionalStep buryCorpse = new ConditionalStep(this, enterCampOverRocks);
 		buryCorpse.addStep(hasBuried, createCairn);
-		buryCorpse.addStep(necklace.alsoCheckBank(questBank), buryCorpseOnIsland);
+		buryCorpse.addStep(onIsland3, buryCorpseOnIsland);
+		buryCorpse.addStep(onIsland2, plankRocks);
+		buryCorpse.addStep(onIsland1, poleVaultRocks);
+		buryCorpse.addStep(necklace.alsoCheckBank(questBank), climbTree);
 		buryCorpse.addStep(muddyRocks5.alsoCheckBank(questBank), speakRagnar);
 		buryCorpse.addStep(inTheCamp, collectRocks);
 

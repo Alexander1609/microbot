@@ -17,6 +17,7 @@ public class AccountBuilderTaskList {
     static {
         tasks = new HashMap<>();
 
+        // F2P Quests
         tasks.put(new CookAssistantTask(), 4000);
         tasks.put(new SheepShearerTask(), 2000);
         tasks.put(new RomeoJulietTask(), 1000);
@@ -34,6 +35,7 @@ public class AccountBuilderTaskList {
         tasks.put(new WitchsPotionTask(), 1000);
         tasks.put(new PiratesTreasureTask(), 1000);
 
+        // P2P Quests
         tasks.put(new NatualHistoryQuizTask(), 1000);
         //tasks.put(new DwarfCannonTask(), 1000);
         tasks.put(new WaterfallQuestTask(), 1000);
@@ -69,14 +71,23 @@ public class AccountBuilderTaskList {
         tasks.put(new LostCityTask(), 1000);
         tasks.put(new FairytaleITask(), 1000);
         tasks.put(new FairytaleIIUnlockTask(), 1000);
-        tasks.put(new KandarinEasyDiaryTask(), 1000);
         tasks.put(new DeathToTheDorgeshuunTask(), 1000);
+        tasks.put(new SeaSlugTask(), 1000);
+        tasks.put(new FishingContestTask(), 1000);
+        tasks.put(new RFDMountainDwarfTask(), 1000);
+        tasks.put(new MountainDaughterTask(), 1000);
+        tasks.put(new XMarksTheSpotTask(), 1000);
+        tasks.put(new ClientOfKourendTask(), 1000);
 
+        // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
+        tasks.put(new KandarinEasyDiaryTask(), 1000);
 
+        // Combat
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);
 
+        // Skilling
         tasks.put(new MiningSmithingBronzeTask(), 1000);
         tasks.put(new ChoppingTreeTask(), 1000);
         tasks.put(new ChoppingOakTask(), 1000);
@@ -85,6 +96,7 @@ public class AccountBuilderTaskList {
         tasks.put(new FletchingHeadlessArrowTask(), 1000);
         tasks.put(new BuildingCrudeChairTask(), 1000);
 
+        // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);
     }
 }
