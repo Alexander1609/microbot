@@ -5,10 +5,8 @@ import lombok.Setter;
 import net.runelite.api.GrandExchangeOfferState;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
+import net.runelite.api.events.*;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -127,6 +125,7 @@ public abstract class AccountBuilderTask {
     public void onGameObjectSpawned(GameObjectSpawned event){ }
     public void onGameTick(GameTick gameTick) { }
     public void onGameStateChanged(GameStateChanged event) { }
+    public void onWallObjectSpawned(WallObjectSpawned event) { }
 
     protected void sleep(int time) {
         try {

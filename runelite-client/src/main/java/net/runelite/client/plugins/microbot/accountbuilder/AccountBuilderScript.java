@@ -3,10 +3,8 @@ package net.runelite.client.plugins.microbot.accountbuilder;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameObjectSpawned;
-import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
+import net.runelite.api.events.*;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
@@ -259,6 +257,11 @@ public class AccountBuilderScript extends Script {
     {
         if (task != null)
             task.onGameStateChanged(event);
+    }
+
+    public void onWallObjectSpawned(WallObjectSpawned event){
+        if (task != null)
+            task.onWallObjectSpawned(event);
     }
 
     @Override
