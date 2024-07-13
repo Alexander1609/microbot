@@ -997,28 +997,33 @@ public class Rs2GameObject {
                 param1 = object.getLocalLocation().getSceneY();
             }
 
-            int index = 0;
-            if (action != null) {
-                String[] actions;
-                if (objComp.getImpostorIds() != null) {
-                    actions = objComp.getImpostor().getActions();
-                } else {
-                    actions = objComp.getActions();
-                }
+            int index = -1;
+            String[] actions;
+            if (objComp.getImpostorIds() != null) {
+                actions = objComp.getImpostor().getActions();
+            } else {
+                actions = objComp.getActions();
+            }
 
+            if (action != null && !action.isBlank()) {
                 for (int i = 0; i < actions.length; i++) {
                     if (action.equalsIgnoreCase(actions[i])) {
                         index = i;
                         break;
                     }
                 }
-
-                if (index == actions.length)
-                    index = 0;
+            } else {
+                for (int i = 0; i < actions.length; i++){
+                    if (actions[i] != null && !actions[i].isBlank()){
+                        index = i;
+                        break;
+                    }
+                }
             }
 
             if (index == -1) {
                 Microbot.log("Failed to interact with object " + object.getId() + " " + action);
+                return false;
             }
 
 
