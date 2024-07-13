@@ -7,6 +7,7 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
+import net.runelite.client.plugins.microbot.playerassist.combat.AntiPoisonScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
@@ -34,14 +35,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import static net.runelite.client.plugins.microbot.nmz.NmzScript.prayerPotionScript;
-
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Getter
     private final QuestHelperQuest quest;
     private final MQuestScript questScript  = new MQuestScript();
     ReentrantLock questScriptLock = new ReentrantLock();
     private final FoodScript foodScript = new FoodScript();
+    private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
 
     @Getter
     protected QuestStep currentStep;
@@ -118,6 +118,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
         stopQuest();
         foodScript.shutdown();
+        antiPoisonScript.shutdown();
 
         if (quest != null && !shutdown){
             sleepUntil(() -> Rs2Widget.getWidget(10027025) != null, 30_000);
@@ -141,7 +142,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         }
 
         if (useAntiPoison){
-            prayerPotionScript.run(new PlayerAssistConfig() {
+            antiPoisonScript.run(new PlayerAssistConfig() {
                 @Override
                 public boolean useAntiPoison() {
                     return true;

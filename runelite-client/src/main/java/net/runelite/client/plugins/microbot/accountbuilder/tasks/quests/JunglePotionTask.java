@@ -26,62 +26,28 @@ public class JunglePotionTask extends AccountBuilderQuestTask{
     }
 
     @Override
-    protected void handleNPCStep(NpcStep step) {
-        super.handleNPCStep(step);
-    }
-
-    @Override
-    protected void handleDetailedStep(DetailedQuestStep step) {
-        if (!step.getRequirements().isEmpty()){
-            if (step.getRequirements().get(0) instanceof ItemRequirement) {
-                ItemRequirement requirement = (ItemRequirement) step.getRequirements().get(0);
-                if (requirement.getName().equals("Grimy Snake Weed")) {
-                    stopQuest();
-                    Rs2Inventory.interact(1525, "Clean");
-                } else if (requirement.getName().equals("Grimy Ardrigal")){
-                    stopQuest();
-                    Rs2Inventory.interact(1527, "Clean");
-                } else if (requirement.getName().equals("Grimy Sito Foil")){
-                    stopQuest();
-                    Rs2Inventory.interact(1529, "Clean");
-                } else if (requirement.getName().equals("Volencia Moss")){
-                    stopQuest();
-                    Rs2Inventory.interact("Volencia Moss", "Clean");
-                } else if (requirement.getName().equals("Grimy Rogues Purse")){
-                    stopQuest();
-                    Rs2Inventory.interact(1533, "Clean");
-                }
-            }
-        } else if (!isQuestRunning())
-            startupQuest();
-//        }
-    }
-
-    @Override
     protected void handleObjectStep(ObjectStep step) {
         if(step.objectID == 2583){
             if (isQuestRunning())
                 stopQuest();
             WorldPoint safeSpot = new WorldPoint(2830, 9492, 0);
             if (!Rs2Player.getWorldLocation().equals(safeSpot)){
-                Rs2Walker.walkTo(safeSpot);
+                Rs2Walker.walkFastCanvas(safeSpot);
             } else {
-                Rs2GameObject.interact(2583, "Search");
+                var wall = Rs2GameObject.getTileObjects(2583, safeSpot.dy(-1)).get(0);
+                Rs2GameObject.interact(wall, "Search");
                 Rs2Player.waitForAnimation();
                 sleepUntil(() -> Rs2Inventory.hasItem("Grimy rogue's purse"), 30000);
             }
-        } else if (!isQuestRunning())
-            startupQuest();
-    }
-
-    @Override
-    public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyItems();
+        } else if(step.objectID == 2584){
+            Rs2GameObject.interact(step.objectID, "Search");
+            Rs2Player.waitForAnimation();
+        }
     }
 
     @Override
     public boolean requirementsMet() {
-        return super.requirementsMet()  && isQuestCompleted(QuestHelperQuest.DRUIDIC_RITUAL);
+        return super.requirementsMet() && Microbot.getClient().getRealSkillLevel(Skill.HITPOINTS) > 25;
     }
 }
 

@@ -7,6 +7,7 @@ import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,7 @@ public class AntiPoisonScript extends Script {
                         return;
                     }
                     for (Rs2Item potion: potions) {
-                        if (potion.name.toLowerCase().contains("poison")) {
+                        if (ItemCollections.ANTIPOISONS.getItems().contains(potion.id)) {
                             Rs2Inventory.interact(potion, "drink");
                             Rs2Player.waitForAnimation();
                             break;

@@ -80,6 +80,7 @@ public class AccountBuilderTaskList {
         tasks.put(new ClientOfKourendTask(), 1000);
         tasks.put(new TheGiantDwarfTask(), 1000);
         tasks.put(new TheQueenOfThievesTask(), 1000);
+        tasks.put(new JunglePotionTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
