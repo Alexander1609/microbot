@@ -608,9 +608,9 @@ public class Rs2Walker {
                             var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
                             NPC npc = null;
                             String action = "";
-                            for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)){
+                            for (int n = npcAndAction.indexOf(" "); n >= 0; n = npcAndAction.indexOf(" ", n + 1)) {
                                 npc = Rs2Npc.getNpc(npcAndAction.substring(n + 1));
-                                if (npc != null){
+                                if (npc != null) {
                                     action = npcAndAction.substring(0, n);
                                     break;
                                 }
@@ -628,41 +628,41 @@ public class Rs2Walker {
 
                         if (origin != null && b.getDestination().distanceTo2D(Rs2Player.getWorldLocation()) > 20) {
                             handled |= handleTrapdoor(b);
-                    }
+                        }
 
-                    if (b.isSpiritTree()) {
+                        if (b.isSpiritTree()) {
                             handled |= b.handleSpiritTree();
-                    }
+                        }
 
 
-                    if (b.isGnomeGlider()) {
+                        if (b.isGnomeGlider()) {
                             handled |= b.handleGlider();
-                    }
+                        }
 
-                    if (b.isFairyRing()) {
+                        if (b.isFairyRing()) {
                             handled |= b.handleFairyRing();
                         }
 
-                        if (b.isPlayerItem()){
+                        if (b.isPlayerItem()) {
                             handled |= b.handleItemTeleport();
-                    }
+                        }
 
                         if (handled)
                             return true;
 
-                    GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
+                        GameObject gameObject = Rs2GameObject.getGameObjects(b.getObjectId(), b.getOrigin()).stream().findFirst().orElse(null);
 
-                    //check game objects
-                    if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                        boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
+                        //check game objects
+                        if (gameObject != null && gameObject.getId() == b.getObjectId()) {
+                            boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
                                 return true;
-                        }
-                        Rs2Player.waitForWalking();
+                            }
+                            Rs2Player.waitForWalking();
                             return true;
-                    }
+                        }
 
                         //check tile objects
                         List<TileObject> tileObjects = Rs2GameObject.getTileObjects(b.getObjectId(), b.getOrigin());
@@ -672,19 +672,19 @@ public class Rs2Walker {
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
                             boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
-                        if (!interact) {
-                            Rs2Walker.walkMiniMap(path.get(i));
-                            sleep(1600, 2000);
+                            if (!interact) {
+                                Rs2Walker.walkMiniMap(path.get(i));
+                                sleep(1600, 2000);
                                 return true;
                             }
-                        if (b.isAgilityShortcut()) {
-                            Rs2Player.waitForAnimation();
-                        } else {
-                            Rs2Player.waitForWalking();
+                            if (b.isAgilityShortcut()) {
+                                Rs2Player.waitForAnimation();
+                            } else {
+                                Rs2Player.waitForWalking();
+                            }
+                            return true;
                         }
-                        return true;
                     }
-                }
                 }
             }
         }
