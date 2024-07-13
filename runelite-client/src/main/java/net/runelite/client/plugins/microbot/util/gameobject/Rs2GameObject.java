@@ -1021,7 +1021,7 @@ public class Rs2GameObject {
                 }
             }
 
-            if (index == -1) {
+            if (index == -1 && !Microbot.getClient().isWidgetSelected()) {
                 Microbot.log("Failed to interact with object " + object.getId() + " " + action);
                 return false;
             }
