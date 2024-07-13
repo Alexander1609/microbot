@@ -58,8 +58,6 @@ public class MQuestScript extends Script {
     private static ArrayList<TileObject> objectsHandeled = new ArrayList<>();
     private ArrayList<String> selectedChatOptions = new ArrayList<>();
 
-    QuestStep dialogueStartedStep = null;
-
     public boolean run(MQuestConfig config) {
         this.config = config;
 
@@ -73,9 +71,6 @@ public class MQuestScript extends Script {
                     Rs2Player.waitForAnimation();
 
                 QuestStep questStep = getQuestHelperPlugin().getSelectedQuest().getCurrentStep().getActiveStep();
-
-                if (Rs2Dialogue.isInDialogue() && dialogueStartedStep == null)
-                    dialogueStartedStep = questStep;
 
                 if (questStep != null && Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
                     var dialogOptions = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS);
@@ -148,13 +143,12 @@ public class MQuestScript extends Script {
                         return;
                     }
 
-                    if (Rs2Dialogue.isInDialogue() && dialogueStartedStep == questStep) {
+                    if (Rs2Dialogue.isInDialogue()) {
                         // Stop walker if in dialogue
                         Rs2Walker.setTarget(null);
                         Rs2Keyboard.keyPress(KeyEvent.VK_SPACE);
                         return;
                     } else {
-                        dialogueStartedStep = null;
                         selectedChatOptions.clear();
                     }
 
