@@ -34,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import static net.runelite.client.plugins.microbot.nmz.NmzScript.prayerPotionScript;
+
 public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Getter
     private final QuestHelperQuest quest;
@@ -45,6 +47,8 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     protected QuestStep currentStep;
 
     protected boolean useFood = false;
+
+    protected boolean useAntiPoison = false;
 
     public AccountBuilderQuestTask(QuestHelperQuest quest, ItemRequirement... additionalRequirements){
         this(quest, true, additionalRequirements);
@@ -131,6 +135,15 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
             foodScript.run(new PlayerAssistConfig() {
                 @Override
                 public boolean toggleFood() {
+                    return true;
+                }
+            });
+        }
+
+        if (useAntiPoison){
+            prayerPotionScript.run(new PlayerAssistConfig() {
+                @Override
+                public boolean useAntiPoison() {
                     return true;
                 }
             });
