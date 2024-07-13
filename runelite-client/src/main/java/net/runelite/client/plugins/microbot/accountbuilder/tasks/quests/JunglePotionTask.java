@@ -39,9 +39,6 @@ public class JunglePotionTask extends AccountBuilderQuestTask{
                 Rs2Player.waitForAnimation();
                 sleepUntil(() -> Rs2Inventory.hasItem("Grimy rogue's purse"), 30000);
             }
-        } else if(step.objectID == 2584){
-            Rs2GameObject.interact(step.objectID, "Search");
-            Rs2Player.waitForAnimation();
         }
     }
 
