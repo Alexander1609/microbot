@@ -239,6 +239,7 @@ public class TheCorsairCurse extends BasicQuestHelper
 		goUpToGnocci = new ObjectStep(this, ObjectID.STAIRS_31733, new WorldPoint(2549, 2862, 0), "Talk to Gnocci in the north west hut.");
 		talkToGnocci = new NpcStep(this, NpcID.GNOCCI_THE_COOK, new WorldPoint(2545, 2863, 1), "Talk to Gnocci in the north west hut.");
 		talkToGnocci.addDialogStep("I hear you've been cursed.");
+		talkToGnocci.finishDialogue();
 		talkToGnocci.addSubSteps(goUpToGnocci, goDownFromIthoi);
 
 		goDownFromGnocci = new ObjectStep(this, ObjectID.STAIRS_31734, new WorldPoint(2548, 2862, 1), "Talk to Chief Tess down the hole west of the Cove.");
@@ -281,6 +282,7 @@ public class TheCorsairCurse extends BasicQuestHelper
 		goDownFromIthoi2 = new ObjectStep(this, ObjectID.STAIRS_31735, new WorldPoint(2529, 2834, 1), "Leave Ithoi's hut.");
 		goUpToGnocci2 = new ObjectStep(this, ObjectID.STAIRS_31733, new WorldPoint(2549, 2862, 0), "Talk to Gnocci in the north west hut.");
 		talkToGnocci2 = new NpcStep(this, NpcID.GNOCCI_THE_COOK, new WorldPoint(2545, 2863, 1), "Talk to Gnocci in the north west hut.");
+		talkToGnocci2.finishDialogue();
 		talkToGnocci2.addSubSteps(goUpToGnocci2, goDownFromIthoi2);
 
 		goDownFromGnocci2 = new ObjectStep(this, ObjectID.STAIRS_31734, new WorldPoint(2548, 2862, 1), "Talk to Arsen.");
@@ -302,6 +304,7 @@ public class TheCorsairCurse extends BasicQuestHelper
 		goUpToGnocci3 = new ObjectStep(this, ObjectID.STAIRS_31733, new WorldPoint(2549, 2862, 0), "Talk to Gnocci in the north west hut.");
 		talkToGnocci3 = new NpcStep(this, NpcID.GNOCCI_THE_COOK, new WorldPoint(2545, 2863, 1), "Talk to Gnocci in the north west hut.");
 		talkToGnocci3.addDialogStep("I hear it happened straight after dinner.");
+		talkToGnocci3.finishDialogue();
 		talkToGnocci3.addSubSteps(goUpToGnocci3, leaveShip2);
 
 		goDownFromGnocci3 = new ObjectStep(this, ObjectID.STAIRS_31734, new WorldPoint(2548, 2862, 1), "Talk to Arsen.");

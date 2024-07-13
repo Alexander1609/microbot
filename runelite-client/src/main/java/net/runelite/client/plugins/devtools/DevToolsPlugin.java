@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -150,6 +151,7 @@ public class DevToolsPlugin extends Plugin
 	private DevToolsButton shell;
 	private DevToolsButton menus;
 	private DevToolsButton uiDefaultsInspector;
+	private DevToolsButton copyWorldPos;
 	private NavigationButton navButton;
 
 	private final HotkeyListener swingInspectorHotkeyListener = new HotkeyListener(() -> config.swingInspectorHotkey())
@@ -253,6 +255,8 @@ public class DevToolsPlugin extends Plugin
 		menus = new DevToolsButton("Menus");
 
 		uiDefaultsInspector = new DevToolsButton("Swing Defaults");
+
+		copyWorldPos = new DevToolsButton("Copy World Location");
 
 		overlayManager.add(overlay);
 		overlayManager.add(locationOverlay);
@@ -627,6 +631,14 @@ public class DevToolsPlugin extends Plugin
 					.setType(MenuAction.RUNELITE)
 					.onClick(c -> client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "menu " + i_, null));
 			}
+		}
+
+		if (copyWorldPos.isActive()){
+			copyWorldPos.setActive(false);
+
+			var location = client.getLocalPlayer().getWorldLocation();
+			var locationSelection = new StringSelection(String.format("%d %d %d", location.getX(), location.getY(), location.getPlane()));
+			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(locationSelection, locationSelection);
 		}
 	}
 }

@@ -221,6 +221,8 @@ class DevToolsPanel extends PluginPanel
 		{
 		}
 
+		container.add(plugin.getCopyWorldPos());
+
 		return container;
 	}
 }
