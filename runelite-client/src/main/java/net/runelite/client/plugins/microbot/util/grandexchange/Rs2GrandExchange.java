@@ -400,8 +400,8 @@ public class Rs2GrandExchange {
         sleepUntil(Rs2GrandExchange::isOpen);
         Rs2Widget.clickWidgetFast(
                 COLLECT_BUTTON, collectToBank ? 2 : 1);
-        sleepUntil(() -> Rs2Widget.getWidget(COLLECT_BUTTON).isSelfHidden());
-        return Rs2Widget.getWidget(COLLECT_BUTTON).isSelfHidden();
+        sleepUntil(() -> Rs2Widget.isHidden(COLLECT_BUTTON));
+        return Rs2Widget.isHidden(COLLECT_BUTTON);
     }
 
     public static boolean collectToInventory() {
