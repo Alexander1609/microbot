@@ -130,10 +130,11 @@ public class Transport {
     /** Whether the transport is a player-held item */
     @Getter
     private boolean isPlayerItem;
-
+    
     /** Whether the transport is a player-held item */
     @Getter
     private boolean isNpc;
+
 
     /** The additional travel time */
     @Setter
