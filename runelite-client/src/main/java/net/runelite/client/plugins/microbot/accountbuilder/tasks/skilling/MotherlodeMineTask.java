@@ -21,7 +21,7 @@ import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement
 public class MotherlodeMineTask extends AccountBuilderTask {
     @Override
     public String getName() {
-        return "Motherlode mine";
+        return "Mining: Motherlode mine";
     }
 
     MotherloadMineScript motherloadMineScript = new MotherloadMineScript();

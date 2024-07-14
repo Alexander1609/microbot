@@ -20,6 +20,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
+import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
 
@@ -129,8 +130,16 @@ public abstract class AccountBuilderTask {
         itemRequirements.add(new ItemRequirement("", id, quantity));
     }
 
+    protected void addRequirement(ItemCollections collection, int quantity){
+        itemRequirements.add(new ItemRequirement("", collection, quantity));
+    }
+
     protected void addRequirement(int id, boolean equip){
         itemRequirements.add(new ItemRequirement("", id, 1, equip));
+    }
+
+    protected void addRequirement(ItemCollections collection, boolean equip){
+        itemRequirements.add(new ItemRequirement("", collection, 1, equip));
     }
 
     public void onChatMessage(ChatMessage chatMessage) { }
@@ -138,6 +147,7 @@ public abstract class AccountBuilderTask {
     public void onGameTick(GameTick gameTick) { }
     public void onGameStateChanged(GameStateChanged event) { }
     public void onWallObjectSpawned(WallObjectSpawned event) { }
+    public void onHitsplatApplied(HitsplatApplied hitsplatApplied) { }
 
     protected void sleep(int time) {
         try {

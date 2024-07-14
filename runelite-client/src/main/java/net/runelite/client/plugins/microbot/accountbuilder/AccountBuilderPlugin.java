@@ -128,4 +128,10 @@ public class AccountBuilderPlugin extends Plugin {
     public void onWallObjectSpawned(WallObjectSpawned event) {
         script.onWallObjectSpawned(event);
     }
+
+    @Subscribe
+    public void onHitsplatApplied(HitsplatApplied hitsplatApplied)
+    {
+        script.onHitsplatApplied(hitsplatApplied);
+    }
 }

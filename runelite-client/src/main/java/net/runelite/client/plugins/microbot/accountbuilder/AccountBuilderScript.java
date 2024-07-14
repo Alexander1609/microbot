@@ -52,6 +52,7 @@ public class AccountBuilderScript extends Script {
     boolean taskRunning = false;
 
     long timeSinceLastAction = 0;
+    long nextMaxIdleDuration = 20_000;
     WorldPoint lastLocation = null;
 
     long nextCameraRotationTime = 0;
@@ -193,11 +194,12 @@ public class AccountBuilderScript extends Script {
                 || (task != null && task.blockStuckPrevention)){
             lastLocation = Rs2Player.getWorldLocation();
             timeSinceLastAction = System.currentTimeMillis();
-        } else if (timeSinceLastAction + 10_000 < System.currentTimeMillis()){
+        } else if (timeSinceLastAction + nextMaxIdleDuration < System.currentTimeMillis()){
             var worldPoints = new ArrayList<>(Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 5).keySet());
             if (worldPoints.isEmpty())
                 return;
 
+            nextMaxIdleDuration = net.runelite.client.plugins.microbot.util.math.Random.random(20_000, 40_000);
             var randomIndex = new Random().nextInt(worldPoints.size());
             Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
         }
@@ -262,6 +264,12 @@ public class AccountBuilderScript extends Script {
     public void onWallObjectSpawned(WallObjectSpawned event){
         if (task != null)
             task.onWallObjectSpawned(event);
+    }
+
+    public void onHitsplatApplied(HitsplatApplied event)
+    {
+        if (task != null)
+            task.onHitsplatApplied(event);
     }
 
     @Override
