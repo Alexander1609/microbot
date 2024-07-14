@@ -861,7 +861,7 @@ public class Rs2Bank {
                     if (npc == null) return false;
                     action = Rs2Npc.interact(npc, "bank");
                 } else {
-                    action = Rs2GameObject.interact(chest, "use");
+                    action = Rs2GameObject.interact(chest);
                 }
             } else {
                 action = Rs2GameObject.interact(bank, "bank");
