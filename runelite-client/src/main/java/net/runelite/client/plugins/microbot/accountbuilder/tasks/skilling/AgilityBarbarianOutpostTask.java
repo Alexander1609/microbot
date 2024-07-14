@@ -29,7 +29,7 @@ public class AgilityBarbarianOutpostTask extends AccountBuilderTask {
     public AgilityBarbarianOutpostTask(){
         skill = Skill.AGILITY;
         minLevel = 35;
-        maxLevel = 50;
+        maxLevel = 45;
 
         addRequirement(ItemID.SWORDFISH, 20);
 

@@ -59,7 +59,7 @@ public class CraftingGlassblowingTask extends AccountBuilderTask {
 
     @Override
     public boolean isCompleted() {
-        return super.isCompleted() || running && !Rs2Bank.hasBankItem(ItemID.MOLTEN_GLASS, 1) && !Rs2Inventory.contains(ItemID.MOLTEN_GLASS);
+        return super.isCompleted() || running && !glassblowingScript.isRunning();
     }
 
     @Override

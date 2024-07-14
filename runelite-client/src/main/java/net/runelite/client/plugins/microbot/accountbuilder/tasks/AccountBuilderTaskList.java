@@ -107,6 +107,9 @@ public class AccountBuilderTaskList {
         tasks.put(new AgilityShayzienTask(), 1000);
         tasks.put(new WintertodtTask(), 1000);
         tasks.put(new CraftingGlassblowingTask(), 1000);
+        tasks.put(new FletchingWillowLongbowTask(), 1000);
+        tasks.put(new FletchingMapleShortbowTask(), 1000);
+        tasks.put(new FletchingMapleLongbowTask(), 1000);
 
         // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);

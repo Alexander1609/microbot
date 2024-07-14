@@ -128,6 +128,7 @@ public class GiantFrogFightingTask extends AccountBuilderFightingTask {
                     return false;
 
                 Rs2Bank.depositEquipment();
+                Rs2Bank.depositAll();
 
                 if (!Rs2Bank.hasBankItem("Mithril longsword"))
                     hasAdventurerGear = false;

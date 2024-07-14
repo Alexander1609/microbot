@@ -1,10 +1,12 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling;
 
+import net.runelite.api.GameState;
 import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.HitsplatApplied;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.plugins.microbot.Microbot;
@@ -42,6 +44,7 @@ public class WintertodtTask extends AccountBuilderTask {
     public WintertodtTask(){
         skill = Skill.FIREMAKING;
         minLevel = 50;
+        maxLevel = 99;
 
         addRequirement(ItemID.KNIFE, 1);
         addRequirement(ItemID.RUNE_AXE, 1);
@@ -162,6 +165,23 @@ public class WintertodtTask extends AccountBuilderTask {
             if (!Rs2Equipment.isWearing(item) && Rs2Inventory.contains(item)){
                 Rs2Inventory.wear(item);
                 sleep(200);
+            }
+        }
+    }
+
+    @Override
+    public void onGameStateChanged(GameStateChanged event) {
+        if (event.getGameState() == GameState.LOGGED_IN){
+            if (!wintertodtWorlds.contains(Microbot.getClientThread().runOnClientThread(() -> Microbot.getClient().getWorld()))) {
+                var worlds = Microbot.getWorldService().getWorlds();
+                var bestWorld = wintertodtWorlds.stream().map(x -> worlds.findWorld(x)).max(Comparator.comparing(World::getPlayers)).orElse(null);
+
+                Microbot.getClient().openWorldHopper();
+                sleepUntil(() -> !Rs2Widget.isHidden(ComponentID.WORLD_SWITCHER_WORLD_LIST), 2000);
+                sleep(500);
+
+                Microbot.doInvoke(new NewMenuEntry(bestWorld.getId(), 4522002, MenuAction.CC_OP.getId(), 1, -1, ""), new Rectangle(1, 1));
+                sleep(5000);
             }
         }
     }

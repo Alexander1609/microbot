@@ -41,6 +41,7 @@ public class GlassblowingScript extends Script {
                 if (config.Afk() && Random.random(1, 100) == 2)
                     sleep(1000, 60000);
                 if (config.glassType() == Glass.PROGRESSIVE) {
+                    calculateItemToCraft();
                     itemToCraft = model.getItemToCraft();
                 } else {
                     itemToCraft = config.glassType();

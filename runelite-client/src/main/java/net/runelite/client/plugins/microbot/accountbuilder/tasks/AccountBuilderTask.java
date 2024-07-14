@@ -86,6 +86,9 @@ public abstract class AccountBuilderTask {
 
         ShortestPathPlugin.getPathfinderConfig().setRestrictedTiles();
         running = false;
+
+        inventoryCleared = false;
+        itemsBought = new ArrayList<>();
     }
 
     public void init(){
@@ -247,7 +250,8 @@ public abstract class AccountBuilderTask {
                         .entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).orElse(null).getKey();
                 var itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemToBuy));
 
-                Rs2GrandExchange.buyItemAboveXPercent(itemComposition.getName(), itemsToBuy.get(0).getQuantity(), minClicks, clicks);
+                var amountToBuy = itemsToBuy.get(0).getQuantity() - Rs2Bank.bankItems.stream().filter(x -> x.id == itemToBuy).map(x -> x.quantity).findFirst().orElse(0);
+                Rs2GrandExchange.buyItemAboveXPercent(itemComposition.getName(), amountToBuy, minClicks, clicks);
                 sleepUntil(() -> Rs2GrandExchange.hasBoughtOffer(itemToBuy), 10000);
 
                 if (Rs2GrandExchange.hasBoughtOffer(itemToBuy)){

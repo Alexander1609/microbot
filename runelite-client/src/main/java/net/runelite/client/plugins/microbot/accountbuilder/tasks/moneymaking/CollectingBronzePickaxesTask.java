@@ -72,7 +72,8 @@ public class CollectingBronzePickaxesTask extends AccountBuilderTask {
     @Override
     public boolean requirementsMet() {
         // Travel to dungeon not working for members due to transports
-        return super.requirementsMet() && isQuestCompleted(QuestHelperQuest.BELOW_ICE_MOUNTAIN);
+        return super.requirementsMet() && isQuestCompleted(QuestHelperQuest.BELOW_ICE_MOUNTAIN)
+                && !Rs2Bank.hasBankItem("Coins", 500_000);
     }
 
     @Override
