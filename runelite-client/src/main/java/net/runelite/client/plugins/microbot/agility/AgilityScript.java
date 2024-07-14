@@ -19,18 +19,15 @@ import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static net.runelite.api.NullObjectID.*;
 import static net.runelite.api.ObjectID.LADDER_36231;
 import static net.runelite.client.plugins.microbot.util.math.Random.random;
-import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.GNOME_STRONGHOLD_AGILITY_COURSE;
-import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.PRIFDDINAS_AGILITY_COURSE;
+import static net.runelite.client.plugins.worldmap.AgilityCourseLocation.*;
 
 public class AgilityScript extends Script {
 
@@ -48,6 +45,7 @@ public class AgilityScript extends Script {
     public List<AgilityObstacleModel> rellekkaCourse = new ArrayList<>();
     public List<AgilityObstacleModel> ardougneCourse = new ArrayList<>();
     public List<AgilityObstacleModel> prifddinasCourse = new ArrayList<>();
+    public List<AgilityObstacleModel> barbarianOutpostCourse = new ArrayList<>();
 
 
     WorldPoint startCourse = null;
@@ -83,6 +81,8 @@ public class AgilityScript extends Script {
                 return ardougneCourse;
             case PRIFDDINAS_AGILITY_COURSE:
                 return prifddinasCourse;
+            case BARBARIAN_OUTPOST_AGILITY_COURSE:
+                return barbarianOutpostCourse;
             default:
                 return canafisCourse;
         }
@@ -122,6 +122,9 @@ public class AgilityScript extends Script {
                 break;
             case PRIFDDINAS_AGILITY_COURSE:
                 startCourse = new WorldPoint(3253, 6109, 0);
+                break;
+            case BARBARIAN_OUTPOST_AGILITY_COURSE:
+                startCourse = new WorldPoint(2551, 3554, 0);
                 break;
         }
     }
@@ -168,7 +171,7 @@ public class AgilityScript extends Script {
                     }
                 }
 
-                if (Microbot.getClient().getTopLevelWorldView().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE) {
+                if (Microbot.getClient().getTopLevelWorldView().getPlane() == 0 && playerWorldLocation.distanceTo(startCourse) > 6 && config.agilityCourse() != GNOME_STRONGHOLD_AGILITY_COURSE && config.agilityCourse() != BARBARIAN_OUTPOST_AGILITY_COURSE) {
                     currentObstacle = 0;
                     LocalPoint startCourseLocal = LocalPoint.fromWorld(Microbot.getClient().getTopLevelWorldView(), startCourse);
                     if (startCourseLocal == null || playerLocation.distanceTo(startCourseLocal) >= MAX_DISTANCE) {
@@ -216,10 +219,11 @@ public class AgilityScript extends Script {
 
                         List<AgilityObstacleModel> courses = getCurrentCourse(config);
 
-
-                        TileObject gameObject = Rs2GameObject.findObject(courses.stream()
+                        var courseObjects = courses.stream()
                                 .filter(x -> x.getOperationX().check(Rs2Player.getWorldLocation().getX(), x.getRequiredX()) && x.getOperationY().check(Rs2Player.getWorldLocation().getY(), x.getRequiredY()))
-                                .map(AgilityObstacleModel::getObjectID).collect(Collectors.toList()));
+                                .collect(Collectors.toList());
+                        var gameObject = Rs2GameObject.getAll().stream().filter(x -> courseObjects.stream().anyMatch(y -> y.getObjectID() == x.getId() && (y.getObjectPoint() == null || y.getObjectPoint().equals(x.getWorldLocation()))))
+                                .min(Comparator.comparing(x -> x.getWorldLocation().distanceTo(Rs2Player.getWorldLocation()))).orElse(null);
 
                         if (gameObject == null) {
                             System.out.println("NO agility obstacle found.");

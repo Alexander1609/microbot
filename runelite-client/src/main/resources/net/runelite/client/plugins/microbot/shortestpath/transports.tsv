@@ -4477,3 +4477,9 @@
 2561 2868 1	2561 2865 0	Climb-down Stairs 31734
 2529 2835 1	2532 2833 0	Climb Stairs 31735
 2532 2833 0	2529 2835 1	Climb Stairs 31735
+
+# Barbarian Outpost
+2552 3558 0	2552 3561 0	Squeeze-through Obstacle pipe 20210
+2552 3561 0	2552 3558 0	Squeeze-through Obstacle pipe 20210
+2547 9952 0	2547 3552 0	Climb-up Ladder 17385
+2547 3552 0	2547 9952 0	Climb-down Ladder 16680

@@ -37,6 +37,7 @@ public abstract class AccountBuilderTask {
     protected ScheduledExecutorService executorService = Executors.newScheduledThreadPool(100);
     protected ScheduledFuture<?> scheduledFuture;
     protected boolean canceled;
+    protected boolean running = false;
 
     protected boolean memberOnly = true;
     public boolean blockStuckPrevention = false;
@@ -83,6 +84,7 @@ public abstract class AccountBuilderTask {
             scheduledFuture.cancel(true);
 
         ShortestPathPlugin.getPathfinderConfig().setRestrictedTiles();
+        running = false;
     }
 
     public void init(){
@@ -92,6 +94,8 @@ public abstract class AccountBuilderTask {
     public void tick(){ }
 
     public void run(){
+        running = true;
+
         scheduledFuture = executorService.scheduleWithFixedDelay(() -> {
             try {
                 if (Microbot.enableAutoRunOn)
@@ -119,6 +123,14 @@ public abstract class AccountBuilderTask {
     public void cancel(){
         canceled = true;
         System.out.printf("[AIO Account builder] Task '%s' canceled%n", getName());
+    }
+
+    protected void addRequirement(int id, int quantity){
+        itemRequirements.add(new ItemRequirement("", id, quantity));
+    }
+
+    protected void addRequirement(int id, boolean equip){
+        itemRequirements.add(new ItemRequirement("", id, 1, equip));
     }
 
     public void onChatMessage(ChatMessage chatMessage) { }
