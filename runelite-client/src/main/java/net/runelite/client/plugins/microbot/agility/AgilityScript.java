@@ -46,6 +46,7 @@ public class AgilityScript extends Script {
     public List<AgilityObstacleModel> ardougneCourse = new ArrayList<>();
     public List<AgilityObstacleModel> prifddinasCourse = new ArrayList<>();
     public List<AgilityObstacleModel> barbarianOutpostCourse = new ArrayList<>();
+    public List<AgilityObstacleModel> shayzienCourse = new ArrayList<>();
 
 
     WorldPoint startCourse = null;
@@ -83,6 +84,8 @@ public class AgilityScript extends Script {
                 return prifddinasCourse;
             case BARBARIAN_OUTPOST_AGILITY_COURSE:
                 return barbarianOutpostCourse;
+            case SHAYZIEN_COURSE:
+                return shayzienCourse;
             default:
                 return canafisCourse;
         }
@@ -125,6 +128,9 @@ public class AgilityScript extends Script {
                 break;
             case BARBARIAN_OUTPOST_AGILITY_COURSE:
                 startCourse = new WorldPoint(2551, 3554, 0);
+                break;
+            case SHAYZIEN_COURSE:
+                startCourse = new WorldPoint(1552, 3632, 0);
                 break;
         }
     }
