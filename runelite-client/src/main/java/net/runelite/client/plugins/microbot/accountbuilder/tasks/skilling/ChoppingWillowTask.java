@@ -19,7 +19,6 @@ import net.runelite.client.plugins.microbot.woodcutting.enums.WoodcuttingTree;
 
 public class ChoppingWillowTask extends AccountBuilderTask {
     AutoWoodcuttingScript script = new AutoWoodcuttingScript();
-    boolean firemaking;
 
     AutoWoodcuttingConfig configFiremaking = new AutoWoodcuttingConfig() {
         @Override
@@ -33,27 +32,17 @@ public class ChoppingWillowTask extends AccountBuilderTask {
         }
     };
 
-    AutoWoodcuttingConfig config = new AutoWoodcuttingConfig() {
-        @Override
-        public WoodcuttingTree TREE() {
-            return WoodcuttingTree.WILLOW;
-        }
-
-        @Override
-        public WoodcuttingResetOptions resetOptions() {
-            return WoodcuttingResetOptions.BANK;
-        }
-    };
-
     public ChoppingWillowTask(){
-        skill = Skill.WOODCUTTING;
+        skill = Skill.FIREMAKING;
         minLevel = 30;
+        maxLevel = 50;
         memberOnly = false;
     }
 
     @Override
     public boolean requirementsMet() {
-        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 15;
+        return super.requirementsMet() && Microbot.getClient().getLocalPlayer().getCombatLevel() > 15
+                && Microbot.getClient().getRealSkillLevel(Skill.WOODCUTTING) >= 30;
     }
 
     @Override
@@ -63,12 +52,10 @@ public class ChoppingWillowTask extends AccountBuilderTask {
 
     @Override
     public boolean doTaskPreparations() {
-        firemaking = Microbot.getClient().getRealSkillLevel(Skill.FIREMAKING) < 50;
-
         if (!EquipmentHelper.getBestSkillingEquipment(skill))
             return false;
 
-        if (!Rs2Inventory.hasItem("tinderbox") && firemaking){
+        if (!Rs2Inventory.hasItem("tinderbox")){
             if (!Rs2Bank.walkToBank() || !Rs2Bank.openBank())
                 return false;
 
@@ -87,10 +74,7 @@ public class ChoppingWillowTask extends AccountBuilderTask {
 
     @Override
     public void run() {
-        if (firemaking)
-            script.run(configFiremaking);
-        else
-            script.run(config);
+        script.run(configFiremaking);
     }
 
     @Override

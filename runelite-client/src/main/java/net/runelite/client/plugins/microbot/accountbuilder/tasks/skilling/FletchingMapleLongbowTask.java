@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.fletching.enums.FletchingMaterial;
 import net.runelite.client.plugins.microbot.fletching.enums.FletchingMode;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.math.Random;
 
 public class FletchingMapleLongbowTask extends AccountBuilderTask {
     FletchingScript fletchingScript = new FletchingScript();
@@ -29,6 +30,9 @@ public class FletchingMapleLongbowTask extends AccountBuilderTask {
         addRequirement(ItemID.BOW_STRING, 1000);
     }
 
+    FletchingMode currentMode = FletchingMode.UNSTRUNG;
+    int nextSwap = Random.random(80, 150);
+
     @Override
     public void run() {
         super.run();
@@ -36,7 +40,14 @@ public class FletchingMapleLongbowTask extends AccountBuilderTask {
         fletchingScript.run(new FletchingConfig() {
             @Override
             public FletchingMode fletchingMode() {
-                return FletchingMode.UNSTRUNG_STRUNG;
+                if (Rs2Bank.hasBankItem(ItemID.MAPLE_LONGBOW_U, nextSwap)){
+                    currentMode = FletchingMode.STRUNG;
+                    nextSwap = Random.random(80, 150);
+                } else if (!Rs2Bank.hasBankItem(ItemID.MAPLE_LONGBOW_U, 1) && !Rs2Inventory.contains(ItemID.MAPLE_LONGBOW_U)){
+                    currentMode = FletchingMode.UNSTRUNG;
+                }
+
+                return currentMode;
             }
 
             @Override

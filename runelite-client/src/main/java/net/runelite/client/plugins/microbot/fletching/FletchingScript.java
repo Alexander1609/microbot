@@ -35,12 +35,12 @@ public class FletchingScript extends Script {
     FletchingMode fletchingMode;
 
     public void run(FletchingConfig config) {
-        fletchingMode = config.fletchingMode();
         mainScheduledFuture = scheduledExecutorService.scheduleWithFixedDelay(() -> {
             try {
                 if (!Microbot.isLoggedIn())
                     return;
                 if (!super.run()) return;
+                fletchingMode = config.fletchingMode();
 
                 if (fletchingMode == FletchingMode.PROGRESSIVE && model.getFletchingItem() == null)
                     calculateItemToFletch();
