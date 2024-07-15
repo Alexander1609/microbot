@@ -4497,3 +4497,11 @@
 2857 3516 0	2857 9916 0	Climb-down Ladder 16680
 2858 3519 0	2858 9919 0	Climb-down Ladder 16680
 2858 9919 0	2858 3519 0	Climb-up Ladder 17385
+
+# Tai Bwo Wannai
+2782 3088 0	2782 3088 1	Climb-up Ladder 16683
+2782 3088 1	2782 3088 0	Climb-down Ladder 16679
+
+# Rogues Den
+2906 3537 0	3061 4985 1	Enter Trapdoor 7257
+3061 4985 1	2906 3537 0	Enter Passageway 7258

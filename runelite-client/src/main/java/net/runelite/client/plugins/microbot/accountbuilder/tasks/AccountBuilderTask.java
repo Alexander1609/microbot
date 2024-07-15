@@ -249,7 +249,9 @@ public abstract class AccountBuilderTask {
             var clicks = 4;
             boolean bought = false;
             while (!bought && !canceled){
-                int itemToBuy = itemsToBuy.get(0).getAllIds().stream().collect(Collectors.toMap(x -> x, x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(x, false))))
+                int itemToBuy = itemsToBuy.get(0).getAllIds().stream()
+                        .filter(x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(x).isTradeable()))
+                        .collect(Collectors.toMap(x -> x, x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemPriceWithSource(x, false))))
                         .entrySet().stream().filter(x -> x.getValue() > 0).min(Map.Entry.comparingByValue()).orElse(null).getKey();
                 var itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemToBuy));
 

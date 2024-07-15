@@ -17,6 +17,7 @@ import net.runelite.client.plugins.microbot.util.inventory.Rs2Item;
 import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import org.apache.commons.lang3.StringUtils;
 
@@ -494,6 +495,7 @@ public class Transport {
         char key = displayInfo.charAt(0);
         Rs2Keyboard.keyPress(key);
         System.out.println("Pressing: " + key);
+        Rs2Player.waitForAnimation();
         return true;
     }
 
@@ -686,6 +688,9 @@ public class Transport {
     }
 
     public boolean handleItemTeleport(){
+        if (Rs2Tile.isTileReachable(destination))
+            return false;
+
         for (var itemId : itemRequirements){
             Rs2Item item;
             boolean isWearing = Rs2Equipment.isWearing(itemId);

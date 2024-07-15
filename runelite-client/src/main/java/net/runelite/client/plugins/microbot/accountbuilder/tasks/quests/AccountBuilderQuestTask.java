@@ -104,7 +104,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
     @Override
     public boolean requirementsMet() {
-        return super.requirementsMet() && !isQuestCompleted(quest) && checkRequirements();
+        return !isQuestCompleted(quest) && checkRequirements() && super.requirementsMet();
     }
 
     @Override

@@ -85,6 +85,7 @@ public class AccountBuilderTaskList {
         tasks.put(new TheCorsairCurseTask(), 1000);
         //tasks.put(new DemonSlayerTask(), 1000);
         tasks.put(new AlfredGrimhandsBarcrawlTask(), 1000);
+        tasks.put(new TaiBwoWannaiTrioTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
@@ -112,6 +113,9 @@ public class AccountBuilderTaskList {
         tasks.put(new FletchingMapleShortbowTask(), 1000);
         tasks.put(new FletchingMapleLongbowTask(), 1000);
         tasks.put(new SmithingGiantsFoundrySteelTask(), 1000);
+        tasks.put(new SmithingGiantsFoundryMithrilTask(), 1000);
+        tasks.put(new PrayerGildedAltar43Task(), 1000);
+        tasks.put(new CookingKarambwanTask(), 1000);
 
         // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);
