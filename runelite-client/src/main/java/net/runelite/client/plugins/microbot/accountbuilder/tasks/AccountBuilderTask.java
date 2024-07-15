@@ -9,6 +9,7 @@ import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
@@ -145,12 +146,14 @@ public abstract class AccountBuilderTask {
         itemRequirements.add(new ItemRequirement("", collection, 1, equip));
     }
 
+    public void onIdleMove() { }
     public void onChatMessage(ChatMessage chatMessage) { }
     public void onGameObjectSpawned(GameObjectSpawned event){ }
     public void onGameTick(GameTick gameTick) { }
     public void onGameStateChanged(GameStateChanged event) { }
     public void onWallObjectSpawned(WallObjectSpawned event) { }
     public void onHitsplatApplied(HitsplatApplied hitsplatApplied) { }
+    public void onVarbitChanged(VarbitChanged event) { }
 
     protected void sleep(int time) {
         try {
@@ -300,9 +303,16 @@ public abstract class AccountBuilderTask {
             var invItem = Rs2Inventory.get(id);
             if (invItem == null || !Rs2Inventory.hasItemAmount(id, item.getQuantity(), invItem.isStackable())){
                 if (item.getQuantity() == 1) {
-                    if (item.isEquip())
-                        Rs2Bank.withdrawAndEquip(id);
-                    else
+                    if (item.isEquip()) {
+                        Rs2Bank.withdrawItem(id);
+                        Rs2Inventory.waitForInventoryChanges();
+                        var oldSlot = Rs2Inventory.get(id).slot;
+                        Rs2Bank.wearItem(id);
+                        Rs2Inventory.waitForInventoryChanges();
+                        var newItem = Rs2Inventory.getItemInSlot(oldSlot);
+                        if (newItem != null)
+                            Rs2Bank.depositOne(newItem.id);
+                    } else
                         Rs2Bank.withdrawItem(id);
                 } else
                     Rs2Bank.withdrawX(id, item.getQuantity() - Rs2Inventory.count(id));

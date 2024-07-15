@@ -6,6 +6,7 @@ import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.Goblin
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.moneymaking.CollectingBronzePickaxesTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling.*;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.utility.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -110,8 +111,12 @@ public class AccountBuilderTaskList {
         tasks.put(new FletchingWillowLongbowTask(), 1000);
         tasks.put(new FletchingMapleShortbowTask(), 1000);
         tasks.put(new FletchingMapleLongbowTask(), 1000);
+        tasks.put(new SmithingGiantsFoundrySteelTask(), 1000);
 
         // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);
+
+        // Utility
+        tasks.put(new IceGlovesTask(), 1000);
     }
 }

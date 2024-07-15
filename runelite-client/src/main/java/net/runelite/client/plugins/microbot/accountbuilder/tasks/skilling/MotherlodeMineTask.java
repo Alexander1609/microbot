@@ -40,7 +40,7 @@ public class MotherlodeMineTask extends AccountBuilderTask {
     public MotherlodeMineTask(){
         skill = Skill.MINING;
         minLevel = 31;
-        maxLevel = 50;
+        maxLevel = 70;
 
         itemRequirements.add(new ItemRequirement("Adamant pick", ItemID.ADAMANT_PICKAXE, 1));
         itemRequirements.add(new ItemRequirement("Hammer", ItemID.HAMMER, 1));
@@ -124,5 +124,10 @@ public class MotherlodeMineTask extends AccountBuilderTask {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onIdleMove() {
+        motherloadMineScript.oreVein = null;
     }
 }

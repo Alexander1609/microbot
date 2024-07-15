@@ -10,6 +10,7 @@ import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.AccountBuilderFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.quests.*;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -202,6 +203,9 @@ public class AccountBuilderScript extends Script {
             nextMaxIdleDuration = net.runelite.client.plugins.microbot.util.math.Random.random(20_000, 40_000);
             var randomIndex = new Random().nextInt(worldPoints.size());
             Rs2Walker.walkFastCanvas(worldPoints.get(randomIndex));
+
+            if (task != null)
+                task.onIdleMove();
         }
     }
 
@@ -272,15 +276,20 @@ public class AccountBuilderScript extends Script {
             task.onHitsplatApplied(event);
     }
 
+    public void onVarbitChanged(VarbitChanged event)
+    {
+        if (task != null)
+            task.onVarbitChanged(event);
+    }
+
     @Override
     public void shutdown() {
-        super.shutdown();
-
         if (task != null){
             task.doTaskCleanup(true);
             task = null;
         }
 
+        super.shutdown();
         sleepUntil(() -> mainScheduledFuture.isDone());
         Rs2Walker.setTarget(null);
     }

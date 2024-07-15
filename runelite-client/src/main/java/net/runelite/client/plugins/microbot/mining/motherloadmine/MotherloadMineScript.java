@@ -62,44 +62,49 @@ public class MotherloadMineScript extends Script {
     }
 
     private void executeTask() {
-        if (!super.run() || !Microbot.isLoggedIn()) {
-            oreVein = null;
-            miningSpot = MLMMiningSpot.IDLE;
-            return;
-        }
-
-        if (pickAxeInInventory.isEmpty() && config.pickAxeInInventory()) {
-            Microbot.showMessage("Pickaxe was not found in your inventory");
-            sleep(5000);
-            return;
-        }
-
-        //if(Rs2Antiban.isActionCooldownActive) return;
-
-        if (Rs2Player.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) return;
-
-
-        handleDragonPickaxeSpec();
-        handleInventory();
-
-        switch (status) {
-            case IDLE:
+        try {
+            if (!super.run() || !Microbot.isLoggedIn()) {
+                oreVein = null;
+                miningSpot = MLMMiningSpot.IDLE;
                 return;
-            case MINING:
-                handleMining();
-                break;
-            case EMPTY_SACK:
-                emptySack();
-                break;
-            case FIXING_WATERWHEEL:
-                fixWaterwheel();
-                break;
-            case DEPOSIT_HOPPER:
-                depositHopper();
-                break;
-            case BANKING:
-                bankItems();
-                break;
+            }
+
+            if (pickAxeInInventory.isEmpty() && config.pickAxeInInventory()) {
+                Microbot.showMessage("Pickaxe was not found in your inventory");
+                sleep(5000);
+                return;
+            }
+
+            //if(Rs2Antiban.isActionCooldownActive) return;
+
+            if (Rs2Player.isAnimating() || Microbot.getClient().getLocalPlayer().isInteracting()) return;
+
+
+            handleDragonPickaxeSpec();
+            handleInventory();
+
+            switch (status) {
+                case IDLE:
+                    return;
+                case MINING:
+                    handleMining();
+                    break;
+                case EMPTY_SACK:
+                    emptySack();
+                    break;
+                case FIXING_WATERWHEEL:
+                    fixWaterwheel();
+                    break;
+                case DEPOSIT_HOPPER:
+                    depositHopper();
+                    break;
+                case BANKING:
+                    bankItems();
+                    break;
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 

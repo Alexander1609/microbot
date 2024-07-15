@@ -4483,3 +4483,17 @@
 2552 3561 0	2552 3558 0	Squeeze-through Obstacle pipe 20210
 2547 9952 0	2547 3552 0	Climb-up Ladder 17385
 2547 3552 0	2547 9952 0	Climb-down Ladder 16680
+
+# Ice Queen's Lair
+2837 3518 0	2840 3517 0	Mine Rock slide 2634	50 Mining	1 pickaxe
+2840 3517 0	2837 3518 0	Mine Rock slide 2634	50 Mining	1 pickaxe
+2847 3513 0	2847 9913 0	Climb-down Ladder 16680
+2847 9913 0	2847 3513 0	Climb-up Ladder 17385
+2825 9907 0	2825 3507 0	Climb-up Ladder 17385
+2825 3507 0	2825 9907 0	Climb-down Ladder 16680
+2827 3509 0	2827 9909 0	Climb-down Ladder 16680
+2827 9909 0	2827 3509 0	Climb-up Ladder 17385
+2857 9916 0	2857 3516 0	Climb-up Ladder 17385
+2857 3516 0	2857 9916 0	Climb-down Ladder 16680
+2858 3519 0	2858 9919 0	Climb-down Ladder 16680
+2858 9919 0	2858 3519 0	Climb-up Ladder 17385

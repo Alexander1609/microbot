@@ -16,6 +16,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.Panel.AccountBuilderPanel;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTaskList;
+import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
@@ -133,5 +134,11 @@ public class AccountBuilderPlugin extends Plugin {
     public void onHitsplatApplied(HitsplatApplied hitsplatApplied)
     {
         script.onHitsplatApplied(hitsplatApplied);
+    }
+
+    @Subscribe
+    public void onVarbitChanged(VarbitChanged event)
+    {
+        script.onVarbitChanged(event);
     }
 }
