@@ -86,6 +86,7 @@ public class AccountBuilderTaskList {
         //tasks.put(new DemonSlayerTask(), 1000);
         tasks.put(new AlfredGrimhandsBarcrawlTask(), 1000);
         tasks.put(new TaiBwoWannaiTrioTask(), 1000);
+        tasks.put(new ShiloVillageTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
