@@ -121,9 +121,7 @@ public class MQuestScript extends Script {
                 }
 
                 if (getQuestHelperPlugin().getSelectedQuest() != null && !Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest().isCompleted())) {
-                    Widget widget = Rs2Widget.findWidget("Start ");
-                    if (Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS) && getQuestHelperPlugin().getSelectedQuest().getQuest().getId() != Quest.COOKS_ASSISTANT.getId() || (widget != null &&
-                            Microbot.getClientThread().runOnClientThread(() -> widget.getParent().getId()) != 10616888)) {
+                    if (Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)) {
                         var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
                         var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
                                 .collect(Collectors.toMap(x -> (String) x.getOnKeyListener()[7], x -> x));
