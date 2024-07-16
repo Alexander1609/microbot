@@ -4505,3 +4505,8 @@
 # Rogues Den
 2906 3537 0	3061 4985 1	Enter Trapdoor 7257
 3061 4985 1	2906 3537 0	Enter Passageway 7258
+
+#Shillo Village
+2925 2950 0	2925 2947 0	Cross Stepping stones 23645	36 Agility			4
+2925 2948 0	2925 2951 0	Cross Stepping stones 23647	36 Agility			4
+2886 9292 0	2887 9373 0	Cave in Search 1417
