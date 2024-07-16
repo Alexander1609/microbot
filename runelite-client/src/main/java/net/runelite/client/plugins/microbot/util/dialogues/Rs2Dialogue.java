@@ -27,6 +27,6 @@ public class Rs2Dialogue {
     }
 
     public static boolean hasSelectAnOption() {
-        return Rs2Widget.hasWidget("Select an Option");
+        return Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS);
     }
 }
