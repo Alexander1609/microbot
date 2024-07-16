@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.Restriction;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -106,5 +107,13 @@ public class DwarfCannonTask extends AccountBuilderQuestTask {
         }
 
         return true;
+    }
+
+    @Override
+    public void doTaskCleanup(boolean shutdown) {
+        while (!Rs2Walker.walkTo(new WorldPoint(2568, 3451, 0)))
+            sleep(500);
+
+        super.doTaskCleanup(shutdown);
     }
 }

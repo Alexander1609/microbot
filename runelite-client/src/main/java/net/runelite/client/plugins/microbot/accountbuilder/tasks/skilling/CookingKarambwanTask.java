@@ -4,10 +4,9 @@ import net.runelite.api.ItemID;
 import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
-import net.runelite.client.plugins.microbot.cooking.CookingScript;
 import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -65,7 +64,7 @@ public class CookingKarambwanTask extends AccountBuilderTask {
         if (!clearInventory() || !withdrawBuyItems())
             return false;
 
-        return Rs2Walker.walkTo(new WorldPoint(3043, 4972, 1));
+        return Rs2Walker.walkTo(new WorldPoint(3043, 4972, 1)) && Rs2Player.getWorldLocation().distanceTo(new WorldArea(3036, 4966, 12, 10, 1)) == 0;
     }
 
     @Override

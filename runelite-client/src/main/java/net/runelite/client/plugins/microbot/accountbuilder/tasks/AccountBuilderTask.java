@@ -3,6 +3,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.GrandExchangeOfferState;
+import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Skill;
 import net.runelite.api.events.*;
@@ -20,6 +21,7 @@ import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
@@ -115,6 +117,16 @@ public abstract class AccountBuilderTask {
                 if (Microbot.pauseAllScripts || !Microbot.isLoggedIn())
                     return;
 
+                if (Rs2Inventory.contains(ItemID.LAMP)){
+                    Rs2Tab.switchToInventoryTab();
+                    sleep(500, 1000);
+                    Rs2Inventory.interact(ItemID.LAMP, "Rub");
+                    sleepUntil(() -> Rs2Widget.isWidgetVisible(240, 0), 5000);
+                    Rs2Widget.clickWidget(240, 14); // Slayer
+                    sleep(500, 1000);
+                    Rs2Widget.clickWidget(240, 26);
+                }
+
                 tick();
             } catch (Exception e){
                 System.out.println(e.getMessage());
@@ -154,6 +166,7 @@ public abstract class AccountBuilderTask {
     public void onWallObjectSpawned(WallObjectSpawned event) { }
     public void onHitsplatApplied(HitsplatApplied hitsplatApplied) { }
     public void onVarbitChanged(VarbitChanged event) { }
+    public void onNpcDespawned(NpcDespawned npcDespawned) { }
 
     protected void sleep(int time) {
         try {

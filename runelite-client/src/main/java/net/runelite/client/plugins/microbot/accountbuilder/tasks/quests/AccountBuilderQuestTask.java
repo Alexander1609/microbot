@@ -2,13 +2,15 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import lombok.Getter;
 import net.runelite.api.*;
-import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.*;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
 import net.runelite.client.plugins.microbot.playerassist.PlayerAssistConfig;
 import net.runelite.client.plugins.microbot.playerassist.combat.AntiPoisonScript;
+import net.runelite.client.plugins.microbot.playerassist.combat.FlickerScript;
 import net.runelite.client.plugins.microbot.playerassist.combat.FoodScript;
+import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.quest.MQuestConfig;
 import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
@@ -17,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.math.Random;
+import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
@@ -42,12 +45,13 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     ReentrantLock questScriptLock = new ReentrantLock();
     private final FoodScript foodScript = new FoodScript();
     private final AntiPoisonScript antiPoisonScript = new AntiPoisonScript();
+    private final FlickerScript flickerScript = new FlickerScript();
 
     @Getter
     protected QuestStep currentStep;
 
     protected boolean useFood = false;
-
+    protected boolean usePrayerFlicking = false;
     protected boolean useAntiPoison = false;
 
     public AccountBuilderQuestTask(QuestHelperQuest quest, ItemRequirement... additionalRequirements){
@@ -104,7 +108,10 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
 
     @Override
     public boolean requirementsMet() {
-        return !isQuestCompleted(quest) && checkRequirements() && super.requirementsMet();
+        return !isQuestCompleted(quest)
+                && checkRequirements()
+                && super.requirementsMet()
+                && (!usePrayerFlicking || Microbot.getClient().getRealSkillLevel(Skill.PRAYER) >= 43);
     }
 
     @Override
@@ -119,6 +126,7 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         stopQuest();
         foodScript.shutdown();
         antiPoisonScript.shutdown();
+        flickerScript.shutdown();
 
         if (quest != null && !shutdown){
             sleepUntil(() -> Rs2Widget.getWidget(10027025) != null, 30_000);
@@ -146,6 +154,20 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
                 @Override
                 public boolean useAntiPoison() {
                     return true;
+                }
+            });
+        }
+
+        if (usePrayerFlicking){
+            flickerScript.run(new PlayerAssistConfig() {
+                @Override
+                public boolean togglePrayer() {
+                    return true;
+                }
+
+                @Override
+                public PrayerStyle prayerStyle() {
+                    return PrayerStyle.PERFECT_LAZY_FLICK;
                 }
             });
         }
@@ -189,6 +211,28 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
             if (Microbot.getClientThread().runOnClientThread(() -> getQuestHelperPlugin().getSelectedQuest() == null)){
                 Microbot.getClientThread().runOnClientThread(() -> { getQuestHelperPlugin().startUpQuest(quest.getQuestHelper()); return null; });
             }
+        }
+    }
+
+    @Override
+    public void onGameTick(GameTick gameTick) {
+        if (usePrayerFlicking)
+            flickerScript.onGameTick();
+    }
+
+    @Override
+    public void onNpcDespawned(NpcDespawned npcDespawned) {
+        if(usePrayerFlicking)
+            flickerScript.onNpcDespawned(npcDespawned);
+    }
+
+    @Subscribe
+    public void onHitsplatApplied(HitsplatApplied event){
+        if (event.getActor() != Microbot.getClient().getLocalPlayer()) return;
+
+        if (usePrayerFlicking) {
+            flickerScript.resetLastAttack(true);
+            Rs2Prayer.disableAllPrayers();
         }
     }
 

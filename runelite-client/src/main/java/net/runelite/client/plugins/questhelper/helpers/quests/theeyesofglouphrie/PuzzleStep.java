@@ -442,7 +442,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 		{
 			for (ItemRequirement itemRequirement : items2)
 			{
-				if (itemRequirement.getId() == heldDisc)
+				if (itemRequirement.getAllIds().contains(heldDisc))
 				{
 					startUpStep(clickDiscHole2);
 					return;
@@ -450,7 +450,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 			}
 			for (ItemRequirement itemRequirement : items3)
 			{
-				if (itemRequirement.getId() == heldDisc)
+				if (itemRequirement.getAllIds().contains(heldDisc))
 				{
 					startUpStep(clickDiscHole3);
 					return;
@@ -458,7 +458,7 @@ public class PuzzleStep extends QuestStep implements OwnerStep
 			}
 			for (ItemRequirement itemRequirement : items4)
 			{
-				if (itemRequirement.getId() == heldDisc)
+				if (itemRequirement.getAllIds().contains(heldDisc))
 				{
 					startUpStep(clickDiscHole4);
 					return;

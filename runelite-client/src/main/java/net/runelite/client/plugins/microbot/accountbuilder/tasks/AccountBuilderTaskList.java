@@ -38,11 +38,11 @@ public class AccountBuilderTaskList {
 
         // P2P Quests
         tasks.put(new NatualHistoryQuizTask(), 1000);
-        //tasks.put(new DwarfCannonTask(), 1000);
+        tasks.put(new DwarfCannonTask(), 1000);
         tasks.put(new WaterfallQuestTask(), 1000);
         tasks.put(new ChildrenOfTheSunTask(), 1000);
         tasks.put(new TreeGnomeVillageTask(), 1000);
-        //tasks.put(new KnightsSwordTask(), 1000);
+        tasks.put(new KnightsSwordTask(), 1000);
         tasks.put(new GertrudesCatTask(), 1000);
         tasks.put(new DruidicRitualTask(), 1000);
         tasks.put(new TouristTrapTask(), 1000);
@@ -57,7 +57,7 @@ public class AccountBuilderTaskList {
         //tasks.put(new MurderMysteryTask(), 1000);
         tasks.put(new EnterTheAbyssTask(), 1000);
         tasks.put(new PriestInPerilTask(), 1000);
-        //tasks.put(new FightArenaTask(), 1000);
+        tasks.put(new FightArenaTask(), 1000);
         tasks.put(new TribalTotemTask(), 1000);
         tasks.put(new NatureSpiritTask(), 1000);
         tasks.put(new ElementalWorkshopITask(), 1000);
@@ -86,6 +86,10 @@ public class AccountBuilderTaskList {
         //tasks.put(new DemonSlayerTask(), 1000);
         tasks.put(new AlfredGrimhandsBarcrawlTask(), 1000);
         tasks.put(new TaiBwoWannaiTrioTask(), 1000);
+        tasks.put(new TheEyesOfGlouphrieTask(), 1000);
+        tasks.put(new TempleOfTheEyeTask(), 1000);
+        tasks.put(new TheDigSiteTask(), 1000);
+        tasks.put(new APorcineOfInterestTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);

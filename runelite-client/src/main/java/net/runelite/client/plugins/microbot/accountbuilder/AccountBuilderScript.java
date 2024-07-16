@@ -282,6 +282,11 @@ public class AccountBuilderScript extends Script {
             task.onVarbitChanged(event);
     }
 
+    public void onNpcDespawned(NpcDespawned npcDespawned) {
+        if (task != null)
+            task.onNpcDespawned(npcDespawned);
+    }
+
     @Override
     public void shutdown() {
         if (task != null){

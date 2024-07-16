@@ -191,7 +191,7 @@ public class FightArena extends BasicQuestHelper
 		killBouncer = new NpcStep(this, NpcID.BOUNCER, new WorldPoint(2601, 3163, 0),
 			"Kill Bouncer. You can lure it behind a skeleton to safespot it. Warning: After Bouncer is killed, you will be unable to re-enter the arena.", combatGear);
 		killBouncer.addSubSteps(talkToSammyForBouncer);
-		leaveArena = new ObjectStep(this, ObjectID.DOOR_82, new WorldPoint(2606, 3152, 0),
+		leaveArena = new ObjectStep(this, ObjectID.DOOR_46563, new WorldPoint(2606, 3152, 0),
 			"Exit the arena (can ignore General Khazard). Warning: You will be unable to re-enter the arena.");
 		endQuest = new NpcStep(this, NpcID.LADY_SERVIL, new WorldPoint(2565, 3199, 0),
 			"Go back to Lady Servil to end the quest.");

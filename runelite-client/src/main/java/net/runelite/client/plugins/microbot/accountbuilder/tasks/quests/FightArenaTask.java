@@ -3,8 +3,11 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
 import net.runelite.client.plugins.questhelper.requirements.item.ItemRequirement;
+import net.runelite.client.plugins.questhelper.steps.ObjectStep;
 
 public class FightArenaTask extends AccountBuilderQuestTask {
     public FightArenaTask(){
@@ -20,6 +23,7 @@ public class FightArenaTask extends AccountBuilderQuestTask {
                 new ItemRequirement("Swordfish", ItemID.SWORDFISH, 20));
 
         useFood = true;
+        usePrayerFlicking = true;
     }
 
     @Override
@@ -30,7 +34,10 @@ public class FightArenaTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    public boolean doTaskPreparations() {
-        return clearInventory() && withdrawBuyItems();
+    protected void handleObjectStep(ObjectStep step) {
+        if (step.objectID == 46563){
+            Rs2GameObject.interact(step.objectID, "Quick-escape");
+            Rs2Player.waitForWalking();
+        }
     }
 }
