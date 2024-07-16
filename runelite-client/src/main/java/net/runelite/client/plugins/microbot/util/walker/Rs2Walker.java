@@ -312,7 +312,9 @@ public class Rs2Walker {
         Rs2Player.toggleRunEnergy(toogleRun);
         Point canv;
         if (Microbot.getClient().isInInstancedRegion()) {
-            worldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), worldPoint).stream().findFirst().get();
+            var instancedWorldPoint = WorldPoint.toLocalInstance(Microbot.getClient(), worldPoint).stream().findFirst().orElse(null);
+            if (instancedWorldPoint != null)
+                worldPoint = instancedWorldPoint;
             LocalPoint localPoint = LocalPoint.fromWorld(Microbot.getClient(), worldPoint);
             canv = Perspective.localToCanvas(Microbot.getClient(), localPoint, Microbot.getClient().getPlane());
         } else {
