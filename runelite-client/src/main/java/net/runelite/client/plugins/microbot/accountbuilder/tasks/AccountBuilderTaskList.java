@@ -90,6 +90,7 @@ public class AccountBuilderTaskList {
         tasks.put(new TempleOfTheEyeTask(), 1000);
         tasks.put(new TheDigSiteTask(), 1000);
         tasks.put(new APorcineOfInterestTask(), 1000);
+        tasks.put(new BoneVoyageTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
@@ -126,5 +127,6 @@ public class AccountBuilderTaskList {
 
         // Utility
         tasks.put(new IceGlovesTask(), 1000);
+        tasks.put(new Kudos100Task(), 1000);
     }
 }

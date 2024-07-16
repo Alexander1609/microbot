@@ -111,7 +111,7 @@ public class KandarinEasyDiaryTask extends AccountBuilderQuestTask {
         sleep(500, 1000);
         Rs2Inventory.interact("Antique lamp", "Rub");
         sleepUntil(() -> Rs2Widget.isWidgetVisible(240, 0), 5000);
-        Rs2Widget.clickWidget(240, 17); // Smithing
+        Rs2Widget.clickWidget(240, 14); // Slayer
         sleep(500, 1000);
         Rs2Widget.clickWidget(240, 26);
     }

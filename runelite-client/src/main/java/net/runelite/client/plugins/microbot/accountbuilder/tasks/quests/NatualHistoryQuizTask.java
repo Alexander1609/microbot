@@ -155,8 +155,7 @@ public class NatualHistoryQuizTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean isCompleted() {
-        return Microbot.getClient().getRealSkillLevel(Skill.SLAYER) >= 9
-                && Microbot.getClient().getRealSkillLevel(Skill.HUNTER) >= 9;
+        return Microbot.getVarbitValue(3637) >= 28;
     }
 
     @Override
