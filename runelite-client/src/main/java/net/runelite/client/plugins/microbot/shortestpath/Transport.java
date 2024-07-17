@@ -731,8 +731,7 @@ public class Transport {
                     if (action == null)
                         continue;
 
-                    var actionSplits = action.toLowerCase().split(":");
-                    if (hasTeleportMatch(actionSplits[actionSplits.length - 1])){
+                    if (hasTeleportMatch(action.toLowerCase())){
                         itemAction = action;
                         break;
                     }
@@ -784,12 +783,14 @@ public class Transport {
     }
 
     private boolean hasTeleportMatch(String text){
+        var displaySplits = displayInfo.toLowerCase().split(":");
+
         return Arrays.stream(text.split(" "))
                 .filter(x -> !x.isBlank()
                         && !x.equalsIgnoreCase("xeric's")
                         && !x.equalsIgnoreCase("guild")
                         && !x.equalsIgnoreCase("the")
                         && !x.equalsIgnoreCase("to"))
-                .anyMatch(x -> displayInfo.toLowerCase().contains(x));
+                .anyMatch(x -> displaySplits[displaySplits.length - 1].contains(x));
     }
 }
