@@ -76,10 +76,16 @@
 3582 3973 0	3660 3849 0	Travel Rowboat 32079			Dragon Slayer II	5	
 							
 # Fossil Island, Underwater							
-3724 3807 0	3734 3893 0	Travel Rowboat 30914				4	
-3734 3893 0	3724 3807 0	Travel Rowboat 30915				3	
-3734 3893 0	3768 3898 0	Travel Rowboat 30915				3	
-3768 3898 0	3734 3893 0	Travel Rowboat 30919				3	
+3724 3807 0	3733 3893 0	Travel Rowboat 30914				4	Row to the north of the island.
+3724 3807 0	3769 3898 0	Travel Rowboat 30914				4	Row out to sea, north of the island.
+3734 3893 0	3723 3784 1	Travel Rowboat 30915				4	Row to the barge.
+3734 3893 0	3724 3808 0	Travel Rowboat 30915				4	Row to the camp.
+3734 3893 0	3769 3898 0	Travel Rowboat 30915				4	Row out to sea.
+3768 3898 0	3723 3784 1	Travel Rowboat 30919				3	Row to the barge.
+3768 3898 0	3733 3893 0	Travel Rowboat 30919				3	Row to the north of the island.
+3768 3898 0	3724 3808 0	Travel Rowboat 30919				3	Row to the camp.
+3768 3898 0	3732 10281 1	Dive Rowboat 30919				3	
+3768 3898 0	3732 10281 1	Travel Rowboat 30919				3	Dive into the sea.
 							
 # Hosidius, Crabclaw Isle							
 1783 3458 0	1779 3417 0	Travel Sandicrahb 7483				5	

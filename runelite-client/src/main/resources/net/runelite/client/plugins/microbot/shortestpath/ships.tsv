@@ -16,8 +16,12 @@
 2574 2836 1	2909 3226 0	Travel Cabin Boy Colin 7967			The Corsair Curse	6	
 							
 # Digsite, Fossil Island							
-3362 3445 0	3724 3807 0	Quick-Travel Barge guard 8012			Bone Voyage	12	
-3724 3807 0	3362 3445 0	Travel Rowboat 30914			Bone Voyage	12	
+3723 3786 1	3724 3808 0	Travel Junior Navigator 6258			Bone Voyage
+3724 3808 0	3723 3784 1	Travel Rowboat 30914			Bone Voyage		Row to the barge.
+3724 3807 0	3362 3445 0	Travel Rowboat 30914			Bone Voyage	4	Row to the barge and travel to the Digsite.
+3722 3784 1	3360 3453 1	Travel Lead Navigator 6257			Bone Voyage
+3362 3452 1	3362 3445 0	Deboard Barge guard 25847			Bone Voyage
+3362 3445 0	3724 3808 0	Quick-Travel Barge guard 25839			Bone Voyage
 							
 # Lady of the Waves: Cairn Isle, Port Khazard, Port Sarim							
 2763 2960 1	2680 3150 0	Talk-to Captain Shanks 5364		50 Coins		10	

@@ -7,6 +7,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.plugins.devtools.MovementFlag;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathConfig;
@@ -14,12 +15,15 @@ import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.shortestpath.Transport;
 import net.runelite.client.plugins.microbot.shortestpath.pathfinder.Pathfinder;
 import net.runelite.client.plugins.microbot.util.Global;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
+import net.runelite.client.plugins.microbot.util.keyboard.Rs2Keyboard;
 import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
+import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
 
 import java.awt.*;
@@ -608,6 +612,30 @@ public class Rs2Walker {
                     if (indexOfDestination < indexOfOrigin) continue;
 
                     if (origin == null || path.get(i).equals(origin)) {
+                        if (Rs2Dialogue.isInDialogue()){
+                            if (Rs2Dialogue.hasContinue())
+                                Rs2Dialogue.clickContinue();
+                            else if (Rs2Dialogue.hasSelectAnOption()) {
+                                var optionsWidget = Rs2Widget.getWidget(ComponentID.DIALOG_OPTION_OPTIONS);
+                                var childs = Arrays.stream(optionsWidget.getDynamicChildren()).filter(x -> x.getOnKeyListener() != null)
+                                        .collect(Collectors.toMap(x -> (String) x.getOnKeyListener()[7], x -> x));
+
+                                for (var key : childs.keySet()){
+                                    var text = childs.get(key).getText();
+                                    if (text.equalsIgnoreCase(b.getDisplayInfo())){
+                                        Rs2Keyboard.keyPress(key.charAt(0));
+                                        sleep(1600, 2000);
+                                        return true;
+                                    }
+                                }
+
+                                Rs2Keyboard.keyPress('1');
+                            }
+
+                            sleep(1600, 2000);
+                            return true;
+                        }
+
                         boolean handled = false;
                         if (b.isShip() || b.isNpc() || b.isBoat()) {
                             var npcAndAction = String.format("%s %s", b.getAction(), b.getNpcName());
@@ -659,7 +687,19 @@ public class Rs2Walker {
 
                         //check game objects
                         if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                            boolean interact = Rs2GameObject.interact(gameObject, b.getAction(), true);
+                            var action = b.getAction();
+                            var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(gameObject);
+                            if (objectComp != null){
+                                var combinedText = b.getAction() + " " + b.getNpcName();
+                                for (var objAction : objectComp.getActions()){
+                                    if (objAction != null && combinedText.toLowerCase().contains(objAction.toLowerCase())){
+                                        action = objAction;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            boolean interact = Rs2GameObject.interact(gameObject, action, true);
                             if (!interact) {
                                 Rs2Walker.walkMiniMap(path.get(i));
                                 sleep(1600, 2000);
@@ -679,7 +719,19 @@ public class Rs2Walker {
                                             .thenComparing(x -> ((TileObject)x).getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
-                            boolean interact = Rs2GameObject.interact(tileObject, b.getAction(), true);
+                            var action = b.getAction();
+                            var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(gameObject);
+                            if (objectComp != null){
+                                var combinedText = b.getAction() + " " + b.getNpcName();
+                                for (var objAction : objectComp.getActions()){
+                                    if (objAction != null && combinedText.toLowerCase().contains(objAction.toLowerCase())){
+                                        action = objAction;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            boolean interact = Rs2GameObject.interact(tileObject, action, true);
                             if (!interact) {
                                 Rs2Walker.walkMiniMap(path.get(i));
                                 sleep(1600, 2000);
