@@ -372,6 +372,9 @@ public class MQuestScript extends Script {
 
             if (ShortestPathPlugin.getPathfinder() != null){
                 var path = ShortestPathPlugin.getPathfinder().getPath();
+
+                sleepUntil(() -> Rs2Tile.isTileReachable(path.get(path.size() - 1)), 20_000);
+
                 if (path.get(path.size() - 1).distanceTo(step.getWorldPoint()) <= 1)
                     return false;
             } else
