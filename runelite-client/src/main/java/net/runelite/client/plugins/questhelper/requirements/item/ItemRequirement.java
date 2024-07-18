@@ -104,6 +104,9 @@ public class ItemRequirement extends AbstractRequirement
 	@Getter
 	protected boolean obtainable = false;
 
+	@Getter
+	protected int restockAmount = -1;
+
 	/**
 	 * Denotes whether the quantity-check should take into consideration item charges.
 	 * With this enabled, 1xRing of dueling(7) will count as 7 quantity.
@@ -125,6 +128,15 @@ public class ItemRequirement extends AbstractRequirement
 		this.id = id;
 		this.quantity = quantity;
 		this.name = name;
+		equip = false;
+	}
+
+	public ItemRequirement(String name, int id, int quantity, int restockAmount)
+	{
+		this.id = id;
+		this.quantity = quantity;
+		this.name = name;
+		this.restockAmount = restockAmount;
 		equip = false;
 	}
 

@@ -58,8 +58,8 @@ public class BirdHouseTracker
 	private final TimeTrackingConfig config;
 	private final Notifier notifier;
 
-	@Getter(AccessLevel.PACKAGE)
-	private final ConcurrentMap<BirdHouseSpace, BirdHouseData> birdHouseData = new ConcurrentHashMap<>();
+	@Getter
+	private static final ConcurrentMap<BirdHouseSpace, BirdHouseData> birdHouseData = new ConcurrentHashMap<>();
 
 	@Getter
 	private SummaryState summary = SummaryState.UNKNOWN;

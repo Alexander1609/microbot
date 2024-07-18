@@ -31,7 +31,7 @@ import net.runelite.api.annotations.Varp;
 
 @AllArgsConstructor
 @Getter
-enum BirdHouseSpace
+public enum BirdHouseSpace
 {
 	MEADOW_NORTH("Mushroom Meadow (North)", VarPlayer.BIRD_HOUSE_MEADOW_NORTH),
 	MEADOW_SOUTH("Mushroom Meadow (South)", VarPlayer.BIRD_HOUSE_MEADOW_SOUTH),

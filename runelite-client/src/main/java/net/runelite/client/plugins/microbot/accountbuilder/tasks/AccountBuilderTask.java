@@ -146,6 +146,10 @@ public abstract class AccountBuilderTask {
         itemRequirements.add(new ItemRequirement("", id, quantity));
     }
 
+    protected void addRequirement(int id, int quantity, int restockAmount){
+        itemRequirements.add(new ItemRequirement("", id, quantity, restockAmount));
+    }
+
     protected void addRequirement(ItemCollections collection, int quantity){
         itemRequirements.add(new ItemRequirement("", collection, quantity));
     }
@@ -228,7 +232,7 @@ public abstract class AccountBuilderTask {
                     && (itemRequirement.getQuantity() > 1 || itemRequirement.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))) {
                 var tradable = itemRequirement.getAllIds().stream().anyMatch(x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(x)).isTradeable());
                 if (tradable)
-                    total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * itemRequirement.getQuantity();
+                    total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * itemRequirement.getRestockAmount() == -1 ? itemRequirement.getQuantity() : itemRequirement.getRestockAmount();
                 else if (!ignoreUntradables && !itemRequirement.isObtainable())
                     return Integer.MAX_VALUE;
             }
@@ -269,7 +273,7 @@ public abstract class AccountBuilderTask {
                 var itemComposition = Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(itemToBuy));
 
                 var amountToBuy = itemsToBuy.get(0).getQuantity() - Rs2Bank.bankItems.stream().filter(x -> x.id == itemToBuy).map(x -> x.quantity).findFirst().orElse(0);
-                Rs2GrandExchange.buyItemAboveXPercent(itemComposition.getName(), amountToBuy, minClicks, clicks);
+                Rs2GrandExchange.buyItemAboveXPercent(itemComposition.getName(), itemsToBuy.get(0).getRestockAmount() == -1 ? amountToBuy : itemsToBuy.get(0).getRestockAmount(), minClicks, clicks);
                 sleepUntil(() -> Rs2GrandExchange.hasBoughtOffer(itemToBuy), 10000);
 
                 if (Rs2GrandExchange.hasBoughtOffer(itemToBuy)){

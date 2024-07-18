@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
 import lombok.Getter;
+import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.AmmoniteCrabFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.GiantFrogFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.fighting.GoblinFightingTask;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.moneymaking.CollectingBronzePickaxesTask;
@@ -99,6 +100,7 @@ public class AccountBuilderTaskList {
         // Combat
         tasks.put(new GoblinFightingTask(), 1000);
         tasks.put(new GiantFrogFightingTask(), 1000);
+        tasks.put(new AmmoniteCrabFightingTask(), 1000);
 
         // Skilling
         tasks.put(new MiningSmithingBronzeTask(), 1000);
@@ -121,6 +123,7 @@ public class AccountBuilderTaskList {
         tasks.put(new SmithingGiantsFoundryMithrilTask(), 1000);
         tasks.put(new PrayerGildedAltar43Task(), 1000);
         tasks.put(new CookingKarambwanTask(), 1000);
+        tasks.put(new BirdhouseTask(), 1000);
 
         // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);

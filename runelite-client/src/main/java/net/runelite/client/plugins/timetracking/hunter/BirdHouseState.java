@@ -31,7 +31,7 @@ import net.runelite.client.ui.ColorScheme;
 
 @AllArgsConstructor
 @Getter
-enum BirdHouseState
+public enum BirdHouseState
 {
 	SEEDED(ColorScheme.PROGRESS_COMPLETE_COLOR),
 	BUILT(ColorScheme.PROGRESS_INPROGRESS_COLOR),
@@ -43,7 +43,7 @@ enum BirdHouseState
 	/**
 	 * Gets the {@code BirdHouseState} corresponding to the given {@code VarPlayer} value.
 	 */
-	static BirdHouseState fromVarpValue(int varp)
+	public static BirdHouseState fromVarpValue(int varp)
 	{
 		if (varp < 0 || varp > BirdHouse.values().length * 3)
 		{

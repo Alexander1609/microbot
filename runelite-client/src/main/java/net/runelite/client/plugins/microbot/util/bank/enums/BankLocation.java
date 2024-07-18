@@ -43,7 +43,7 @@ public enum BankLocation {
     FARMING_GUILD(new WorldPoint(1253, 3741, 0)),
     FEROX_ENCLAVE(new WorldPoint(3130, 3631, 0)),
     FISHING_GUILD(new WorldPoint(2586, 3420, 0)),
-    FOSSIL_ISLAND(new WorldPoint(3739, 3804, 0)),
+    //FOSSIL_ISLAND(new WorldPoint(3739, 3804, 0)), TODO Check if built
     FOSSIL_ISLAND_WRECK(new WorldPoint(3771, 3898, 0)),
     GNOME_BANK(new WorldPoint(2445, 3425, 1)),
     GNOME_TREE_BANK_SOUTH(new WorldPoint(2449, 3482, 1)),
