@@ -720,7 +720,7 @@ public class Rs2Walker {
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
                             var action = b.getAction();
-                            var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(gameObject);
+                            var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(tileObject);
                             if (objectComp != null){
                                 var combinedText = b.getAction() + " " + b.getNpcName();
                                 for (var objAction : objectComp.getActions()){
