@@ -11,6 +11,7 @@ import net.runelite.client.plugins.cluescrolls.clues.emote.Emote;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.camera.Rs2Camera;
 import net.runelite.client.plugins.microbot.util.combat.Rs2Combat;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
@@ -373,7 +374,8 @@ public class MQuestScript extends Script {
             if (ShortestPathPlugin.getPathfinder() != null){
                 var path = ShortestPathPlugin.getPathfinder().getPath();
 
-                sleepUntil(() -> Rs2Tile.isTileReachable(path.get(path.size() - 1)), 20_000);
+                if (!Global.sleepUntilTrue(() -> Rs2Tile.isTileReachable(path.get(path.size() - 1)), 10, 5000))
+                    return false;
 
                 if (path.get(path.size() - 1).distanceTo(step.getWorldPoint()) <= 1)
                     return false;
