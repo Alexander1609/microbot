@@ -687,14 +687,15 @@ public class Rs2Walker {
 
                         //check game objects
                         if (gameObject != null && gameObject.getId() == b.getObjectId()) {
-                            var action = b.getAction();
+                            var action = "";
                             var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(gameObject);
                             if (objectComp != null){
                                 var combinedText = b.getAction() + " " + b.getNpcName();
                                 for (var objAction : objectComp.getActions()){
-                                    if (objAction != null && combinedText.toLowerCase().contains(objAction.toLowerCase())){
+                                    if (objAction != null
+                                            && combinedText.toLowerCase().contains(objAction.toLowerCase())
+                                            && objAction.length() > action.length()){
                                         action = objAction;
-                                        break;
                                     }
                                 }
                             }
@@ -719,14 +720,15 @@ public class Rs2Walker {
                                             .thenComparing(x -> ((TileObject)x).getWorldLocation().distanceTo(b.getDestination()))).orElse(null);
 
                         if (tileObject != null && tileObject.getId() == b.getObjectId()) {
-                            var action = b.getAction();
+                            var action = "";
                             var objectComp = Rs2GameObject.convertGameObjectToObjectComposition(tileObject);
                             if (objectComp != null){
                                 var combinedText = b.getAction() + " " + b.getNpcName();
                                 for (var objAction : objectComp.getActions()){
-                                    if (objAction != null && combinedText.toLowerCase().contains(objAction.toLowerCase())){
+                                    if (objAction != null
+                                            && combinedText.toLowerCase().contains(objAction.toLowerCase())
+                                            && objAction.length() > action.length()){
                                         action = objAction;
-                                        break;
                                     }
                                 }
                             }
