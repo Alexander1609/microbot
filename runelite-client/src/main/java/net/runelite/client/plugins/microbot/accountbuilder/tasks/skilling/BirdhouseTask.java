@@ -99,7 +99,7 @@ public class BirdhouseTask extends AccountBuilderTask {
                     case EMPTY:
                         if (Rs2Inventory.hasItem("house"))
                             Rs2GameObject.interact(location.getWorldPoint(), "build");
-                        else {
+                        else if (Rs2Inventory.contains(ItemID.CLOCKWORK)) {
                             Rs2Inventory.combine(ItemID.HAMMER, birdhouse.getLogsId());
                             if (Rs2Inventory.count(ItemID.CLOCKWORK) > 1){
                                 sleep(500, 1000);
@@ -129,7 +129,8 @@ public class BirdhouseTask extends AccountBuilderTask {
         if (!clearInventory() || !withdrawBuyItems())
             return false;
 
-        if (ItemCollections.DIGSITE_PENDANTS.getItems().stream().noneMatch(Rs2Inventory::contains)){
+        if (ItemCollections.DIGSITE_PENDANTS.getItems().stream().noneMatch(Rs2Inventory::contains)
+                && Rs2Player.getWorldLocation().distanceTo(new WorldPoint(3764, 3878, 1)) > 20){
             if (Rs2Bank.isOpen()){
                 Rs2Bank.closeBank();
                 return false;

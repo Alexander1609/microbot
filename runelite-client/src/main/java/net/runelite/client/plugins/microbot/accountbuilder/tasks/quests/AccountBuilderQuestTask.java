@@ -50,6 +50,8 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
     @Getter
     protected QuestStep currentStep;
 
+    protected boolean ignoreRecommendedRequirements = false;
+
     protected boolean useFood = false;
     protected boolean usePrayerFlicking = false;
     protected boolean useAntiPoison = false;
@@ -303,37 +305,39 @@ public abstract class AccountBuilderQuestTask extends AccountBuilderTask {
         if (!success)
             return false;
 
-        var recommendedItems = quest.getQuestHelper().getItemRecommended();
-        if (recommendedItems != null){
+        if (!ignoreRecommendedRequirements){
+            var recommendedItems = quest.getQuestHelper().getItemRecommended();
+            if (recommendedItems != null){
 
-            for (var item : recommendedItems){
-                if (item.getId() == -1) continue;
+                for (var item : recommendedItems){
+                    if (item.getId() == -1) continue;
 
-                var amount = item.getQuantity();
-                if (ItemCollections.COINS.getItems().contains(item.getId())){
-                    amount += Random.random(200, 400);
-                }
+                    var amount = item.getQuantity();
+                    if (ItemCollections.COINS.getItems().contains(item.getId())){
+                        amount += Random.random(200, 400);
+                    }
 
-                List<Integer> itemIds = null;
-                if (item.getId() == ItemID.ARDOUGNE_TELEPORT)
-                    itemIds = ItemCollections.ARDY_CLOAKS.getItems();
+                    List<Integer> itemIds = null;
+                    if (item.getId() == ItemID.ARDOUGNE_TELEPORT)
+                        itemIds = ItemCollections.ARDY_CLOAKS.getItems();
 
-                if (itemIds == null)
-                    itemIds = item.getAllIds();
+                    if (itemIds == null)
+                        itemIds = item.getAllIds();
 
-                int finalAmount = amount;
-                if (amount == 1 && itemIds.stream().anyMatch(Rs2Equipment::isWearing)
-                        || itemIds.stream().anyMatch(x -> Rs2Inventory.hasItemAmount(x, finalAmount)))
-                    continue;
+                    int finalAmount = amount;
+                    if (amount == 1 && itemIds.stream().anyMatch(Rs2Equipment::isWearing)
+                            || itemIds.stream().anyMatch(x -> Rs2Inventory.hasItemAmount(x, finalAmount)))
+                        continue;
 
-                for (var itemId : itemIds){
-                    if (Rs2Bank.hasBankItem(itemId, amount)){
-                        if (!Rs2Bank.walkToBankAndUseBank())
-                            return false;
+                    for (var itemId : itemIds){
+                        if (Rs2Bank.hasBankItem(itemId, amount)){
+                            if (!Rs2Bank.walkToBankAndUseBank())
+                                return false;
 
-                        Rs2Bank.withdrawX(itemId, amount);
-                        sleep(100, 200);
-                        break;
+                            Rs2Bank.withdrawX(itemId, amount);
+                            sleep(100, 200);
+                            break;
+                        }
                     }
                 }
             }

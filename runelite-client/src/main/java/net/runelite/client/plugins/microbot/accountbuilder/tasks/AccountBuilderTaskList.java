@@ -84,7 +84,7 @@ public class AccountBuilderTaskList {
         tasks.put(new TheQueenOfThievesTask(), 1000);
         tasks.put(new JunglePotionTask(), 1000);
         tasks.put(new TheCorsairCurseTask(), 1000);
-        //tasks.put(new DemonSlayerTask(), 1000);
+        tasks.put(new DemonSlayerTask(), 1000);
         tasks.put(new AlfredGrimhandsBarcrawlTask(), 1000);
         tasks.put(new TaiBwoWannaiTrioTask(), 1000);
         tasks.put(new TheEyesOfGlouphrieTask(), 1000);
@@ -92,6 +92,7 @@ public class AccountBuilderTaskList {
         tasks.put(new TheDigSiteTask(), 1000);
         tasks.put(new APorcineOfInterestTask(), 1000);
         tasks.put(new BoneVoyageTask(), 1000);
+        tasks.put(new WantedTask(), 1000);
 
         // Diaries
         tasks.put(new ArdougneEasyDiaryTask(), 1000);
@@ -123,7 +124,7 @@ public class AccountBuilderTaskList {
         tasks.put(new SmithingGiantsFoundryMithrilTask(), 1000);
         tasks.put(new PrayerGildedAltar43Task(), 1000);
         tasks.put(new CookingKarambwanTask(), 1000);
-        tasks.put(new BirdhouseTask(), 1000);
+        tasks.put(new BirdhouseTask(), 100000);
 
         // Money making
         tasks.put(new CollectingBronzePickaxesTask(), 1000);

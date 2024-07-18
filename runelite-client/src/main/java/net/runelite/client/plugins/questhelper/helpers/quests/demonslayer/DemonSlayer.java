@@ -200,7 +200,9 @@ public class DemonSlayer extends BasicQuestHelper
 		talkToRovin.addSubSteps(goUpToRovin, goUpToRovin2);
 
 		goDownstairsFromRovin = new ObjectStep(this, ObjectID.STAIRCASE_11793, new WorldPoint(3203, 3498, 2), "Go to the Varrock Castle kitchen.");
+		goDownstairsFromRovin.addDialogStep("Climb down");
 		goDownstairsFromRovin2 = new ObjectStep(this, ObjectID.STAIRCASE_11792, new WorldPoint(3203, 3498, 1), "Go to the Varrock Castle kitchen.");
+		goDownstairsFromRovin2.addDialogStep("Climb down");
 		goUpToBucket = new ObjectStep(this, ObjectID.STAIRCASE_11789, new WorldPoint(3219, 3497, 0), "Get a bucket from above the Varrock Castle kitchen.");
 		pickupBucket = new DetailedQuestStep(this, new WorldPoint(3221, 3497, 1), "Pick up the bucket nearby.", bucket);
 		goDownFromBucket = new ObjectStep(this, ObjectID.STAIRCASE_11793, new WorldPoint(3219, 3497, 1), "Go back down to the kitchen.");
