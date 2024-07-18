@@ -688,7 +688,7 @@ public class Transport {
     }
 
     public boolean handleItemTeleport(){
-        if (Rs2Tile.isTileReachable(destination))
+        if (Rs2Tile.getReachableTilesFromTile(Rs2Player.getWorldLocation(), 10).containsKey(destination))
             return false;
 
         for (var itemId : itemRequirements){
