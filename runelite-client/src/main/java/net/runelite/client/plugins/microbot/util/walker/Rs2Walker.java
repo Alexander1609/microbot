@@ -702,7 +702,7 @@ public class Rs2Walker {
 
                             boolean interact = Rs2GameObject.interact(gameObject, action, true);
                             if (!interact) {
-                                Rs2Walker.walkMiniMap(path.get(i));
+                                Rs2Walker.walkMiniMap(getPointWithWallDistance(path.get(i)));
                                 sleep(1600, 2000);
                                 return true;
                             }
@@ -735,7 +735,7 @@ public class Rs2Walker {
 
                             boolean interact = Rs2GameObject.interact(tileObject, action, true);
                             if (!interact) {
-                                Rs2Walker.walkMiniMap(path.get(i));
+                                Rs2Walker.walkMiniMap(getPointWithWallDistance(path.get(i)));
                                 sleep(1600, 2000);
                                 return true;
                             }
