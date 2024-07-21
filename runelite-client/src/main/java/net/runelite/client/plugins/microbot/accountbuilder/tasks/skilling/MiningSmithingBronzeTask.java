@@ -1,6 +1,7 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.skilling;
 
 import lombok.Getter;
+import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.client.plugins.microbot.accountbuilder.tasks.AccountBuilderTask;
@@ -67,7 +68,7 @@ public class MiningSmithingBronzeTask extends AccountBuilderTask {
         else
             nextWait = Random.random(500, 1000);
 
-        if (!Rs2Inventory.hasItem(OresEnum.COPPER.getOreName()) && !Rs2Inventory.hasItem(OresEnum.TIN.getOreName()) && !Rs2Inventory.isEmpty()){
+        if (Math.max(Rs2Inventory.count(OresEnum.COPPER.getOreName()), Rs2Inventory.count(OresEnum.TIN.getOreName())) == 0 && Rs2Inventory.contains(ItemID.BRONZE_BAR)){
             if (!Rs2Bank.walkToBank(BankLocation.LUMBRIDGE_TOP) || !Rs2Bank.openBank())
                 return;
 
@@ -77,6 +78,7 @@ public class MiningSmithingBronzeTask extends AccountBuilderTask {
 
             Rs2GameObject.interact("Furnace", "Smelt", true);
             sleepUntil(() -> Rs2Widget.getWidget(17694734) != null, 2000);
+            sleep(500, 1000);
             if (Rs2Widget.getWidget(17694734) != null)
                 Rs2Widget.clickWidget(17694734);
             Rs2Player.waitForAnimation();

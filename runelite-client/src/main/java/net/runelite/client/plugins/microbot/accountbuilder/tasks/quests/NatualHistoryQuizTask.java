@@ -155,7 +155,9 @@ public class NatualHistoryQuizTask extends AccountBuilderQuestTask {
 
     @Override
     public boolean isCompleted() {
-        return Microbot.getVarbitValue(3637) >= 28;
+        return Microbot.getVarbitValue(3637) >= 28
+                && Microbot.getClient().getRealSkillLevel(Skill.HUNTER) >= 9
+                && Microbot.getClient().getRealSkillLevel(Skill.SLAYER) >= 9;
     }
 
     @Override
@@ -169,4 +171,9 @@ public class NatualHistoryQuizTask extends AccountBuilderQuestTask {
 
     @Override
     public void onGameStateChanged(GameStateChanged event) { }
+
+    @Override
+    public boolean doTaskPreparations() {
+        return true;
+    }
 }

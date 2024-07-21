@@ -108,7 +108,7 @@ public class FishingShrimpsTask extends AccountBuilderTask {
                     Rs2Inventory.use(item);
                     Rs2GameObject.interact("fire");
                 } else {
-                    if (!Rs2Walker.walkTo(new WorldPoint(3210, 3214, 0)))
+                    if (!Rs2Walker.walkTo(new WorldPoint(3211, 3215, 0)))
                         return;
 
                     var item = Rs2Inventory.get(rawFish).name;

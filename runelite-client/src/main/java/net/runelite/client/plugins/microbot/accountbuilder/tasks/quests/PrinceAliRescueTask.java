@@ -6,6 +6,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
+import net.runelite.client.plugins.microbot.util.equipment.Rs2Equipment;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.grounditem.Rs2GroundItem;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
@@ -58,6 +59,9 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
             if (!Rs2Bank.walkToBankAndUseBank())
                 return false;
 
+            if (Rs2Equipment.isWearing(ItemID.BRONZE_AXE) || Rs2Equipment.isWearing(ItemID.BRONZE_PICKAXE))
+                Rs2Equipment.remove(EquipmentInventorySlot.WEAPON);
+
             if (!inventoryCleared){
                 Rs2Bank.depositAll();
                 inventoryCleared = true;
@@ -90,7 +94,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
         }
 
         if (!Rs2Inventory.hasItemAmount(ItemID.BEER, 4)){
-            if (!Rs2Walker.walkTo(new WorldPoint(3225, 3399, 0)))
+            if (!Rs2Walker.walkTo(new WorldPoint(3224, 3398, 0)))
                 return false;
 
             if (!Rs2Dialogue.isInDialogue())
@@ -147,8 +151,8 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
             if (!Rs2Walker.walkTo(new WorldPoint(3275, 3369, 0), 3))
                 return false;
 
-            if (!Rs2GameObject.interact(23628, "pick"))
-                Rs2GameObject.interact(23629, "pick");
+            if (!Rs2GameObject.interact(23628, "pick-from"))
+                Rs2GameObject.interact(23629, "pick-from");
 
             Rs2Player.waitForAnimation();
             return false;
@@ -201,7 +205,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
         }
 
         if (!Rs2Inventory.contains("Pot of flour") && !Rs2Inventory.contains("Pot")){
-            if (!Rs2Walker.walkTo(new WorldPoint(3208, 3214, 0)))
+            if (!Rs2Walker.walkTo(new WorldPoint(3208, 3215, 0)))
                 return false;
 
             if (!Rs2GroundItem.exists("Pot", 10)){
@@ -245,7 +249,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
             }
 
             if (!depositedWheat){
-                if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 2)))
+                if (!Rs2Walker.walkTo(new WorldPoint(3165, 3306, 2)))
                     return false;
 
                 if (Rs2Inventory.contains("Grain")){
@@ -262,7 +266,7 @@ public class PrinceAliRescueTask extends AccountBuilderQuestTask {
                 }
             }
 
-            if (!Rs2Walker.walkTo(new WorldPoint(3166, 3306, 0)))
+            if (!Rs2Walker.walkTo(new WorldPoint(3165, 3306, 0)))
                 return false;
 
             Rs2GameObject.interact(1781, "Empty");

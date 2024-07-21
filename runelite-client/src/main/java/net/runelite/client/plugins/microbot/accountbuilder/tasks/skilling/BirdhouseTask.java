@@ -167,7 +167,10 @@ public class BirdhouseTask extends AccountBuilderTask {
         if (missingHouses > 0)
             addRequirement(ItemID.CLOCKWORK, missingHouses);
 
-        addRequirement(getHouseType().getLogsId(), 4, 100);
+        var houseType = getHouseType();
+        if (houseType == null) return;
+
+        addRequirement(houseType.getLogsId(), 4, 100);
 
         if (Rs2Player.getWorldLocation().distanceTo(new WorldPoint(3764, 3878, 1)) > 20){
             if (ItemCollections.DIGSITE_PENDANTS.getItems().stream().anyMatch(x -> Rs2Bank.hasBankItem(x, 1)))

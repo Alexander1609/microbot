@@ -1,10 +1,13 @@
 package net.runelite.client.plugins.microbot.accountbuilder.tasks.quests;
 
 import net.runelite.api.ItemID;
+import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.quest.MQuestScript;
+import net.runelite.client.plugins.microbot.util.Global;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
 import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
@@ -40,8 +43,19 @@ public class SheepShearerTask extends AccountBuilderQuestTask {
             if (Rs2Player.isAnimating() && isQuestRunning())
                 stopQuest();
 
-            if (!Rs2Inventory.contains(ItemID.WOOL) && !isQuestRunning())
+            if ((!Rs2Inventory.contains(ItemID.WOOL) || !Global.sleepUntilTrue(Rs2Player::isAnimating, 10, 2000)) && !isQuestRunning())
                 startupQuest();
+        }
+    }
+
+    @Override
+    protected void handleNPCStep(NpcStep step) {
+        if (step.npcID == NpcID.FRED_THE_FARMER && MQuestScript.getFullText(step).isBlank()){
+            if (Rs2Dialogue.isInDialogue()){
+                Rs2Dialogue.clickContinue();
+            } else {
+                Rs2Npc.interact(step.npcID);
+            }
         }
     }
 

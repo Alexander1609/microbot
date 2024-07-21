@@ -232,7 +232,7 @@ public abstract class AccountBuilderTask {
                     && (itemRequirement.getQuantity() > 1 || itemRequirement.getAllIds().stream().noneMatch(Rs2Equipment::isWearing))) {
                 var tradable = itemRequirement.getAllIds().stream().anyMatch(x -> Microbot.getClientThread().runOnClientThread(() -> Microbot.getItemManager().getItemComposition(x)).isTradeable());
                 if (tradable)
-                    total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * itemRequirement.getRestockAmount() == -1 ? itemRequirement.getQuantity() : itemRequirement.getRestockAmount();
+                    total += Microbot.getClientThread().runOnClientThread(() -> itemRequirement.getAllIds().stream().mapToInt(x -> Microbot.getItemManager().getItemPriceWithSource(x, false)).filter(x -> x > 0).min()).orElseThrow() * (itemRequirement.getRestockAmount() == -1 ? itemRequirement.getQuantity() : itemRequirement.getRestockAmount());
                 else if (!ignoreUntradables && !itemRequirement.isObtainable())
                     return Integer.MAX_VALUE;
             }

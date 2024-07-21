@@ -58,7 +58,7 @@ public class RomeoJulietTask extends AccountBuilderQuestTask {
             if (!Rs2Walker.walkTo(new WorldPoint(3260, 3368, 0)))
                 return false;
 
-            Rs2GameObject.interact("Cadava bush", "Pick");
+            Rs2GameObject.interact("Cadava bush", "Pick-from");
             Rs2Player.waitForAnimation();
             return false;
         }

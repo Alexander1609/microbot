@@ -68,6 +68,11 @@ public class GoblinFightingTask extends AccountBuilderFightingTask {
             public boolean toggleBalanceCombatSkills() {
                 return true;
             }
+
+            @Override
+            public boolean toggleAvoidControlled() {
+                return false;
+            }
         });
 
         memberOnly = false;

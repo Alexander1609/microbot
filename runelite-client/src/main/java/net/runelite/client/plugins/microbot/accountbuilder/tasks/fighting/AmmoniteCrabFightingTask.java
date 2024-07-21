@@ -57,6 +57,11 @@ public class AmmoniteCrabFightingTask extends AccountBuilderFightingTask {
             }
 
             @Override
+            public boolean toggleAvoidControlled() {
+                return false;
+            }
+
+            @Override
             public PlayStyle playStyle() {
                 return PlayStyle.PASSIVE;
             }
