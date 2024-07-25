@@ -6,6 +6,7 @@ import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -761,14 +762,26 @@ public class Transport {
                     Rs2Inventory.interact(itemId, itemAction);
 
                 if (itemAction.equalsIgnoreCase("rub")){
-                    sleepUntil(() -> Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS), 1000);
-                    if (!Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS))
-                        return false;
+                    sleepUntil(() -> Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS) || !Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_OPTIONS), 1000);
 
-                    var options = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS).getDynamicChildren();
+                    Widget[] options;
+                    if (Rs2Widget.isWidgetVisible(WidgetInfo.DIALOG_OPTION_OPTIONS)){
+                        options = Rs2Widget.getWidget(WidgetInfo.DIALOG_OPTION_OPTIONS).getDynamicChildren();
+                    } else if (!Rs2Widget.isHidden(ComponentID.ADVENTURE_LOG_OPTIONS)){
+                        options = Rs2Widget.getWidget(ComponentID.ADVENTURE_LOG_OPTIONS).getDynamicChildren();
+                    } else {
+                        return false;
+                    }
+
                     for (var option : options){
                         if (hasTeleportMatch(StringUtils.strip(option.getText(), ".").toLowerCase())){
-                            Rs2Keyboard.keyPress(option.getOnKeyListener()[7].toString().charAt(0));
+                            char key;
+                            if (option.getOnKeyListener() != null)
+                                key = option.getOnKeyListener()[7].toString().charAt(0);
+                            else
+                                key = Integer.toString(option.getIndex() + 1).charAt(0);
+
+                            Rs2Keyboard.keyPress(key);
                             break;
                         }
                     }
