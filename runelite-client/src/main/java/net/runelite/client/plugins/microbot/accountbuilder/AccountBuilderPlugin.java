@@ -3,10 +3,7 @@ package net.runelite.client.plugins.microbot.accountbuilder;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.Hitsplat;
-import net.runelite.api.NPC;
+import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.client.Notifier;
 import net.runelite.client.callback.ClientThread;
@@ -22,6 +19,7 @@ import net.runelite.client.plugins.microbot.giantsfoundry.GiantsFoundryState;
 import net.runelite.client.plugins.microbot.playerassist.enums.PrayerStyle;
 import net.runelite.client.plugins.microbot.util.mouse.VirtualMouse;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.questhelper.QuestHelperPlugin;
 import net.runelite.client.plugins.questhelper.questhelpers.QuestHelper;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
@@ -149,5 +147,11 @@ public class AccountBuilderPlugin extends Plugin {
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
         script.onNpcDespawned(npcDespawned);
+    }
+
+    @Subscribe
+    public void onGraphicsObjectCreated(GraphicsObjectCreated event)
+    {
+        script.onGraphicsObjectCreated(event);
     }
 }

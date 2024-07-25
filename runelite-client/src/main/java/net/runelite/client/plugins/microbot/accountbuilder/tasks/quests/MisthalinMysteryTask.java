@@ -5,6 +5,8 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameObjectSpawned;
+import net.runelite.api.events.GraphicsObjectCreated;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.bank.Rs2Bank;
@@ -12,6 +14,7 @@ import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
 import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
@@ -52,24 +55,6 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
             var mirrorLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), mirror.getLocalLocation());
             // <li>0 is true South</li><li>512 is true West</li><li>1024 is true North</li><li>1536 is true East</li>
             var orientation = mirror.getOrientation();
-
-            if (targetWardrobe == null || targetWardrobeTime < System.currentTimeMillis()) {
-                GameObject nextWardrobe = null;
-                while (nextWardrobe == null || nextWardrobe.getWorldLocation().getX() == mirror.getWorldLocation().getX()
-                        || nextWardrobe.getWorldLocation().getY() == mirror.getWorldLocation().getY()) {
-                    var wardrobes = Rs2GameObject.getGameObjects(30141);
-                    nextWardrobe = wardrobes.get(new Random().nextInt(wardrobes.size()));
-                    var nextWardrobeLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), nextWardrobe.getLocalLocation());
-
-                    if (mirrorLocation.getY() == 4828 && nextWardrobeLocation.getY() == 4825
-                            || mirrorLocation.getX() == 1624 && nextWardrobeLocation.getX() == 1627
-                            || mirrorLocation.getY() == 4831 && nextWardrobeLocation.getY() == 4834
-                            || mirrorLocation.getX() == 1622 && nextWardrobeLocation.getX() == 1619)
-                        nextWardrobe = null;
-                }
-                targetWardrobe = nextWardrobe;
-                targetWardrobeTime = Long.MAX_VALUE;
-            }
 
             var targetLocation = WorldPoint.fromLocalInstance(Microbot.getClient(), targetWardrobe.getLocalLocation());
 
@@ -167,15 +152,19 @@ public class MisthalinMysteryTask extends AccountBuilderQuestTask {
     }
 
     @Override
-    public void onChatMessage(ChatMessage chatMessage) {
-        if (chatMessage.getMessage().equals("The mirror can't go any further in that direction."))
-            targetWardrobeTime = 0;
-    }
-
-    @Override
-    public void onGameObjectSpawned(GameObjectSpawned event) {
-        if (event.getGameObject().getId() == 30142)
-            targetWardrobeTime = System.currentTimeMillis() + 1_000;
+    public void onGraphicsObjectCreated(GraphicsObjectCreated event)
+    {
+        if (event.getGraphicsObject().getId() == 483){
+            var location = WorldPoint.fromLocalInstance(Microbot.getClient(), event.getGraphicsObject().getLocation());
+            var mirror = Rs2Npc.getNpc(7641);
+            if (location.getX() != mirror.getWorldLocation().getX() && location.getY() != mirror.getWorldLocation().getY()
+                && !(mirror.getWorldLocation().getY() == 4828 && location.getY() == 4825
+                    || mirror.getWorldLocation().getX() == 1624 && location.getX() == 1627
+                    || mirror.getWorldLocation().getY() == 4831 && location.getY() == 4834
+                    || mirror.getWorldLocation().getX() == 1622 && location.getX() == 1619)) {
+                targetWardrobe = Rs2GameObject.getGameObject(event.getGraphicsObject().getLocation());
+            }
+        }
     }
 
     @Override

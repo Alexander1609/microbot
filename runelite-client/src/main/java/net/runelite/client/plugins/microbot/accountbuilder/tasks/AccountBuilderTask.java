@@ -2,10 +2,7 @@ package net.runelite.client.plugins.microbot.accountbuilder.tasks;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.runelite.api.GrandExchangeOfferState;
-import net.runelite.api.ItemID;
-import net.runelite.api.MenuAction;
-import net.runelite.api.Skill;
+import net.runelite.api.*;
 import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -22,6 +19,7 @@ import net.runelite.client.plugins.microbot.util.math.Random;
 import net.runelite.client.plugins.microbot.util.menu.NewMenuEntry;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.tabs.Rs2Tab;
+import net.runelite.client.plugins.microbot.util.tile.Rs2Tile;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
 import net.runelite.client.plugins.questhelper.collections.ItemCollections;
 import net.runelite.client.plugins.questhelper.questinfo.QuestHelperQuest;
@@ -171,6 +169,7 @@ public abstract class AccountBuilderTask {
     public void onHitsplatApplied(HitsplatApplied hitsplatApplied) { }
     public void onVarbitChanged(VarbitChanged event) { }
     public void onNpcDespawned(NpcDespawned npcDespawned) { }
+    public void onGraphicsObjectCreated(GraphicsObjectCreated event) { }
 
     protected void sleep(int time) {
         try {

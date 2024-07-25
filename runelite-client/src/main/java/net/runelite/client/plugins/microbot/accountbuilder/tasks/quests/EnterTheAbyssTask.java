@@ -36,7 +36,7 @@ public class EnterTheAbyssTask extends AccountBuilderQuestTask {
             if (npc != null)
                 Rs2Npc.interact(npc, "Use");
             else if (go != null)
-                Rs2GameObject.interact(go, "Use");
+                Rs2GameObject.interact(go, "Exit");
             Rs2Player.waitForWalking();
             startupQuest();
         }

@@ -5,10 +5,13 @@ import net.runelite.api.NpcID;
 import net.runelite.api.ObjectID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.plugins.microbot.quest.MQuestScript;
 import net.runelite.client.plugins.microbot.shortestpath.Restriction;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
+import net.runelite.client.plugins.microbot.util.dialogues.Rs2Dialogue;
 import net.runelite.client.plugins.microbot.util.gameobject.Rs2GameObject;
 import net.runelite.client.plugins.microbot.util.inventory.Rs2Inventory;
+import net.runelite.client.plugins.microbot.util.npc.Rs2Npc;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
 import net.runelite.client.plugins.microbot.util.widget.Rs2Widget;
@@ -47,25 +50,34 @@ public class PiratesTreasureTask extends AccountBuilderQuestTask {
 
     @Override
     protected void handleObjectStep(ObjectStep step) {
-        if (step.objectID == ObjectID.CRATE_2072 && !gotBananas){
-            if (isQuestRunning() && !Rs2Inventory.hasItemAmount(ItemID.BANANA, 10))
-                stopQuest();
+        if (step.objectID == ObjectID.CRATE_2072){
+            if (!gotBananas){
+                if (isQuestRunning() && !Rs2Inventory.hasItemAmount(ItemID.BANANA, 10))
+                    stopQuest();
 
-            if (!Rs2Inventory.hasItemAmount(ItemID.BANANA, 10)){
-                if (!Rs2Walker.walkTo(new WorldPoint(2916, 3163, 0)))
-                    return;
+                if (!Rs2Inventory.hasItemAmount(ItemID.BANANA, 10)){
+                    if (!Rs2Walker.walkTo(new WorldPoint(2916, 3163, 0)))
+                        return;
 
-                var closestBananaTree = Rs2GameObject.getGameObjects().stream().filter(x -> x.getId() >= 2073 && x.getId() < 2078)
-                        .sorted(Comparator.comparing(x -> Rs2Player.getWorldLocation().distanceTo(x.getWorldLocation())))
-                        .findFirst().orElse(null);
+                    var closestBananaTree = Rs2GameObject.getGameObjects().stream().filter(x -> x.getId() >= 2073 && x.getId() < 2078)
+                            .sorted(Comparator.comparing(x -> Rs2Player.getWorldLocation().distanceTo(x.getWorldLocation())))
+                            .findFirst().orElse(null);
 
-                if (closestBananaTree != null){
-                    Rs2GameObject.interact(closestBananaTree, "Pick");
-                    sleep(200, 400);
+                    if (closestBananaTree != null){
+                        Rs2GameObject.interact(closestBananaTree, "Pick");
+                        sleep(200, 400);
+                    }
+                } else if (!isQuestRunning()){
+                    startupQuest();
+                    gotBananas = true;
                 }
-            } else if (!isQuestRunning()){
-                startupQuest();
-                gotBananas = true;
+            } else if (MQuestScript.getFullText(step).contains("then talk to Luthas") && !Rs2Inventory.contains(ItemID.BANANA)){
+                if (!Rs2Dialogue.isInDialogue()){
+                    stopQuest();
+                    Rs2Npc.interact("Luthas", "Talk-to");
+                    Rs2Player.waitForWalking();
+                } else
+                    startupQuest();
             }
         }
     }

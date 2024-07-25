@@ -77,8 +77,8 @@ public class GoblinDiplomacyTask extends AccountBuilderQuestTask {
             if (!Rs2Walker.walkTo(new WorldPoint(3275, 3369, 0), 3))
                 return false;
 
-            if (!Rs2GameObject.interact(23628, "pick"))
-                Rs2GameObject.interact(23629, "pick");
+            if (!Rs2GameObject.interact(23628, "pick-from"))
+                Rs2GameObject.interact(23629, "pick-from");
 
             Rs2Player.waitForAnimation();
             return false;

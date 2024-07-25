@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.accountbuilder;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.api.GraphicsObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
@@ -285,6 +286,12 @@ public class AccountBuilderScript extends Script {
     public void onNpcDespawned(NpcDespawned npcDespawned) {
         if (task != null)
             task.onNpcDespawned(npcDespawned);
+    }
+
+    public void onGraphicsObjectCreated(GraphicsObjectCreated event)
+    {
+        if (task != null)
+            task.onGraphicsObjectCreated(event);
     }
 
     @Override
